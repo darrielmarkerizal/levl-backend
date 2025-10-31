@@ -1,0 +1,10 @@
+vendor/
+node_modules/
+storage/
+public/build/
+bootstrap/cache/
+.idea/
+.DS_Store
+.phpunit.cache/
+coverage/
+
