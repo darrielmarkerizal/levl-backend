@@ -27,12 +27,52 @@
         "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
-            "Database\\Seeders\\": "database/seeders/"
+            "Database\\Seeders\\": "database/seeders/",
+            "Modules\\Assessments\\": "Modules/Assessments/app/",
+            "Modules\\Assessments\\Database\\Factories\\": "Modules/Assessments/database/factories/",
+            "Modules\\Assessments\\Database\\Seeders\\": "Modules/Assessments/database/seeders/",
+            "Modules\\Auth\\": "Modules/Auth/app/",
+            "Modules\\Auth\\Database\\Factories\\": "Modules/Auth/database/factories/",
+            "Modules\\Auth\\Database\\Seeders\\": "Modules/Auth/database/seeders/",
+            "Modules\\Common\\": "Modules/Common/app/",
+            "Modules\\Common\\Database\\Factories\\": "Modules/Common/database/factories/",
+            "Modules\\Common\\Database\\Seeders\\": "Modules/Common/database/seeders/",
+            "Modules\\Enrollments\\": "Modules/Enrollments/app/",
+            "Modules\\Enrollments\\Database\\Factories\\": "Modules/Enrollments/database/factories/",
+            "Modules\\Enrollments\\Database\\Seeders\\": "Modules/Enrollments/database/seeders/",
+            "Modules\\Gamification\\": "Modules/Gamification/app/",
+            "Modules\\Gamification\\Database\\Factories\\": "Modules/Gamification/database/factories/",
+            "Modules\\Gamification\\Database\\Seeders\\": "Modules/Gamification/database/seeders/",
+            "Modules\\Grading\\": "Modules/Grading/app/",
+            "Modules\\Grading\\Database\\Factories\\": "Modules/Grading/database/factories/",
+            "Modules\\Grading\\Database\\Seeders\\": "Modules/Grading/database/seeders/",
+            "Modules\\Learning\\": "Modules/Learning/app/",
+            "Modules\\Learning\\Database\\Factories\\": "Modules/Learning/database/factories/",
+            "Modules\\Learning\\Database\\Seeders\\": "Modules/Learning/database/seeders/",
+            "Modules\\Notifications\\": "Modules/Notifications/app/",
+            "Modules\\Notifications\\Database\\Factories\\": "Modules/Notifications/database/factories/",
+            "Modules\\Notifications\\Database\\Seeders\\": "Modules/Notifications/database/seeders/",
+            "Modules\\Operations\\": "Modules/Operations/app/",
+            "Modules\\Operations\\Database\\Factories\\": "Modules/Operations/database/factories/",
+            "Modules\\Operations\\Database\\Seeders\\": "Modules/Operations/database/seeders/",
+            "Modules\\Schemes\\": "Modules/Schemes/app/",
+            "Modules\\Schemes\\Database\\Factories\\": "Modules/Schemes/database/factories/",
+            "Modules\\Schemes\\Database\\Seeders\\": "Modules/Schemes/database/seeders/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": "tests/"
+            "Tests\\": "tests/",
+            "Modules\\Assessments\\Tests\\": "Modules/Assessments/tests/",
+            "Modules\\Auth\\Tests\\": "Modules/Auth/tests/",
+            "Modules\\Common\\Tests\\": "Modules/Common/tests/",
+            "Modules\\Enrollments\\Tests\\": "Modules/Enrollments/tests/",
+            "Modules\\Gamification\\Tests\\": "Modules/Gamification/tests/",
+            "Modules\\Grading\\Tests\\": "Modules/Grading/tests/",
+            "Modules\\Learning\\Tests\\": "Modules/Learning/tests/",
+            "Modules\\Notifications\\Tests\\": "Modules/Notifications/tests/",
+            "Modules\\Operations\\Tests\\": "Modules/Operations/tests/",
+            "Modules\\Schemes\\Tests\\": "Modules/Schemes/tests/"
         }
     },
     "scripts": {
