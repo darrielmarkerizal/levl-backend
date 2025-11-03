@@ -8,6 +8,7 @@ use Modules\Auth\Models\OtpCode;
 use Modules\Auth\Models\User;
 use Modules\Common\Models\SystemSetting;
 use Modules\Auth\Mail\VerifyEmailLinkMail;
+use Modules\Auth\Mail\ChangeEmailVerificationMail;
 
 class EmailVerificationService
 {
@@ -118,7 +119,7 @@ class EmailVerificationService
         $baseUrl = rtrim(config('app.url'), '/');
         $verifyUrl = $baseUrl.'/api/v1/profile/email/verify?uuid='.$uuid.'&code='.$otp->code;
 
-        Mail::to($newEmail)->send(new VerifyEmailLinkMail($user, $verifyUrl, $ttlMinutes, $code));
+        Mail::to($newEmail)->send(new ChangeEmailVerificationMail($user, $newEmail, $verifyUrl, $ttlMinutes, $code));
 
         return $uuid;
     }
