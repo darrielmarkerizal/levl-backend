@@ -18,7 +18,8 @@ class EnsureEmailVerified
 
         if ($request->expectsJson()) {
             return response()->json([
-                'message' => 'Email belum terverifikasi. Silakan verifikasi email Anda terlebih dahulu.'
+                'status' => 'error',
+                'message' => 'Email belum terverifikasi. Silakan verifikasi email Anda terlebih dahulu.',
             ], 403);
         }
 

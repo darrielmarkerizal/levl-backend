@@ -10,7 +10,7 @@ use Modules\Auth\Http\Requests\LoginRequest;
 use Modules\Auth\Http\Requests\RegisterRequest;
 use Modules\Auth\Services\AuthService;
 use Modules\Auth\Services\EmailVerificationService;
-use Modules\Auth\Http\Responses\ApiResponse;
+use App\Support\ApiResponse;
 
 class AuthApiController extends Controller
 {
@@ -76,12 +76,12 @@ class AuthApiController extends Controller
         /** @var \Modules\Auth\Models\User|null $user */
         $user = auth('api')->user();
         if (!$user) {
-            return $this->error('Tidak terotorisasi. Token akses tidak ditemukan atau tidak valid.', 401);
+            return $this->error('Tidak terotorisasi.', 401);
         }
 
         $currentJwt = $request->bearerToken();
         if (!$currentJwt) {
-            return $this->error('Tidak terotorisasi. Token akses tidak ditemukan di header Authorization.', 401);
+            return $this->error('Tidak terotorisasi.', 401);
         }
 
         $this->auth->logout($user, $currentJwt, $request->input('refresh_token'));
@@ -94,7 +94,7 @@ class AuthApiController extends Controller
         /** @var \Modules\Auth\Models\User|null $user */
         $user = auth('api')->user();
         if (!$user) {
-            return $this->error('Tidak terotorisasi. Token akses tidak ditemukan atau tidak valid.', 401);
+            return $this->error('Tidak terotorisasi.', 401);
         }
 
         return $this->success($user->toArray(), 'Profil berhasil diambil.');
@@ -105,7 +105,7 @@ class AuthApiController extends Controller
         /** @var \Modules\Auth\Models\User|null $user */
         $user = auth('api')->user();
         if (!$user) {
-            return $this->error('Tidak terotorisasi. Token akses tidak ditemukan atau tidak valid.', 401);
+            return $this->error('Tidak terotorisasi.', 401);
         }
 
         if ($user->email_verified_at && $user->status === 'active') {

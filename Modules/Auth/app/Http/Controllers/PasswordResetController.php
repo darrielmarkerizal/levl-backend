@@ -13,7 +13,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password as PasswordRule;
 use Modules\Auth\Http\Requests\ResetPasswordRequest;
 use Modules\Auth\Http\Requests\ChangePasswordRequest;
-use Modules\Auth\Http\Responses\ApiResponse;
+use App\Support\ApiResponse;
 use Modules\Auth\Mail\ResetPasswordMail;
 use Modules\Auth\Models\User;
 use Modules\Auth\Models\PasswordResetToken;
@@ -111,7 +111,7 @@ class PasswordResetController extends Controller
         /** @var User|null $user */
         $user = auth('api')->user();
         if (!$user) {
-            return $this->error('Tidak terotorisasi. Token akses tidak ditemukan atau tidak valid.', 401);
+            return $this->error('Tidak terotorisasi.', 401);
         }
 
         if (!Hash::check($request->string('current_password'), $user->password)) {
