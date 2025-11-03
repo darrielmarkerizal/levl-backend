@@ -3,7 +3,7 @@
     "alias": "schemes",
     "description": "",
     "keywords": [],
-    "priority": 0,
+    "priority": -95,
     "providers": [
         "Modules\\Schemes\\Providers\\SchemesServiceProvider"
     ],

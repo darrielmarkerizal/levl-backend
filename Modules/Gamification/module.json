@@ -3,7 +3,7 @@
     "alias": "gamification",
     "description": "",
     "keywords": [],
-    "priority": 0,
+    "priority": 50,
     "providers": [
         "Modules\\Gamification\\Providers\\GamificationServiceProvider"
     ],

@@ -3,7 +3,7 @@
     "alias": "learning",
     "description": "",
     "keywords": [],
-    "priority": 0,
+    "priority": 30,
     "providers": [
         "Modules\\Learning\\Providers\\LearningServiceProvider"
     ],

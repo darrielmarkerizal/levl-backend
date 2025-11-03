@@ -3,7 +3,7 @@
     "alias": "common",
     "description": "",
     "keywords": [],
-    "priority": 0,
+    "priority": 80,
     "providers": [
         "Modules\\Common\\Providers\\CommonServiceProvider"
     ],

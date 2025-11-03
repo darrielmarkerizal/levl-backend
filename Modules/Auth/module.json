@@ -3,7 +3,7 @@
     "alias": "auth",
     "description": "",
     "keywords": [],
-    "priority": 0,
+    "priority": -100,
     "providers": [
         "Modules\\Auth\\Providers\\AuthServiceProvider"
     ],

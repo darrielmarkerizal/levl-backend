@@ -3,7 +3,7 @@
     "alias": "assessments",
     "description": "",
     "keywords": [],
-    "priority": 0,
+    "priority": 10,
     "providers": [
         "Modules\\Assessments\\Providers\\AssessmentsServiceProvider"
     ],

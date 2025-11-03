@@ -3,7 +3,7 @@
     "alias": "notifications",
     "description": "",
     "keywords": [],
-    "priority": 0,
+    "priority": 60,
     "providers": [
         "Modules\\Notifications\\Providers\\NotificationsServiceProvider"
     ],

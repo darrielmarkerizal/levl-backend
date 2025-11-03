@@ -3,7 +3,7 @@
     "alias": "grading",
     "description": "",
     "keywords": [],
-    "priority": 0,
+    "priority": 40,
     "providers": [
         "Modules\\Grading\\Providers\\GradingServiceProvider"
     ],

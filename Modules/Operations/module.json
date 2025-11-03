@@ -3,7 +3,7 @@
     "alias": "operations",
     "description": "",
     "keywords": [],
-    "priority": 0,
+    "priority": 70,
     "providers": [
         "Modules\\Operations\\Providers\\OperationsServiceProvider"
     ],
