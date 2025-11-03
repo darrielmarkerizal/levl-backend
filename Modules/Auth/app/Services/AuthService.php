@@ -9,11 +9,14 @@ use Illuminate\Validation\ValidationException;
 use Tymon\JWTAuth\JWTAuth;
 use Modules\Auth\Repositories\AuthRepository;
 use Modules\Auth\Models\User;
+use Modules\Auth\Interfaces\AuthRepositoryInterface;
+use Modules\Auth\Interfaces\AuthServiceInterface;
+use Modules\Auth\Support\TokenPairDTO;
 
-class AuthService
+class AuthService implements AuthServiceInterface
 {
     public function __construct(
-        private readonly AuthRepository $authRepository,
+        private readonly AuthRepositoryInterface $authRepository,
         private readonly JWTAuth $jwt
     ) {}
 
@@ -31,13 +34,13 @@ class AuthService
             ttlMinutes: (int) config('jwt.refresh_ttl')
         );
 
-        return [
-            'user' => $user,
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => $this->jwt->factory()->getTTL() * 60,
-            'refresh_token' => $refresh->getAttribute('plain_token'),
-        ];
+        $pair = new TokenPairDTO(
+            accessToken: $token,
+            expiresIn: $this->jwt->factory()->getTTL() * 60,
+            refreshToken: $refresh->getAttribute('plain_token')
+        );
+
+        return [ 'user' => $user ] + $pair->toArray();
     }
 
     public function login(string $login, string $password, string $ip, ?string $userAgent): array
@@ -64,13 +67,13 @@ class AuthService
             ttlMinutes: (int) config('jwt.refresh_ttl')
         );
 
-        return [
-            'user' => $user,
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => $this->jwt->factory()->getTTL() * 60,
-            'refresh_token' => $refresh->getAttribute('plain_token'),
-        ];
+        $pair = new TokenPairDTO(
+            accessToken: $token,
+            expiresIn: $this->jwt->factory()->getTTL() * 60,
+            refreshToken: $refresh->getAttribute('plain_token')
+        );
+
+        return [ 'user' => $user ] + $pair->toArray();
     }
 
     public function refresh(User $currentUser, string $refreshToken): array
@@ -94,12 +97,13 @@ class AuthService
             ttlMinutes: (int) config('jwt.refresh_ttl')
         );
 
-        return [
-            'access_token' => $accessToken,
-            'token_type' => 'bearer',
-            'expires_in' => $this->jwt->factory()->getTTL() * 60,
-            'refresh_token' => $newRefresh->getAttribute('plain_token'),
-        ];
+        $pair = new TokenPairDTO(
+            accessToken: $accessToken,
+            expiresIn: $this->jwt->factory()->getTTL() * 60,
+            refreshToken: $newRefresh->getAttribute('plain_token')
+        );
+
+        return $pair->toArray();
     }
 
     public function logout(User $user, string $currentJwt, ?string $refreshToken = null): void

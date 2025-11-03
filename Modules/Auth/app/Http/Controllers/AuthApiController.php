@@ -10,9 +10,12 @@ use Modules\Auth\Http\Requests\LoginRequest;
 use Modules\Auth\Http\Requests\RegisterRequest;
 use Modules\Auth\Services\AuthService;
 use Tymon\JWTAuth\Facades\JWTAuth as JWT;
+use Modules\Auth\Http\Responses\ApiResponse;
 
 class AuthApiController extends Controller
 {
+    use ApiResponse;
+
     public function __construct(private readonly AuthService $auth)
     {
         
@@ -26,11 +29,7 @@ class AuthApiController extends Controller
             userAgent: $request->userAgent()
         );
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Registrasi berhasil',
-            'data' => $data,
-        ], 201);
+        return $this->created($data, 'Registrasi berhasil');
     }
 
     public function login(LoginRequest $request): JsonResponse
@@ -45,18 +44,10 @@ class AuthApiController extends Controller
                 userAgent: $request->userAgent()
             );
         } catch (ValidationException $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Validasi gagal',
-                'errors' => $e->errors(),
-            ], 422);
+            return $this->error('Validasi gagal', 422, $e->errors());
         }
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Login berhasil',
-            'data' => $data,
-        ], 200);
+        return $this->success($data, 'Login berhasil');
     }
 
     public function refresh(Request $request): JsonResponse
@@ -65,29 +56,15 @@ class AuthApiController extends Controller
             'refresh_token' => ['required', 'string'],
         ]);
 
-        if (!auth('api')->check()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Tidak terotorisasi: header Authorization Bearer wajib dikirim dan harus valid.',
-            ], 401);
-        }
-
         try {
             /** @var \Modules\Auth\Models\User $authUser */
             $authUser = auth('api')->user();
             $data = $this->auth->refresh($authUser, $request->string('refresh_token'));
         } catch (ValidationException $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Refresh token tidak valid atau tidak cocok dengan akun saat ini.',
-            ], 401);
+            return $this->error('Refresh token tidak valid atau tidak cocok dengan akun saat ini.', 401);
         }
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Token berhasil diperbarui',
-            'data' => $data,
-        ], 200);
+        return $this->success($data, 'Token berhasil diperbarui');
     }
 
     public function logout(Request $request): JsonResponse
@@ -99,26 +76,17 @@ class AuthApiController extends Controller
         /** @var \Modules\Auth\Models\User|null $user */
         $user = auth('api')->user();
         if (!$user) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Tidak terotorisasi: header Authorization Bearer wajib dikirim dan harus valid.',
-            ], 401);
+            return $this->error('Tidak terotorisasi: header Authorization Bearer wajib dikirim dan harus valid.', 401);
         }
 
         $currentJwt = $request->bearerToken();
         if (!$currentJwt) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Tidak terotorisasi: token akses tidak ditemukan di header Authorization.',
-            ], 401);
+            return $this->error('Tidak terotorisasi: token akses tidak ditemukan di header Authorization.', 401);
         }
 
         $this->auth->logout($user, $currentJwt, $request->input('refresh_token'));
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Logout berhasil',
-        ], 200);
+        return $this->success([], 'Logout berhasil');
     }
 
     public function profile(): JsonResponse
@@ -126,17 +94,10 @@ class AuthApiController extends Controller
         /** @var \Modules\Auth\Models\User|null $user */
         $user = auth('api')->user();
         if (!$user) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Tidak terotorisasi: header Authorization Bearer wajib dikirim dan harus valid.',
-            ], 401);
+            return $this->error('Tidak terotorisasi: header Authorization Bearer wajib dikirim dan harus valid.', 401);
         }
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Profil berhasil diambil',
-            'data' => $user,
-        ], 200);
+        return $this->success($user->toArray(), 'Profil berhasil diambil');
     }
 }
 

@@ -7,8 +7,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Modules\Auth\Models\JwtRefreshToken;
 use Modules\Auth\Models\User;
+use Modules\Auth\Interfaces\AuthRepositoryInterface;
 
-class AuthRepository
+class AuthRepository implements AuthRepositoryInterface
 {
     public function findActiveUserByLogin(string $login): ?User
     {

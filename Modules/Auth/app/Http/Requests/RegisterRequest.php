@@ -3,9 +3,12 @@
 namespace Modules\Auth\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Password;
+use Modules\Auth\Http\Requests\Concerns\HasCommonValidationMessages;
 
 class RegisterRequest extends FormRequest
 {
+    use HasCommonValidationMessages;
     public function authorize(): bool
     {
         return true;
@@ -20,16 +23,15 @@ class RegisterRequest extends FormRequest
             'password' => [
                 'required',
                 'string',
-                'min:8',
+                Password::min(8)->mixedCase()->numbers()->symbols(),
                 'confirmed',
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z\\d]).{8,}$/'
             ],
         ];
     }
 
     public function messages(): array
     {
-        return [
+        return array_merge($this->commonMessages(), [
             'name.required' => 'Nama wajib diisi.',
             'name.string' => 'Nama harus berupa teks.',
             'name.max' => 'Nama maksimal 255 karakter.',
@@ -48,8 +50,10 @@ class RegisterRequest extends FormRequest
             'password.string' => 'Password harus berupa teks.',
             'password.min' => 'Password minimal 8 karakter.',
             'password.confirmed' => 'Konfirmasi password tidak sama.',
-            'password.regex' => 'Password harus mengandung minimal 1 huruf besar, 1 huruf kecil, 1 angka, dan 1 karakter spesial.',
-        ];
+            'password.mixed' => 'Password harus mengandung huruf besar dan huruf kecil.',
+            'password.numbers' => 'Password harus mengandung angka.',
+            'password.symbols' => 'Password harus mengandung karakter spesial.',
+        ]);
     }
 }
 
