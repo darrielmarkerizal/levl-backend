@@ -365,9 +365,9 @@ class AuthApiController extends Controller
         }
 
         $isAllowedRole = $target->hasRole('admin') || $target->hasRole('super-admin') || $target->hasRole('instructor');
-        $isInactive = ($target->status ?? null) !== 'active';
-        if (! ($isAllowedRole && $isInactive)) {
-            return $this->error('Hanya untuk akun admin, superadmin, atau instruktur yang belum aktif.', 422);
+        $isPending = ($target->status ?? null) === 'pending';
+        if (! ($isAllowedRole && $isPending)) {
+            return $this->error('Hanya untuk akun admin, superadmin, atau instruktur yang berstatus pending.', 422);
         }
 
         $passwordPlain = (new \ReflectionClass($this->auth))->getMethod('generatePasswordFromNameEmail')->invoke($this->auth, $target->name, $target->email);
