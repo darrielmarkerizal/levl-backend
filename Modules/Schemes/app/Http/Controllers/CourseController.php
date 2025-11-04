@@ -34,7 +34,16 @@ class CourseController extends Controller
     public function store(CourseRequest $request)
     {
         $data = $request->validated();
-        $course = $this->service->create($data);
+        // Handle file uploads
+        if ($request->hasFile('thumbnail')) {
+            $data['thumbnail_path'] = app(\App\Services\UploadService::class)->storePublic($request->file('thumbnail'), 'courses/thumbnails');
+        }
+        if ($request->hasFile('banner')) {
+            $data['banner_path'] = app(\App\Services\UploadService::class)->storePublic($request->file('banner'), 'courses/banners');
+        }
+        /** @var \Modules\Auth\Models\User|null $actor */
+        $actor = auth('api')->user();
+        $course = $this->service->create($data, $actor);
 
         return $this->created(['course' => $course], 'Course created');
     }
@@ -52,6 +61,12 @@ class CourseController extends Controller
     public function update(CourseRequest $request, int $course)
     {
         $data = $request->validated();
+        if ($request->hasFile('thumbnail')) {
+            $data['thumbnail_path'] = app(\App\Services\UploadService::class)->storePublic($request->file('thumbnail'), 'courses/thumbnails');
+        }
+        if ($request->hasFile('banner')) {
+            $data['banner_path'] = app(\App\Services\UploadService::class)->storePublic($request->file('banner'), 'courses/banners');
+        }
         $updated = $this->service->update($course, $data);
         if (! $updated) {
             return $this->error('Course not found', 404);

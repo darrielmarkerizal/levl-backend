@@ -52,7 +52,7 @@ class CourseRepository
         if (is_string($value)) {
             $trim = trim($value);
             if ($trim !== '' && ($trim[0] === '[' || str_starts_with($trim, '%5B'))) {
-                // try decode JSON or URL-encoded JSON-like arrays
+
                 $decoded = json_decode($trim, true);
                 if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
                     return $decoded;
@@ -64,7 +64,6 @@ class CourseRepository
                 }
             }
 
-            // fallback single value string like "3"
             return [$value];
         }
 

@@ -14,8 +14,8 @@ class Course extends Model
 
     protected $fillable = [
         'code', 'slug', 'title', 'short_desc', 'type',
-        'level_tag', 'category', 'tags_json', 'outcomes_json',
-        'prereq_text', 'duration_estimate', 'thumbnail_path',
+        'level_tag', 'category_id', 'tags_json', 'outcomes_json',
+        'prereq_json', 'duration_estimate', 'thumbnail_path',
         'banner_path', 'visibility', 'progression_mode',
         'status', 'published_at', 'instructor_id',
     ];
@@ -23,6 +23,7 @@ class Course extends Model
     protected $casts = [
         'tags_json' => 'array',
         'outcomes_json' => 'array',
+        'prereq_json' => 'array',
         'published_at' => 'datetime',
     ];
 

@@ -35,13 +35,17 @@ class CourseService
         return $this->repository->paginate($params, $perPage);
     }
 
-    public function create(array $data): Course
+    public function create(array $data, ?\Modules\Auth\Models\User $actor = null): Course
     {
 
         if (empty($data['slug'])) {
             $data['slug'] = $this->generateUniqueSlug($data['title'] ?? $data['code'] ?? Str::random(8));
         } else {
             $data['slug'] = $this->generateUniqueSlug($data['slug']);
+        }
+
+        if (empty($data['status'])) {
+            $data['status'] = 'draft';
         }
 
         $course = $this->repository->create($data);
@@ -52,6 +56,17 @@ class CourseService
 
         if (($course->status ?? null) === 'published') {
             CoursePublished::dispatch($course);
+        }
+
+        $adminIds = [];
+        if (! empty($data['course_admins']) && is_array($data['course_admins'])) {
+            $adminIds = array_map('intval', $data['course_admins']);
+        }
+        if ($actor && ($actor->hasRole('admin') || $actor->hasRole('super-admin'))) {
+            $adminIds[] = (int) $actor->id;
+        }
+        if (! empty($adminIds) && method_exists($course, 'admins')) {
+            $course->admins()->syncWithoutDetaching(array_unique($adminIds));
         }
 
         return $course;
