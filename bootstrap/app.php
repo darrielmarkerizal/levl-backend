@@ -78,10 +78,37 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->render(function (ValidationException $e, \Illuminate\Http\Request $request) {
+            $errors = $e->errors();
+            
+            
+            $isLoginRoute = $request->is('api/v1/auth/login') || 
+                           $request->routeIs('auth.login') ||
+                           str_contains($request->path(), 'auth/login');
+            
+            if ($isLoginRoute && isset($errors['login'])) {
+                $loginErrors = $errors['login'];
+                $isCredentialError = collect($loginErrors)->first(function ($error) {
+                    return stripos($error, 'username') !== false ||
+                           stripos($error, 'email') !== false ||
+                           stripos($error, 'password') !== false ||
+                           stripos($error, 'salah') !== false ||
+                           stripos($error, 'kredensial') !== false ||
+                           stripos($error, 'credential') !== false;
+                });
+                
+                if ($isCredentialError) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Username/email atau password salah.',
+                        'errors' => $errors,
+                    ], 422);
+                }
+            }
+            
             return response()->json([
                 'status' => 'error',
                 'message' => 'Data yang Anda kirim tidak valid. Periksa kembali isian Anda.',
-                'errors' => $e->errors(),
+                'errors' => $errors,
             ], 422);
         });
 

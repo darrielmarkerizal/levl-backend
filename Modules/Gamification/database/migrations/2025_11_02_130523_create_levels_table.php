@@ -12,11 +12,10 @@ return new class extends Migration {
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('course_id')->nullable()->constrained('courses')->onDelete('cascade');
             $table->integer('current_level')->default(1);
-            $table->integer('current_points')->default(0);
-            $table->integer('points_to_next')->default(100);
             $table->timestamps();
 
-            $table->unique(['user_id', 'course_id']);
+            $table->unique(['user_id', 'course_id'], 'levels_user_course_unique');
+            $table->index(['user_id', 'course_id'], 'levels_user_course_idx');
         });
     }
 

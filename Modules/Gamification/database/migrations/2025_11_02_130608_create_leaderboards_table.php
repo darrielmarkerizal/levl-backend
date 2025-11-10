@@ -11,11 +11,11 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('course_id')->nullable()->constrained('courses')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->integer('total_points')->default(0);
             $table->integer('rank')->nullable();
             $table->timestamps();
 
-            $table->unique(['course_id', 'user_id']);
+            $table->unique(['course_id', 'user_id'], 'leaderboards_course_user_unique');
+            $table->index(['user_id', 'course_id'], 'leaderboards_user_course_idx');
         });
     }
 

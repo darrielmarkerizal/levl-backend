@@ -75,7 +75,7 @@ class AuthService implements AuthServiceInterface
             $this->throttle->hitAttempt($login, $ip);
             $this->throttle->recordFailureAndMaybeLock($login);
             throw ValidationException::withMessages([
-                'login' => 'Kredensial tidak valid.',
+                'login' => 'Username/email atau password salah.',
             ]);
         }
 
