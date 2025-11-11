@@ -11,7 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('social_accounts', function (Blueprint $table) {
+        if (!Schema::hasTable('social_accounts')) {
+            Schema::create('social_accounts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('provider_name', 50);
@@ -21,7 +22,8 @@ return new class extends Migration
             $table->timestamps();
         
             $table->unique(['provider_name', 'provider_id']);
-        });        
+            });
+        }
     }
 
     /**
