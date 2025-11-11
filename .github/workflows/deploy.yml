@@ -5,12 +5,10 @@ on:
     branches: ["main"]
   workflow_dispatch:
 
-# Hindari deploy overlap saat ada push bertubi-tubi
 concurrency:
   group: deploy-vps-laravel-${{ github.ref }}
   cancel-in-progress: true
 
-# Least-privilege for GHA token
 permissions:
   contents: read
 
@@ -22,7 +20,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    environment: production  # pakai ini kalau secrets disimpan di Environment "production"
+    environment: production
 
     steps:
       - name: Checkout (metadata only)
@@ -30,14 +28,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      # Validasi secrets via env + indirect expansion (tanpa ekspresi array GHA)
       - name: Validate required secrets
         env:
           SSH_HOST:   ${{ secrets.SSH_HOST }}
           SSH_USER:   ${{ secrets.SSH_USER }}
           SSH_KEY:    ${{ secrets.SSH_KEY }}
           APP_DIR:    ${{ secrets.APP_DIR }}
-          SSH_PORT:   ${{ secrets.SSH_PORT }}  # optional
+          SSH_PORT:   ${{ secrets.SSH_PORT }}
         run: |
           set -euo pipefail
           missing=0
@@ -47,10 +44,8 @@ jobs:
               missing=1
             fi
           done
-          # Info: SSH_PORT opsional; jika kosong, kita fallback 22 di step berikutnya
           exit $missing
 
-      # (Opsional) echo ringkas info commit yang di-deploy
       - name: Deployment context
         run: |
           echo "Repo: ${{ github.repository }}"
@@ -64,12 +59,9 @@ jobs:
           host:     ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key:      ${{ secrets.SSH_KEY }}
-          port:     ${{ secrets.SSH_PORT && secrets.SSH_PORT || '22' }}
+          port:     ${{ secrets.SSH_PORT || '22' }}
           script_stop: true
-          # Biar step ini juga punya timeout internal (detik)
-          command_timeout: 1200
-          # NOTE: Kalau kamu mau pin host fingerprint:
-          # host_fingerprint: ${{ secrets.SSH_FINGERPRINT }}
+          command_timeout: 20m  # ✅ pakai format durasi yang benar
           script: |
             set -euo pipefail
             echo ">>> Host check"
