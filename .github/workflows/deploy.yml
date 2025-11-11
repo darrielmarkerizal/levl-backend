@@ -28,29 +28,60 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Validate required secrets
+      - name: Validate required secrets (spesifik)
         env:
-          SSH_HOST:   ${{ secrets.SSH_HOST }}
-          SSH_USER:   ${{ secrets.SSH_USER }}
-          SSH_KEY:    ${{ secrets.SSH_KEY }}
-          APP_DIR:    ${{ secrets.APP_DIR }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_KEY:  ${{ secrets.SSH_KEY }}
+          APP_DIR:  ${{ secrets.APP_DIR }}
         run: |
           set -euo pipefail
+          echo "::group::Validating secrets"
           missing=0
           for v in SSH_HOST SSH_USER SSH_KEY APP_DIR; do
             if [ -z "${!v:-}" ]; then
               echo "::error::Missing secret: $v"
               missing=1
+            else
+              echo "::notice::Found $v"
             fi
           done
+
+          # Host must look like IPv4 or domain (sederhana)
+          if [[ -n "${SSH_HOST:-}" ]]; then
+            if ! [[ "$SSH_HOST" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ || "$SSH_HOST" =~ ^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ || "$SSH_HOST" =~ ^[a-zA-Z0-9.-]+$ ]]; then
+              echo "::error::SSH_HOST format tidak valid: $SSH_HOST"
+              missing=1
+            fi
+          fi
+
+          # Key must start with BEGIN (tanpa mengekspose isinya)
+          if [[ -n "${SSH_KEY:-}" ]]; then
+            first_line="$(printf '%s' "$SSH_KEY" | head -n1 || true)"
+            if ! [[ "$first_line" =~ ^-----BEGIN\ .*PRIVATE\ KEY-----$ ]]; then
+              echo "::error::SSH_KEY tidak berformat OpenSSH/PEM yang valid (first line: $first_line)"
+              missing=1
+            fi
+          fi
+
+          # APP_DIR harus absolute path di server
+          if [[ -n "${APP_DIR:-}" ]]; then
+            if [[ "$APP_DIR" != /* ]]; then
+              echo "::error::APP_DIR harus absolute path, sekarang: $APP_DIR"
+              missing=1
+            fi
+          fi
+          echo "::endgroup::"
           exit $missing
 
       - name: Deployment context
         run: |
+          echo "::group::Deployment context"
           echo "Repo : ${{ github.repository }}"
           echo "Ref  : ${{ github.ref }}"
           echo "SHA  : ${{ github.sha }}"
           echo "Actor: ${{ github.actor }}"
+          echo "::endgroup::"
 
       - name: SSH Deploy
         uses: appleboy/ssh-action@v1.2.0
@@ -60,18 +91,75 @@ jobs:
           key:      ${{ secrets.SSH_KEY }}
           script_stop: true
           command_timeout: 20m
+          # debug: true  # aktifkan saat perlu investigasi
           script: |
             set -euo pipefail
-            echo ">>> Host check"
-            uname -a || true
-            whoami || true
-            date || true
 
-            echo ">>> Go to app dir"
+            echo "::group::Host & env check"
+            echo "User   : $(whoami || true)"
+            echo "Kernel : $(uname -a || true)"
+            echo "Date   : $(date || true)"
+            echo "APP_DIR: '${{ secrets.APP_DIR }}'"
+            echo "::endgroup::"
+
+            echo "::group::Check APP_DIR existence & permissions"
+            if [ ! -d "${{ secrets.APP_DIR }}" ]; then
+              echo "::error::APP_DIR tidak ditemukan di server: '${{ secrets.APP_DIR }}'"
+              exit 71
+            fi
             cd "${{ secrets.APP_DIR }}"
+            if [ ! -w "." ]; then
+              echo "::error::Tidak punya write permission di APP_DIR"
+              exit 72
+            fi
+            echo "::notice::APP_DIR OK"
+            echo "::endgroup::"
 
-            echo ">>> Ensure deploy.sh executable"
-            chmod +x deploy.sh
+            echo "::group::Git sanity checks"
+            if ! command -v git >/dev/null 2>&1; then
+              echo "::error::git tidak tersedia di server"
+              exit 73
+            fi
+            git rev-parse --is-inside-work-tree >/dev/null 2>&1 || { echo "::error::Bukan direktori git"; exit 74; }
+            echo "::notice::Remote: $(git remote -v | head -n1 || true)"
+            echo "::endgroup::"
 
-            echo ">>> Run deploy.sh"
+            echo "::group::Ensure deploy.sh executable"
+            if [ ! -f "./deploy.sh" ]; then
+              echo "::error::deploy.sh tidak ada di APP_DIR"
+              exit 75
+            fi
+            chmod +x ./deploy.sh
+            echo "::endgroup::"
+
+            echo "::group::Runtime checks (php/composer)"
+            if ! command -v php >/dev/null 2>&1; then
+              echo "::error::PHP tidak ditemukan"
+              exit 76
+            fi
+            php -v | head -n 2 || true
+
+            if ! command -v composer >/dev/null 2>&1; then
+              echo "::warning::Composer tidak ditemukan di PATH, deploy.sh harus menangani sendiri"
+            else
+              composer --version || true
+            fi
+            echo "::endgroup::"
+
+            echo "::group::Run deploy.sh"
+            set +e
             ./deploy.sh
+            code=$?
+            set -e
+            if [ $code -ne 0 ]; then
+              echo "::error::deploy.sh gagal dengan exit code $code"
+              # Optional: tampilkan log laravel terakhir bila ada
+              if [ -f storage/logs/laravel.log ]; then
+                echo "::group::Tail laravel.log (100 lines)"
+                tail -n 100 storage/logs/laravel.log || true
+                echo "::endgroup::"
+              fi
+              exit $code
+            fi
+            echo "::notice::Deploy sukses"
+            echo "::endgroup::"
