@@ -420,7 +420,6 @@ class ProgressionService
         $progress = CourseProgress::query()
             ->firstOrNew([
                 'enrollment_id' => $enrollment->id,
-                'course_id' => $course->id,
             ]);
 
         $previousStatus = $progress->exists ? $progress->status : 'not_started';
@@ -444,7 +443,8 @@ class ProgressionService
 
         $courseJustCompleted = $previousStatus !== 'completed' && $status === 'completed';
 
-        $enrollment->progress_percent = $progressPercent;
+        // Update enrollment status and completed_at, but not progress_percent
+        // Progress is now stored in course_progress table
         if ($status === 'completed') {
             $enrollment->completed_at = $enrollment->completed_at ?? Carbon::now();
             $enrollment->status = 'completed';

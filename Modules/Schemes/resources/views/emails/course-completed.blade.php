@@ -142,12 +142,18 @@
                 @if($enrollment->completed_at)
                 <p><strong>Tanggal Selesai:</strong> {{ $enrollment->completed_at->format('d F Y, H:i') }}</p>
                 @endif
-                <p><strong>Progress:</strong> {{ number_format($enrollment->progress_percent, 1) }}%</p>
+                @php
+                    $progress = $enrollment->courseProgress?->progress_percent ?? 0;
+                @endphp
+                <p><strong>Progress:</strong> {{ number_format($progress, 1) }}%</p>
             </div>
 
             <div class="stats">
+                @php
+                    $progress = $enrollment->courseProgress?->progress_percent ?? 0;
+                @endphp
                 <div class="stat-item">
-                    <p class="stat-value">{{ number_format($enrollment->progress_percent, 0) }}%</p>
+                    <p class="stat-value">{{ number_format($progress, 0) }}%</p>
                     <p class="stat-label">Progress</p>
                 </div>
                 <div class="stat-item">

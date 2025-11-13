@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Modules\Operations\Models\SystemAudit;
+use Modules\Common\Models\Audit;
 use Symfony\Component\HttpFoundation\Response;
 
 class LogApiAction
@@ -56,12 +56,15 @@ class LogApiAction
                 $meta['route_parameters'] = $request->route()->parameters();
             }
 
-            SystemAudit::create([
+            Audit::create([
                 'action' => $action,
+                'actor_id' => $user?->id,
+                'actor_type' => $user ? get_class($user) : null,
                 'user_id' => $user?->id,
                 'module' => $module,
                 'target_table' => $targetTable,
                 'target_id' => $targetId,
+                'context' => 'application',
                 'ip_address' => $request->ip(),
                 'user_agent' => $request->userAgent(),
                 'meta' => $meta,

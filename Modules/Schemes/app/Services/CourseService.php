@@ -36,7 +36,9 @@ class CourseService
     public function create(array $data, ?\Modules\Auth\Models\User $actor = null): Course
     {
         $tags = $data['tags_list'] ?? [];
-        unset($data['tags_list']);
+        $outcomes = $data['outcomes'] ?? [];
+        $prerequisites = $data['prerequisites'] ?? [];
+        unset($data['tags_list'], $data['outcomes'], $data['prerequisites']);
 
         if (! isset($data['tags_json'])) {
             $data['tags_json'] = [];
@@ -72,8 +74,10 @@ class CourseService
         $course->load('tags');
 
         $this->tagService->syncCourseTags($course, $tags);
+        $this->syncCourseOutcomes($course, $outcomes);
+        $this->syncCoursePrerequisites($course, $prerequisites);
 
-        $freshCourse = $course->fresh(['tags', 'admins', 'instructor']);
+        $freshCourse = $course->fresh(['tags', 'admins', 'instructor', 'outcomes', 'prerequisiteCourses']);
 
         CourseCreated::dispatch($freshCourse);
 
@@ -106,10 +110,22 @@ class CourseService
             unset($data['enrollment_key']);
         }
 
+        $outcomes = $data['outcomes'] ?? null;
+        $prerequisites = $data['prerequisites'] ?? null;
+        unset($data['outcomes'], $data['prerequisites']);
+
         $course = $this->repository->update($course, $data);
 
         if ($tags !== null) {
             $this->tagService->syncCourseTags($course, $tags);
+        }
+
+        if ($outcomes !== null) {
+            $this->syncCourseOutcomes($course, $outcomes);
+        }
+
+        if ($prerequisites !== null) {
+            $this->syncCoursePrerequisites($course, $prerequisites);
         }
 
         $course->load('tags');
@@ -118,7 +134,7 @@ class CourseService
             CoursePublished::dispatch($course);
         }
 
-        return $course->fresh(['tags', 'admins', 'instructor']);
+        return $course->fresh(['tags', 'admins', 'instructor', 'outcomes', 'prerequisiteCourses']);
     }
 
     public function delete(int $id): bool
@@ -184,5 +200,42 @@ class CourseService
             }
             $suffix++;
         } while (true);
+    }
+
+    private function syncCourseOutcomes(Course $course, array $outcomes): void
+    {
+        $course->outcomes()->delete();
+
+        foreach ($outcomes as $index => $outcome) {
+            if (empty($outcome)) {
+                continue;
+            }
+
+            $course->outcomes()->create([
+                'outcome_text' => is_string($outcome) ? $outcome : (is_array($outcome) ? ($outcome['text'] ?? $outcome['outcome_text'] ?? json_encode($outcome)) : (string) $outcome),
+                'order' => is_array($outcome) ? ($outcome['order'] ?? $index) : $index,
+            ]);
+        }
+    }
+
+    private function syncCoursePrerequisites(Course $course, array $prerequisites): void
+    {
+        $course->prerequisites()->delete();
+
+        foreach ($prerequisites as $prereq) {
+            if (empty($prereq)) {
+                continue;
+            }
+
+            $prerequisiteCourseId = is_array($prereq) ? ($prereq['course_id'] ?? $prereq['id'] ?? null) : $prereq;
+            $isRequired = is_array($prereq) ? ($prereq['is_required'] ?? true) : true;
+
+            if ($prerequisiteCourseId && $prerequisiteCourseId != $course->id) {
+                $course->prerequisites()->create([
+                    'prerequisite_course_id' => $prerequisiteCourseId,
+                    'is_required' => $isRequired,
+                ]);
+            }
+        }
     }
 }

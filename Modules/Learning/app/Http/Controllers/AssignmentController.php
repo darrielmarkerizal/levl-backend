@@ -32,6 +32,14 @@ class AssignmentController extends Controller
 
     public function store(Request $request, \Modules\Schemes\Models\Course $course, \Modules\Schemes\Models\Unit $unit, \Modules\Schemes\Models\Lesson $lesson)
     {
+        /** @var \Modules\Auth\Models\User $user */
+        $user = auth('api')->user();
+
+        // Check if user can manage this course
+        if (! $this->userCanManageCourse($user, $course)) {
+            return $this->error('Anda tidak memiliki akses untuk membuat assignment di course ini.', 403);
+        }
+
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
@@ -45,8 +53,6 @@ class AssignmentController extends Controller
         ]);
 
         $validated['lesson_id'] = $lesson->id;
-        /** @var \Modules\Auth\Models\User $user */
-        $user = auth('api')->user();
 
         $assignment = $this->service->create($validated, $user->id);
 
@@ -62,6 +68,17 @@ class AssignmentController extends Controller
 
     public function update(Request $request, Assignment $assignment)
     {
+        /** @var \Modules\Auth\Models\User $user */
+        $user = auth('api')->user();
+
+        // Load lesson and course relationship
+        $assignment->loadMissing('lesson.unit.course');
+        $course = $assignment->lesson?->unit?->course;
+
+        if (! $course || ! $this->userCanManageCourse($user, $course)) {
+            return $this->error('Anda tidak memiliki akses untuk mengubah assignment ini.', 403);
+        }
+
         $validated = $request->validate([
             'title' => ['sometimes', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
@@ -81,6 +98,17 @@ class AssignmentController extends Controller
 
     public function destroy(Assignment $assignment)
     {
+        /** @var \Modules\Auth\Models\User $user */
+        $user = auth('api')->user();
+
+        // Load lesson and course relationship
+        $assignment->loadMissing('lesson.unit.course');
+        $course = $assignment->lesson?->unit?->course;
+
+        if (! $course || ! $this->userCanManageCourse($user, $course)) {
+            return $this->error('Anda tidak memiliki akses untuk menghapus assignment ini.', 403);
+        }
+
         $this->service->delete($assignment);
 
         return $this->success([], 'Assignment berhasil dihapus.');
@@ -98,6 +126,28 @@ class AssignmentController extends Controller
         $updated = $this->service->unpublish($assignment);
 
         return $this->success(['assignment' => $updated], 'Assignment berhasil diunpublish.');
+    }
+
+    /**
+     * Check if user can manage a course.
+     */
+    private function userCanManageCourse(\Modules\Auth\Models\User $user, \Modules\Schemes\Models\Course $course): bool
+    {
+        if ($user->hasRole('superadmin')) {
+            return true;
+        }
+
+        if ($user->hasRole('admin') || $user->hasRole('instructor')) {
+            if ((int) $course->instructor_id === (int) $user->id) {
+                return true;
+            }
+
+            if (method_exists($course, 'hasAdmin') && $course->hasAdmin($user)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
 

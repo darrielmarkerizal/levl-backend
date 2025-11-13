@@ -60,7 +60,7 @@ class GamificationService
         return DB::transaction(function () use ($userId, $xp, $reason, $sourceType, $sourceId, $options) {
             $point = Point::create([
                 'user_id' => $userId,
-                'source_type' => $sourceType,
+                'source_type' => $sourceType ?? 'system',
                 'source_id' => $sourceId,
                 'points' => $xp,
                 'reason' => $reason,
@@ -101,7 +101,7 @@ class GamificationService
         string $description = '',
         string $type = 'completion',
         ?int $threshold = null
-    ): UserBadge {
+    ): ?UserBadge {
         $badge = Badge::query()->firstOrCreate(
             ['code' => $badgeCode],
             [
@@ -112,15 +112,20 @@ class GamificationService
             ]
         );
 
-        return UserBadge::query()->firstOrCreate(
-            [
-                'user_id' => $userId,
-                'badge_id' => $badge->id,
-            ],
-            [
-                'earned_at' => Carbon::now(),
-            ]
-        );
+        $exists = UserBadge::query()
+            ->where('user_id', $userId)
+            ->where('badge_id', $badge->id)
+            ->exists();
+
+        if ($exists) {
+            return null;
+        }
+
+        return UserBadge::create([
+            'user_id' => $userId,
+            'badge_id' => $badge->id,
+            'earned_at' => Carbon::now(),
+        ]);
     }
 
     /**
@@ -154,7 +159,7 @@ class GamificationService
         return (int) (100 * pow(1.1, $level - 1));
     }
 
-    private function updateGlobalLeaderboard(): void
+    public function updateGlobalLeaderboard(): void
     {
         $stats = UserGamificationStat::query()
             ->orderByDesc('total_xp')

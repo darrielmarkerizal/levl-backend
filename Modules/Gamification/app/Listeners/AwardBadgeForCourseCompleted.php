@@ -12,7 +12,7 @@ class AwardBadgeForCourseCompleted
     public function handle(CourseCompleted $event): void
     {
         $enrollment = $event->enrollment->fresh(['user']);
-        $course = $event->course->fresh(['title']);
+        $course = $event->course->fresh();
 
         if (! $enrollment || ! $enrollment->user) {
             return;

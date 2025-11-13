@@ -42,7 +42,7 @@ class InitializeProgressForEnrollment implements ShouldQueue
 
             $this->ensureCourseProgressExists($enrollment->id, $course->id);
 
-            $enrollment->progress_percent = 0;
+            // Progress is now stored in course_progress table, not in enrollments
             if ($enrollment->status === 'completed') {
                 $enrollment->status = 'active';
             }
@@ -88,7 +88,6 @@ class InitializeProgressForEnrollment implements ShouldQueue
         CourseProgress::query()->updateOrCreate(
             [
                 'enrollment_id' => $enrollmentId,
-                'course_id' => $courseId,
             ],
             [
                 'status' => 'not_started',
