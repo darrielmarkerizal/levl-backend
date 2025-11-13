@@ -31,10 +31,8 @@ class CourseFactory extends Factory
             'type' => fake()->randomElement(['okupasi', 'kluster']),
             'level_tag' => fake()->randomElement(['dasar', 'menengah', 'mahir']),
             'tags_json' => [],
-            'outcomes_json' => [],
-            'prereq_json' => [],
             'progression_mode' => fake()->randomElement(['sequential', 'free']),
-            'enrollment_type' => fake()->randomElement(['auto_accept', 'key_based', 'approval']),
+            'enrollment_type' => 'auto_accept',
             'enrollment_key' => null,
             'status' => 'published',
             'published_at' => now(),
@@ -50,6 +48,17 @@ class CourseFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'status' => 'draft',
             'published_at' => null,
+        ]);
+    }
+
+    /**
+     * Indicate that the course requires approval.
+     */
+    public function approval(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'enrollment_type' => 'approval',
+            'enrollment_key' => null,
         ]);
     }
 

@@ -188,7 +188,7 @@ class AuthService implements AuthServiceInterface
 
     public function logout(User $user, string $currentJwt, ?string $refreshToken = null): void
     {
-        $this->jwt->invalidate($currentJwt);
+        $this->jwt->setToken($currentJwt)->invalidate();
         if ($refreshToken) {
             $this->authRepository->revokeRefreshToken($refreshToken, $user->id);
         }

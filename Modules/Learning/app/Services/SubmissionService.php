@@ -93,7 +93,7 @@ class SubmissionService
             // Dispatch event
             SubmissionCreated::dispatch($submission);
 
-            return $submission->fresh(['assignment', 'user', 'enrollment', 'files']);
+            return $submission->fresh(['assignment', 'user', 'enrollment', 'files', 'grade']);
         });
     }
 
@@ -112,7 +112,7 @@ class SubmissionService
         return $submission->fresh(['assignment', 'user', 'enrollment', 'files']);
     }
 
-    public function grade(Submission $submission, int $score, ?string $feedback = null): Submission
+    public function grade(Submission $submission, int $score, ?string $feedback = null, ?int $gradedBy = null): Submission
     {
         $assignment = $submission->assignment;
         $maxScore = $assignment->max_score;
@@ -124,6 +124,7 @@ class SubmissionService
         }
 
         // Apply late penalty if applicable
+        $finalScore = $score;
         if ($submission->is_late) {
             $assignmentPenalty = $assignment->late_penalty_percent;
             $latePenaltyPercent = $assignmentPenalty !== null
@@ -131,18 +132,36 @@ class SubmissionService
                 : (int) SystemSetting::get('learning.late_penalty_percent', 0);
             if ($latePenaltyPercent > 0) {
                 $penalty = ($score * $latePenaltyPercent) / 100;
-                $score = max(0, $score - $penalty);
+                $finalScore = max(0, $score - $penalty);
             }
         }
 
+        // Create or update grade record
+        $grade = \Modules\Grading\Models\Grade::updateOrCreate(
+            [
+                'source_type' => 'assignment',
+                'source_id' => $assignment->id,
+                'user_id' => $submission->user_id,
+            ],
+            [
+                'graded_by' => $gradedBy ?? auth('api')->id(),
+                'score' => $finalScore,
+                'max_score' => $maxScore,
+                'feedback' => $feedback,
+                'status' => 'graded',
+                'graded_at' => Carbon::now(),
+            ]
+        );
+
+        // Update submission status only (score and feedback are in grades table)
         $submission->update([
             'status' => 'graded',
-            'score' => $score,
-            'feedback' => $feedback,
-            'graded_at' => Carbon::now(),
         ]);
 
-        return $submission->fresh(['assignment', 'user', 'enrollment', 'files']);
+        $submission = $submission->fresh(['assignment', 'user', 'enrollment', 'files']);
+        $submission->setRelation('grade', $grade);
+
+        return $submission;
     }
 
     private function getEnrollmentForLesson(Lesson $lesson, int $userId): ?Enrollment

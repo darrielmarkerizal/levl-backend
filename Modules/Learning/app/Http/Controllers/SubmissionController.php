@@ -22,7 +22,7 @@ class SubmissionController extends Controller
 
         $query = Submission::query()
             ->where('assignment_id', $assignment->id)
-            ->with(['user:id,name,email', 'enrollment:id,status', 'files']);
+            ->with(['user:id,name,email', 'enrollment:id,status', 'files', 'grade']);
 
         // Students can only see their own submissions
         if ($user->hasRole('student')) {
@@ -58,7 +58,7 @@ class SubmissionController extends Controller
             return $this->error('Anda tidak memiliki akses untuk melihat submission ini.', 403);
         }
 
-        $submission->load(['assignment', 'user:id,name,email', 'enrollment', 'files', 'previousSubmission']);
+        $submission->load(['assignment', 'user:id,name,email', 'enrollment', 'files', 'previousSubmission', 'grade']);
 
         return $this->success(['submission' => $submission]);
     }

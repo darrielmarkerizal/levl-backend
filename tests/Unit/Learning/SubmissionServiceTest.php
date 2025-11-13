@@ -188,9 +188,9 @@ test('grade applies late penalty when submission is late', function () {
     $graded = $this->service->grade($submission, 100, 'Good work');
 
     expect($graded->status)->toEqual('graded');
-    expect($graded->score)->toEqual(80);
-    // 100 - 20% = 80
-    expect($graded->feedback)->toEqual('Good work');
+    expect($graded->grade)->not->toBeNull();
+    expect($graded->grade->score)->toEqual(80);
+    expect($graded->grade->feedback)->toEqual('Good work');
 });
 
 test('grade uses assignment late penalty over system setting', function () {
@@ -223,8 +223,8 @@ test('grade uses assignment late penalty over system setting', function () {
 
     $graded = $this->service->grade($submission, 100, 'Good work');
 
-    expect($graded->score)->toEqual(70);
-    // 100 - 30% = 70 (uses assignment penalty)
+    expect($graded->grade)->not->toBeNull();
+    expect($graded->grade->score)->toEqual(70);
 });
 
 test('update throws exception for graded submission', function () {

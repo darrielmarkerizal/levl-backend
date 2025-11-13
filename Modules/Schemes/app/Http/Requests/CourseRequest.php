@@ -79,12 +79,8 @@ class CourseRequest extends FormRequest
             $data['tags_list'] = $data['tags'];
             unset($data['tags']);
         }
-        if (array_key_exists('outcomes', $data)) {
-            $data['outcomes_json'] = $data['outcomes'];
-            unset($data['outcomes']);
-        }
         if (array_key_exists('prereq', $data)) {
-            $data['prereq_json'] = $data['prereq'];
+            $data['prerequisites'] = $data['prereq'];
             unset($data['prereq']);
         }
 

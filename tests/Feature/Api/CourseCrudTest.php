@@ -61,6 +61,43 @@ it('admin can create course with all fields', function () {
     ]);
 });
 
+it('admin can create course with outcomes and prerequisites', function () {
+    $prerequisiteCourse = Course::factory()->create();
+
+    $response = $this->actingAs($this->admin, 'api')
+        ->postJson(api('/courses'), [
+            'code' => 'TEST-OUTCOMES',
+            'title' => 'Course with Outcomes',
+            'level_tag' => 'dasar',
+            'type' => 'okupasi',
+            'enrollment_type' => 'auto_accept',
+            'progression_mode' => 'free',
+            'outcomes' => [
+                'Learn Laravel basics',
+                'Understand MVC pattern',
+                'Build REST API',
+            ],
+            'prereq' => [$prerequisiteCourse->id],
+        ]);
+
+    $response->assertStatus(201);
+    $course = Course::where('code', 'TEST-OUTCOMES')->first();
+    
+    expect($course->outcomes)->toHaveCount(3);
+    expect($course->prerequisiteCourses)->toHaveCount(1);
+    
+    assertDatabaseHas('course_outcomes', [
+        'course_id' => $course->id,
+        'outcome_text' => 'Learn Laravel basics',
+        'order' => 0,
+    ]);
+    
+    assertDatabaseHas('course_prerequisites', [
+        'course_id' => $course->id,
+        'prerequisite_course_id' => $prerequisiteCourse->id,
+    ]);
+});
+
 it('superadmin can create course', function () {
     $superadmin = User::factory()->create();
     $superadmin->assignRole('superadmin');
@@ -119,6 +156,33 @@ it('admin can update course with partial data', function () {
         'id' => $course->id,
         'title' => 'Partially Updated',
     ]);
+});
+
+it('admin can update course outcomes and prerequisites', function () {
+    $course = Course::factory()->create(['instructor_id' => $this->admin->id]);
+    $prerequisiteCourse1 = Course::factory()->create();
+    $prerequisiteCourse2 = Course::factory()->create();
+
+    $response = $this->actingAs($this->admin, 'api')
+        ->putJson(api("/courses/{$course->slug}"), [
+            'code' => $course->code,
+            'title' => $course->title,
+            'level_tag' => $course->level_tag,
+            'type' => $course->type,
+            'enrollment_type' => $course->enrollment_type,
+            'progression_mode' => $course->progression_mode,
+            'outcomes' => [
+                'Updated outcome 1',
+                'Updated outcome 2',
+            ],
+            'prereq' => [$prerequisiteCourse1->id, $prerequisiteCourse2->id],
+        ]);
+
+    $response->assertStatus(200);
+    $course->refresh();
+    
+    expect($course->outcomes)->toHaveCount(2);
+    expect($course->prerequisiteCourses)->toHaveCount(2);
 });
 
 // DELETE - Delete Course

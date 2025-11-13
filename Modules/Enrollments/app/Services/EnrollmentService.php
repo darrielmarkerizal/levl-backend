@@ -41,13 +41,12 @@ class EnrollmentService
         $enrollment = $existing ?? new Enrollment([
             'user_id' => $user->id,
             'course_id' => $course->id,
-            'progress_percent' => 0,
         ]);
 
         [$status, $message] = $this->determineStatusAndMessage($course, $payload);
 
         $enrollment->status = $status;
-        $enrollment->progress_percent = $status === 'active' ? $enrollment->progress_percent : 0;
+        // Progress is now stored in course_progress table, not in enrollments
         // enrolled_at cannot be null per migration, always set to now
         $enrollment->enrolled_at = $enrollment->enrolled_at ?? Carbon::now();
 

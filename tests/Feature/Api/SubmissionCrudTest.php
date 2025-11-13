@@ -95,7 +95,14 @@ it('admin can grade submission', function () {
     assertDatabaseHas('submissions', [
         'id' => $submission->id,
         'status' => 'graded',
+    ]);
+
+    assertDatabaseHas('grades', [
+        'source_type' => 'assignment',
+        'source_id' => $this->assignment->id,
+        'user_id' => $this->student->id,
         'score' => 85,
+        'feedback' => 'Good work!',
     ]);
 });
 
@@ -155,7 +162,15 @@ it('cannot update graded submission', function () {
         'enrollment_id' => $this->enrollment->id,
         'answer_text' => 'Original answer',
         'status' => 'graded',
+    ]);
+    
+    \Modules\Grading\Models\Grade::create([
+        'source_type' => 'assignment',
+        'source_id' => $this->assignment->id,
+        'user_id' => $this->student->id,
         'score' => 80,
+        'max_score' => 100,
+        'status' => 'graded',
     ]);
 
     $response = $this->actingAs($this->student, 'api')

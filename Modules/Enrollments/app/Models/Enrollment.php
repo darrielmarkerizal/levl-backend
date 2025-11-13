@@ -10,13 +10,12 @@ class Enrollment extends Model
     use HasFactory;
     protected $fillable = [
         'user_id', 'course_id', 'status',
-        'enrolled_at', 'completed_at', 'progress_percent',
+        'enrolled_at', 'completed_at',
     ];
 
     protected $casts = [
         'enrolled_at' => 'datetime',
         'completed_at' => 'datetime',
-        'progress_percent' => 'float',
     ];
 
     protected $hidden = [

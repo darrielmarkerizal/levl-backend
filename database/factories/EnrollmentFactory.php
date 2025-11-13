@@ -25,7 +25,6 @@ class EnrollmentFactory extends Factory
             'status' => fake()->randomElement(['active', 'pending', 'completed', 'cancelled']),
             'enrolled_at' => now(),
             'completed_at' => null,
-            'progress_percent' => 0.0,
         ];
     }
 
@@ -58,7 +57,6 @@ class EnrollmentFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'status' => 'completed',
-            'progress_percent' => 100.0,
             'completed_at' => now(),
         ]);
     }
