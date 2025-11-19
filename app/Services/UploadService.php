@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class UploadService
 {
@@ -17,24 +18,17 @@ class UploadService
     public function storePublic(UploadedFile $file, string $directory, ?string $filename = null, ?string $disk = null): string
     {
         $diskName = $disk ?: $this->defaultDisk;
-        $storage = Storage::disk($diskName);
+        $diskConfig = config("filesystems.disks.{$diskName}");
         $name = $filename ?: $this->generateFilename($file);
         $path = trim($directory, '/').'/'.$name;
         $mime = $file->getMimeType();
 
-        $options = [
-            'visibility' => 'public',
-        ];
+        // Check if this is S3-compatible storage (DO Spaces)
+        $isS3 = isset($diskConfig['driver']) && $diskConfig['driver'] === 's3';
 
-        
-        $diskConfig = config("filesystems.disks.{$diskName}");
-        if (isset($diskConfig['driver']) && $diskConfig['driver'] === 's3') {
-            $options['ACL'] = 'public-read';
-            
-            if (is_string($mime)) {
-                $options['ContentType'] = $mime;
-            }
-        }
+        // Prepare file content
+        $content = null;
+        $contentType = $mime ?? 'application/octet-stream';
 
         if (is_string($mime) && str_starts_with($mime, 'image/')) {
             if (class_exists('\\Intervention\\Image\\ImageManagerStatic')) {
@@ -43,14 +37,62 @@ class UploadService
                 $targetMime = method_exists($image, 'mime') ? $image->mime() : 'jpg';
                 $encoded = call_user_func([$image, 'encode'], $targetMime ?: 'jpg', $quality);
                 
-                if (isset($options['ContentType']) && is_string($targetMime)) {
-                    $options['ContentType'] = 'image/'.$targetMime;
-                }
-                
-                $storage->put($path, (string) $encoded, $options);
+                $content = (string) $encoded;
+                $contentType = is_string($targetMime) ? 'image/'.$targetMime : $contentType;
             } else {
-                $storage->putFileAs(trim($directory, '/'), $file, $name, $options);
+                $content = file_get_contents($file->getRealPath());
             }
+        } else {
+            $content = file_get_contents($file->getRealPath());
+        }
+
+        // For S3-compatible storage (DO Spaces), use AWS SDK directly
+        if ($isS3) {
+            try {
+                $s3Client = new \Aws\S3\S3Client([
+                    'version' => 'latest',
+                    'region' => $diskConfig['region'] ?? 'sgp1',
+                    'endpoint' => $diskConfig['endpoint'] ?? 'https://sgp1.digitaloceanspaces.com',
+                    'credentials' => [
+                        'key' => $diskConfig['key'] ?? '',
+                        'secret' => $diskConfig['secret'] ?? '',
+                    ],
+                    'use_path_style_endpoint' => false,
+                ]);
+
+                $result = $s3Client->putObject([
+                    'Bucket' => $diskConfig['bucket'] ?? 'prep-lsp',
+                    'Key' => $path,
+                    'Body' => $content,
+                    'ACL' => 'public-read',
+                    'ContentType' => $contentType,
+                ]);
+
+                Log::info('File uploaded to DO Spaces via AWS SDK', [
+                    'path' => $path,
+                    'size' => strlen($content),
+                    'content_type' => $contentType,
+                    'etag' => $result['ETag'] ?? null,
+                ]);
+
+                return $path;
+            } catch (\Exception $e) {
+                Log::error('DO Spaces upload failed via AWS SDK', [
+                    'path' => $path,
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+                
+                throw new \RuntimeException('Failed to upload file to DO Spaces: ' . $e->getMessage(), 0, $e);
+            }
+        }
+
+        // For non-S3 storage (local, etc), use Laravel Storage
+        $storage = Storage::disk($diskName);
+        $options = ['visibility' => 'public'];
+        
+        if ($content !== null) {
+            $storage->put($path, $content, $options);
         } else {
             $storage->putFileAs(trim($directory, '/'), $file, $name, $options);
         }
@@ -65,8 +107,40 @@ class UploadService
         }
 
         $diskName = $disk ?: $this->defaultDisk;
-        $storage = Storage::disk($diskName);
+        $diskConfig = config("filesystems.disks.{$diskName}");
+        $isS3 = isset($diskConfig['driver']) && $diskConfig['driver'] === 's3';
 
+        // For S3-compatible storage (DO Spaces), use AWS SDK directly
+        if ($isS3) {
+            try {
+                $s3Client = new \Aws\S3\S3Client([
+                    'version' => 'latest',
+                    'region' => $diskConfig['region'] ?? 'sgp1',
+                    'endpoint' => $diskConfig['endpoint'] ?? 'https://sgp1.digitaloceanspaces.com',
+                    'credentials' => [
+                        'key' => $diskConfig['key'] ?? '',
+                        'secret' => $diskConfig['secret'] ?? '',
+                    ],
+                    'use_path_style_endpoint' => false,
+                ]);
+
+                $s3Client->deleteObject([
+                    'Bucket' => $diskConfig['bucket'] ?? 'prep-lsp',
+                    'Key' => $path,
+                ]);
+
+                Log::info('File deleted from DO Spaces via AWS SDK', ['path' => $path]);
+            } catch (\Exception $e) {
+                Log::error('DO Spaces delete failed via AWS SDK', [
+                    'path' => $path,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+            return;
+        }
+
+        // For non-S3 storage, use Laravel Storage
+        $storage = Storage::disk($diskName);
         if ($storage->exists($path)) {
             $storage->delete($path);
         }
@@ -111,7 +185,48 @@ class UploadService
     public function exists(string $path, ?string $disk = null): bool
     {
         $diskName = $disk ?: $this->defaultDisk;
+        $diskConfig = config("filesystems.disks.{$diskName}");
+        $isS3 = isset($diskConfig['driver']) && $diskConfig['driver'] === 's3';
 
+        // For S3-compatible storage (DO Spaces), use AWS SDK directly
+        if ($isS3) {
+            try {
+                $s3Client = new \Aws\S3\S3Client([
+                    'version' => 'latest',
+                    'region' => $diskConfig['region'] ?? 'sgp1',
+                    'endpoint' => $diskConfig['endpoint'] ?? 'https://sgp1.digitaloceanspaces.com',
+                    'credentials' => [
+                        'key' => $diskConfig['key'] ?? '',
+                        'secret' => $diskConfig['secret'] ?? '',
+                    ],
+                    'use_path_style_endpoint' => false,
+                ]);
+
+                $s3Client->headObject([
+                    'Bucket' => $diskConfig['bucket'] ?? 'prep-lsp',
+                    'Key' => $path,
+                ]);
+
+                return true;
+            } catch (\Aws\S3\Exception\S3Exception $e) {
+                if ($e->getAwsErrorCode() === 'NotFound' || $e->getStatusCode() === 404) {
+                    return false;
+                }
+                Log::error('DO Spaces exists check failed via AWS SDK', [
+                    'path' => $path,
+                    'error' => $e->getMessage(),
+                ]);
+                return false;
+            } catch (\Exception $e) {
+                Log::error('DO Spaces exists check error', [
+                    'path' => $path,
+                    'error' => $e->getMessage(),
+                ]);
+                return false;
+            }
+        }
+
+        // For non-S3 storage, use Laravel Storage
         return Storage::disk($diskName)->exists($path);
     }
 
