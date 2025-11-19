@@ -224,46 +224,91 @@ class FileTestController extends Controller
      */
     public function testS3Operations(): JsonResponse
     {
+        $put1 = false;
+        $exists = false;
+        $url = null;
+        $size = null;
+        $lastModified = null;
+        $urlCheck = ['accessible' => false];
+        $cleanedUp = false;
+        $putError = null;
+        $testPath = null;
+        
         try {
             $disk = Storage::disk('do');
             $testPath = 'test/s3-test-' . time() . '.txt';
             $testContent = 'Test S3 operations at ' . now()->toDateTimeString();
             
-            Log::info('Testing S3 operations', ['path' => $testPath]);
+            Log::info('Testing S3 operations', [
+                'path' => $testPath,
+                'disk' => 'do',
+                'config' => config('filesystems.disks.do'),
+            ]);
 
             // Test 1: Put file with explicit options
-            $put1 = $disk->put($testPath, $testContent, [
-                'visibility' => 'public',
-                'ACL' => 'public-read',
-                'ContentType' => 'text/plain',
-            ]);
+            try {
+                $put1 = $disk->put($testPath, $testContent, [
+                    'visibility' => 'public',
+                    'ACL' => 'public-read',
+                    'ContentType' => 'text/plain',
+                ]);
+                Log::info('Put operation result', ['success' => $put1, 'path' => $testPath]);
+            } catch (\Exception $e) {
+                $putError = $e->getMessage();
+                Log::error('Put operation failed', [
+                    'error' => $putError,
+                    'trace' => $e->getTraceAsString(),
+                ]);
+            }
             
             // Test 2: Check if exists
             $exists = $disk->exists($testPath);
+            Log::info('Exists check', ['exists' => $exists, 'path' => $testPath]);
             
             // Test 3: Get URL
             $url = $disk->url($testPath);
+            Log::info('URL generated', ['url' => $url]);
             
             // Test 4: Get file info
-            $size = $exists ? $disk->size($testPath) : null;
-            $lastModified = $exists ? $disk->lastModified($testPath) : null;
+            if ($exists) {
+                try {
+                    $size = $disk->size($testPath);
+                    $lastModified = $disk->lastModified($testPath);
+                } catch (\Exception $e) {
+                    Log::error('Failed to get file info', ['error' => $e->getMessage()]);
+                }
+            }
             
             // Test 5: Check URL accessibility
             $urlCheck = $this->checkUrlAccessibility($url);
+            Log::info('URL accessibility check', $urlCheck);
             
             // Cleanup
-            $disk->delete($testPath);
+            try {
+                $disk->delete($testPath);
+                $cleanedUp = !$disk->exists($testPath);
+            } catch (\Exception $e) {
+                Log::error('Cleanup failed', ['error' => $e->getMessage()]);
+            }
 
             return response()->json([
                 'success' => true,
                 'tests' => [
                     'put_with_options' => $put1,
+                    'put_error' => $putError,
                     'file_exists' => $exists,
                     'url_generated' => $url,
                     'size' => $size,
                     'last_modified' => $lastModified ? date('Y-m-d H:i:s', $lastModified) : null,
                     'url_accessible' => $urlCheck,
-                    'cleaned_up' => !$disk->exists($testPath),
+                    'cleaned_up' => $cleanedUp,
+                ],
+                'disk_config' => [
+                    'driver' => config('filesystems.disks.do.driver'),
+                    'bucket' => config('filesystems.disks.do.bucket'),
+                    'has_key' => !empty(config('filesystems.disks.do.key')),
+                    'has_secret' => !empty(config('filesystems.disks.do.secret')),
+                    'endpoint' => config('filesystems.disks.do.endpoint'),
                 ],
             ]);
         } catch (\Exception $e) {
@@ -276,6 +321,13 @@ class FileTestController extends Controller
                 'success' => false,
                 'error' => $e->getMessage(),
                 'trace' => config('app.debug') ? $e->getTraceAsString() : null,
+                'partial_results' => [
+                    'test_path' => $testPath,
+                    'put_result' => $put1,
+                    'put_error' => $putError,
+                    'exists' => $exists,
+                    'url' => $url,
+                ],
             ], 500);
         }
     }
