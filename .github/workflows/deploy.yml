@@ -171,6 +171,8 @@ jobs:
             echo "::endgroup::"
 
             echo "::group::Generating OpenAPI specification"
+            mkdir -p storage/api-docs
+            chmod -R 775 storage/api-docs
             if ! php artisan openapi:generate; then
               echo "::warning::OpenAPI generation failed, but continuing deployment"
             else
