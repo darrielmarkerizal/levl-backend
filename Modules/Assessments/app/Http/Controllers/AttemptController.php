@@ -3,6 +3,8 @@
 namespace Modules\Assessments\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Support\ApiResponse;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Modules\Assessments\Models\Attempt;
 use Modules\Assessments\Models\Exercise;
@@ -10,71 +12,81 @@ use Modules\Assessments\Services\AttemptService;
 
 class AttemptController extends Controller
 {
-    public function __construct(private readonly AttemptService $service) {}
+  use ApiResponse;
 
-    /**
-     * List user's attempts
-     */
-    public function index(Request $request)
-    {
-        $user = $request->user();
+  public function __construct(private readonly AttemptService $service) {}
 
-        $attempts = $this->service->paginate($user, $request->all(), (int) $request->get('per_page', 15));
+  /**
+   * List user's attempts
+   */
+  public function index(Request $request)
+  {
+    $user = $request->user();
 
-        return response()->json(['data' => $attempts]);
+    $attempts = $this->service->paginate(
+      $user,
+      $request->all(),
+      (int) $request->get("per_page", 15),
+    );
+
+    if ($attempts instanceof LengthAwarePaginator) {
+      return $this->paginateResponse($attempts, "Daftar attempt berhasil diambil");
     }
 
-    /**
-     * Start new attempt
-     */
-    public function store(Request $request, Exercise $exercise)
-    {
-        $user = $request->user();
+    return $this->success(["attempts" => $attempts], "Daftar attempt berhasil diambil");
+  }
 
-        $attempt = $this->service->start($user, $exercise);
+  /**
+   * Start new attempt
+   */
+  public function store(Request $request, Exercise $exercise)
+  {
+    $user = $request->user();
 
-        return response()->json(['data' => ['attempt' => $attempt]], 201);
-    }
+    $attempt = $this->service->start($user, $exercise);
 
-    /**
-     * Get attempt details with questions
-     */
-    public function show(Attempt $attempt)
-    {
-        $this->authorize('view', $attempt);
+    return $this->created(["attempt" => $attempt], "Attempt berhasil dimulai");
+  }
 
-        $attempt = $this->service->show($attempt);
+  /**
+   * Get attempt details with questions
+   */
+  public function show(Attempt $attempt)
+  {
+    $this->authorize("view", $attempt);
 
-        return response()->json(['data' => ['attempt' => $attempt]]);
-    }
+    $attempt = $this->service->show($attempt);
 
-    /**
-     * Submit answer for a question
-     */
-    public function submitAnswer(Request $request, Attempt $attempt)
-    {
-        $this->authorize('view', $attempt);
+    return $this->success(["attempt" => $attempt], "Detail attempt berhasil diambil");
+  }
 
-        $validated = $request->validate([
-            'question_id' => 'required|integer|exists:questions,id',
-            'selected_option_id' => 'nullable|integer|exists:question_options,id',
-            'answer_text' => 'nullable|string',
-        ]);
+  /**
+   * Submit answer for a question
+   */
+  public function submitAnswer(Request $request, Attempt $attempt)
+  {
+    $this->authorize("view", $attempt);
 
-        $answer = $this->service->submitAnswer($attempt, $validated);
+    $validated = $request->validate([
+      "question_id" => "required|integer|exists:questions,id",
+      "selected_option_id" => "nullable|integer|exists:question_options,id",
+      "answer_text" => "nullable|string",
+    ]);
 
-        return response()->json(['data' => ['answer' => $answer]]);
-    }
+    $answer = $this->service->submitAnswer($attempt, $validated);
 
-    /**
-     * Complete attempt and trigger grading
-     */
-    public function complete(Request $request, Attempt $attempt)
-    {
-        $this->authorize('view', $attempt);
+    return $this->success(["answer" => $answer], "Jawaban berhasil disimpan");
+  }
 
-        $attempt = $this->service->complete($attempt);
+  /**
+   * Complete attempt and trigger grading
+   */
+  public function complete(Request $request, Attempt $attempt)
+  {
+    $this->authorize("view", $attempt);
 
-        return response()->json(['data' => ['attempt' => $attempt]]);
-    }
+    $attempt = $this->service->complete($attempt);
+
+    return $this->success(["attempt" => $attempt], "Attempt berhasil diselesaikan");
+  }
 }

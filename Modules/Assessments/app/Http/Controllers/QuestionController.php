@@ -3,6 +3,7 @@
 namespace Modules\Assessments\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Support\ApiResponse;
 use Illuminate\Http\Request;
 use Modules\Assessments\Models\Question;
 use Modules\Assessments\Models\Exercise;
@@ -10,67 +11,69 @@ use Modules\Assessments\Services\QuestionService;
 
 class QuestionController extends Controller
 {
-    public function __construct(private readonly QuestionService $service) {}
+  use ApiResponse;
 
-    /**
-     * Create new question in exercise
-     */
-    public function store(Request $request, Exercise $exercise)
-    {
-        $this->authorize('update', $exercise);
+  public function __construct(private readonly QuestionService $service) {}
 
-        $validated = $request->validate([
-            'question_text' => 'required|string',
-            'type' => 'required|in:multiple_choice,free_text,file_upload,true_false',
-            'score_weight' => 'required|numeric|min:0.1',
-            'is_required' => 'boolean',
-            'order' => 'integer|min:1',
-        ]);
+  /**
+   * Create new question in exercise
+   */
+  public function store(Request $request, Exercise $exercise)
+  {
+    $this->authorize("update", $exercise);
 
-        $question = $this->service->create($exercise, $validated);
+    $validated = $request->validate([
+      "question_text" => "required|string",
+      "type" => "required|in:multiple_choice,free_text,file_upload,true_false",
+      "score_weight" => "required|numeric|min:0.1",
+      "is_required" => "boolean",
+      "order" => "integer|min:1",
+    ]);
 
-        return response()->json(['data' => ['question' => $question]], 201);
-    }
+    $question = $this->service->create($exercise, $validated);
 
-    /**
-     * Get question details
-     */
-    public function show(Question $question)
-    {
-        $question = $this->service->show($question);
+    return $this->created(["question" => $question], "Pertanyaan berhasil dibuat");
+  }
 
-        return response()->json(['data' => ['question' => $question]]);
-    }
+  /**
+   * Get question details
+   */
+  public function show(Question $question)
+  {
+    $question = $this->service->show($question);
 
-    /**
-     * Update question
-     */
-    public function update(Request $request, Question $question)
-    {
-        $this->authorize('update', $question->exercise);
+    return $this->success(["question" => $question], "Detail pertanyaan berhasil diambil");
+  }
 
-        $validated = $request->validate([
-            'question_text' => 'sometimes|string',
-            'type' => 'sometimes|in:multiple_choice,free_text,file_upload,true_false',
-            'score_weight' => 'sometimes|numeric|min:0.1',
-            'is_required' => 'boolean',
-            'order' => 'integer|min:1',
-        ]);
+  /**
+   * Update question
+   */
+  public function update(Request $request, Question $question)
+  {
+    $this->authorize("update", $question->exercise);
 
-        $question = $this->service->update($question, $validated);
+    $validated = $request->validate([
+      "question_text" => "sometimes|string",
+      "type" => "sometimes|in:multiple_choice,free_text,file_upload,true_false",
+      "score_weight" => "sometimes|numeric|min:0.1",
+      "is_required" => "boolean",
+      "order" => "integer|min:1",
+    ]);
 
-        return response()->json(['data' => ['question' => $question]]);
-    }
+    $question = $this->service->update($question, $validated);
 
-    /**
-     * Delete question
-     */
-    public function destroy(Question $question)
-    {
-        $this->authorize('update', $question->exercise);
+    return $this->success(["question" => $question], "Pertanyaan berhasil diperbarui");
+  }
 
-        $this->service->delete($question);
+  /**
+   * Delete question
+   */
+  public function destroy(Question $question)
+  {
+    $this->authorize("update", $question->exercise);
 
-        return response()->json(null, 204);
-    }
+    $this->service->delete($question);
+
+    return $this->noContent();
+  }
 }

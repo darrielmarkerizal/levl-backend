@@ -6,88 +6,98 @@ use Modules\Schemes\Services\TagService;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
-beforeEach(function () {
-    $this->service = new TagService();
+function getTagService(): TagService
+{
+  return new TagService();
+}
+
+test("create generates slug automatically", function () {
+  $service = getTagService();
+  $tag = $service->create(["name" => "Web Development"]);
+
+  expect($tag)->not->toBeNull();
+  expect($tag->name)->toEqual("Web Development");
+  expect($tag->slug)->toEqual("web-development");
 });
 
-test('create generates slug automatically', function () {
-    $tag = $this->service->create(['name' => 'Web Development']);
+test("create handles duplicate names", function () {
+  $service = getTagService();
+  $tag1 = $service->create(["name" => "Backend"]);
+  $tag2 = $service->create(["name" => "backend"]);
 
-    expect($tag)->not->toBeNull();
-    expect($tag->name)->toEqual('Web Development');
-    expect($tag->slug)->toEqual('web-development');
+  expect($tag2->id)->toEqual($tag1->id);
 });
 
-test('create handles duplicate names', function () {
-    $tag1 = $this->service->create(['name' => 'Backend']);
-    $tag2 = $this->service->create(['name' => 'backend']);
+test("create many creates multiple tags", function () {
+  $service = getTagService();
+  $tags = $service->createMany(["PHP", "Laravel", "JavaScript"]);
 
-    expect($tag2->id)->toEqual($tag1->id);
+  expect($tags)->toHaveCount(3);
+  expect($tags[0]->name)->toEqual("PHP");
+  expect($tags[1]->name)->toEqual("Laravel");
+  expect($tags[2]->name)->toEqual("JavaScript");
 });
 
-test('create many creates multiple tags', function () {
-    $tags = $this->service->createMany(['PHP', 'Laravel', 'JavaScript']);
+test("create many skips empty names", function () {
+  $service = getTagService();
+  $tags = $service->createMany(["PHP", "", "  ", "Laravel"]);
 
-    expect($tags)->toHaveCount(3);
-    expect($tags[0]->name)->toEqual('PHP');
-    expect($tags[1]->name)->toEqual('Laravel');
-    expect($tags[2]->name)->toEqual('JavaScript');
+  expect($tags)->toHaveCount(2);
 });
 
-test('create many skips empty names', function () {
-    $tags = $this->service->createMany(['PHP', '', '  ', 'Laravel']);
+test("update changes name and slug", function () {
+  $service = getTagService();
+  $tag = Tag::factory()->create(["name" => "Old Name", "slug" => "old-name"]);
 
-    expect($tags)->toHaveCount(2);
+  $updated = $service->update($tag->id, ["name" => "New Name"]);
+
+  expect($updated)->not->toBeNull();
+  expect($updated->name)->toEqual("New Name");
+  expect($updated->slug)->toEqual("new-name");
 });
 
-test('update changes name and slug', function () {
-    $tag = Tag::factory()->create(['name' => 'Old Name', 'slug' => 'old-name']);
+test("update returns null for invalid id", function () {
+  $service = getTagService();
+  $result = $service->update(99999, ["name" => "Test"]);
 
-    $updated = $this->service->update($tag->id, ['name' => 'New Name']);
-
-    expect($updated)->not->toBeNull();
-    expect($updated->name)->toEqual('New Name');
-    expect($updated->slug)->toEqual('new-name');
+  expect($result)->toBeNull();
 });
 
-test('update returns null for invalid id', function () {
-    $result = $this->service->update(99999, ['name' => 'Test']);
+test("delete removes tag and detaches from courses", function () {
+  $service = getTagService();
+  $tag = Tag::factory()->create();
+  $course = Course::factory()->create();
+  $course->tags()->attach($tag->id);
 
-    expect($result)->toBeNull();
+  $result = $service->delete($tag->id);
+
+  expect($result)->toBeTrue();
+  assertDatabaseMissing("tags", ["id" => $tag->id]);
+  assertDatabaseMissing("course_tag_pivot", ["tag_id" => $tag->id]);
 });
 
-test('delete removes tag and detaches from courses', function () {
-    $tag = Tag::factory()->create();
-    $course = Course::factory()->create();
-    $course->tags()->attach($tag->id);
+test("sync course tags attaches tags to course", function () {
+  $service = getTagService();
+  $course = Course::factory()->create();
+  $tag1 = $service->create(["name" => "PHP-Test-" . uniqid()]);
+  $tag2 = $service->create(["name" => "Laravel-Test-" . uniqid()]);
 
-    $result = $this->service->delete($tag->id);
+  $service->syncCourseTags($course, [$tag1->id, $tag2->id]);
 
-    expect($result)->toBeTrue();
-    assertDatabaseMissing('tags', ['id' => $tag->id]);
-    assertDatabaseMissing('course_tag_pivot', ['tag_id' => $tag->id]);
+  $course->refresh();
+  expect($course->tags)->toHaveCount(2);
+  expect($course->tags_json)->toContain($tag1->name);
+  expect($course->tags_json)->toContain($tag2->name);
 });
 
-test('sync course tags attaches tags to course', function () {
-    $course = Course::factory()->create();
-    $tag1 = Tag::factory()->create(['name' => 'PHP']);
-    $tag2 = Tag::factory()->create(['name' => 'Laravel']);
+test("sync course tags creates new tags from names", function () {
+  $service = getTagService();
+  $course = Course::factory()->create();
 
-    $this->service->syncCourseTags($course, [$tag1->id, $tag2->id]);
+  $service->syncCourseTags($course, ["New Tag", "Another Tag"]);
 
-    $course->refresh();
-    expect($course->tags)->toHaveCount(2);
-    expect($course->tags_json)->toContain('PHP');
-    expect($course->tags_json)->toContain('Laravel');
-});
-
-test('sync course tags creates new tags from names', function () {
-    $course = Course::factory()->create();
-
-    $this->service->syncCourseTags($course, ['New Tag', 'Another Tag']);
-
-    $course->refresh();
-    expect($course->tags)->toHaveCount(2);
-    expect($course->tags->contains('name', 'New Tag'))->toBeTrue();
-    expect($course->tags->contains('name', 'Another Tag'))->toBeTrue();
+  $course->refresh();
+  expect($course->tags)->toHaveCount(2);
+  expect($course->tags->contains("name", "New Tag"))->toBeTrue();
+  expect($course->tags->contains("name", "Another Tag"))->toBeTrue();
 });

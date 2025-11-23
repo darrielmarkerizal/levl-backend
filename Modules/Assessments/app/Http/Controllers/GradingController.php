@@ -3,6 +3,8 @@
 namespace Modules\Assessments\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Support\ApiResponse;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Modules\Assessments\Models\Exercise;
 use Modules\Assessments\Models\Attempt;
@@ -11,63 +13,73 @@ use Modules\Assessments\Services\GradingService;
 
 class GradingController extends Controller
 {
-    public function __construct(private readonly GradingService $service) {}
+  use ApiResponse;
 
-    /**
-     * Get all attempts for an exercise
-     */
-    public function getExerciseAttempts(Request $request, Exercise $exercise)
-    {
-        $this->authorize('view', $exercise);
+  public function __construct(private readonly GradingService $service) {}
 
-        $attempts = $this->service->attempts($exercise, $request->all(), (int) $request->get('per_page', 15));
+  /**
+   * Get all attempts for an exercise
+   */
+  public function getExerciseAttempts(Request $request, Exercise $exercise)
+  {
+    $this->authorize("view", $exercise);
 
-        return response()->json(['data' => $attempts]);
+    $result = $this->service->attempts(
+      $exercise,
+      $request->all(),
+      (int) $request->get("per_page", 15),
+    );
+
+    if ($result instanceof LengthAwarePaginator) {
+      return $this->paginateResponse($result, "Daftar attempt berhasil diambil");
     }
 
-    /**
-     * Get all answers for an attempt
-     */
-    public function getAttemptAnswers(Attempt $attempt)
-    {
-        $this->authorize('view', $attempt);
+    return $this->success(["attempts" => $result], "Daftar attempt berhasil diambil");
+  }
 
-        $answers = $this->service->answers($attempt);
+  /**
+   * Get all answers for an attempt
+   */
+  public function getAttemptAnswers(Attempt $attempt)
+  {
+    $this->authorize("view", $attempt);
 
-        return response()->json(['data' => ['answers' => $answers]]);
-    }
+    $answers = $this->service->answers($attempt);
 
-    /**
-     * Add feedback to an answer (for essay/short answer)
-     */
-    public function addFeedback(Request $request, Answer $answer)
-    {
-        $this->authorize('view', $answer->attempt);
+    return $this->success(["answers" => $answers], "Daftar jawaban berhasil diambil");
+  }
 
-        $validated = $request->validate([
-            'feedback' => 'required|string',
-            'score_awarded' => 'required|numeric|min:0',
-        ]);
+  /**
+   * Add feedback to an answer (for essay/short answer)
+   */
+  public function addFeedback(Request $request, Answer $answer)
+  {
+    $this->authorize("view", $answer->attempt);
 
-        $answer = $this->service->addFeedback($answer, $validated);
+    $validated = $request->validate([
+      "feedback" => "required|string",
+      "score_awarded" => "required|numeric|min:0",
+    ]);
 
-        return response()->json(['data' => ['answer' => $answer]]);
-    }
+    $answer = $this->service->addFeedback($answer, $validated);
 
-    /**
-     * Update attempt's final score and feedback
-     */
-    public function updateAttemptScore(Request $request, Attempt $attempt)
-    {
-        $this->authorize('view', $attempt);
+    return $this->success(["answer" => $answer], "Feedback berhasil ditambahkan");
+  }
 
-        $validated = $request->validate([
-            'score' => 'required|numeric|min:0',
-            'feedback' => 'nullable|string',
-        ]);
+  /**
+   * Update attempt's final score and feedback
+   */
+  public function updateAttemptScore(Request $request, Attempt $attempt)
+  {
+    $this->authorize("view", $attempt);
 
-        $attempt = $this->service->updateAttemptScore($attempt, $validated);
+    $validated = $request->validate([
+      "score" => "required|numeric|min:0",
+      "feedback" => "nullable|string",
+    ]);
 
-        return response()->json(['data' => ['attempt' => $attempt]]);
-    }
+    $attempt = $this->service->updateAttemptScore($attempt, $validated);
+
+    return $this->success(["attempt" => $attempt], "Score attempt berhasil diperbarui");
+  }
 }

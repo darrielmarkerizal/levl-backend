@@ -23,6 +23,8 @@ interface AuthRepositoryInterface
 
     public function findValidRefreshRecordByUser(string $plainToken, int $userId): ?JwtRefreshToken;
 
+    public function findValidRefreshRecord(string $plainToken): ?JwtRefreshToken;
+
     public function markTokenAsReplaced(int $oldTokenId, int $newTokenId): void;
 
     public function findReplacedTokenChain(int $tokenId): array;
