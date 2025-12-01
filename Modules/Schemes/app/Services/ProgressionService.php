@@ -42,6 +42,9 @@ class ProgressionService
 
             $this->storeLessonCompletion($lessonModel, $enrollment);
 
+            // Emit LessonCompleted event for gamification
+            \Modules\Schemes\Events\LessonCompleted::dispatch($lessonModel, $enrollment->user_id, $enrollment->id);
+
             $unitResult = $this->updateUnitProgress(
                 $lessonModel->unit,
                 $enrollment,
@@ -119,7 +122,7 @@ class ProgressionService
             }
         }
 
-        $lessons = $lessonModel->unit->lessons ?? new EloquentCollection();
+        $lessons = $lessonModel->unit->lessons ?? new EloquentCollection;
         if ($lessons->isEmpty()) {
             return true;
         }
@@ -192,7 +195,7 @@ class ProgressionService
         $completedUnitsCount = 0;
 
         foreach ($courseModel->units as $unit) {
-            $lessons = $unit->lessons ?? new EloquentCollection();
+            $lessons = $unit->lessons ?? new EloquentCollection;
             $unitProgress = $unitProgressMap->get($unit->id);
 
             $lessonsData = [];
@@ -465,5 +468,3 @@ class ProgressionService
         ];
     }
 }
-
-

@@ -11,7 +11,15 @@ class EventServiceProvider extends ServiceProvider
      *
      * @var array<string, array<int, string>>
      */
-    protected $listen = [];
+    protected $listen = [
+        \Modules\Schemes\Events\CourseCompleted::class => [
+            \Modules\Notifications\Listeners\NotifyUserOnCourseCompleted::class,
+        ],
+        // Additional notification listeners can be added here
+        // Example: \Modules\Learning\Events\AssignmentGraded::class => [
+        //     \Modules\Notifications\Listeners\NotifyUserOnAssignmentGraded::class,
+        // ],
+    ];
 
     /**
      * Indicates if events should be discovered.

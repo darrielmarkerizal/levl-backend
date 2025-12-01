@@ -8,12 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class Notification extends Model
 {
     use HasFactory;
+
     protected $fillable = [
-        'type', 'title', 'message', 'channel',
+        'type', 'title', 'message', 'data', 'action_url', 'channel',
         'priority', 'is_broadcast', 'scheduled_at', 'sent_at',
     ];
 
     protected $casts = [
+        'data' => 'array',
         'scheduled_at' => 'datetime',
         'sent_at' => 'datetime',
         'is_broadcast' => 'boolean',

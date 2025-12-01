@@ -7,7 +7,7 @@ use Modules\Auth\Models\User;
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
 beforeEach(function () {
-    $this->middleware = new EnsureRole();
+    $this->middleware = new EnsureRole;
     createTestRoles();
 });
 
@@ -51,7 +51,7 @@ test('middleware allows access when user has required role', function () {
 
     expect($response->getStatusCode())->toEqual(200);
     $responseData = json_decode($response->getContent(), true);
-    expect($responseData['status'])->toEqual('success');
+    expect($responseData['success'])->toBeTrue();
 });
 
 test('middleware allows access when user has any of multiple roles', function () {

@@ -8,7 +8,7 @@ use Spatie\Permission\Models\Permission;
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
 beforeEach(function () {
-    $this->middleware = new EnsurePermission();
+    $this->middleware = new EnsurePermission;
 });
 
 test('middleware returns 401 when user not authenticated', function () {
@@ -51,7 +51,7 @@ test('middleware allows access when user has permission', function () {
 
     expect($response->getStatusCode())->toEqual(200);
     $responseData = json_decode($response->getContent(), true);
-    expect($responseData['status'])->toEqual('success');
+    expect($responseData['success'])->toBeTrue();
 });
 
 test('middleware allows access when user has any of multiple permissions', function () {

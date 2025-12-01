@@ -4,9 +4,9 @@ use Illuminate\Support\Facades\Route;
 use Modules\Schemes\Http\Controllers\CourseController;
 use Modules\Schemes\Http\Controllers\LessonBlockController;
 use Modules\Schemes\Http\Controllers\LessonController;
-use Modules\Schemes\Http\Controllers\UnitController;
-use Modules\Schemes\Http\Controllers\TagController;
 use Modules\Schemes\Http\Controllers\ProgressController;
+use Modules\Schemes\Http\Controllers\TagController;
+use Modules\Schemes\Http\Controllers\UnitController;
 
 Route::prefix('v1')->scopeBindings()->group(function () {
 
@@ -19,6 +19,11 @@ Route::prefix('v1')->scopeBindings()->group(function () {
         Route::delete('courses/{course:slug}', [CourseController::class, 'destroy'])->middleware('can:delete,course');
         Route::put('courses/{course:slug}/publish', [CourseController::class, 'publish']);
         Route::put('courses/{course:slug}/unpublish', [CourseController::class, 'unpublish']);
+
+        // Enrollment key management
+        Route::post('courses/{course:slug}/enrollment-key/generate', [CourseController::class, 'generateEnrollmentKey']);
+        Route::put('courses/{course:slug}/enrollment-key', [CourseController::class, 'updateEnrollmentKey']);
+        Route::delete('courses/{course:slug}/enrollment-key', [CourseController::class, 'removeEnrollmentKey']);
     });
 
     Route::get('courses/{course:slug}/units', [UnitController::class, 'index']);

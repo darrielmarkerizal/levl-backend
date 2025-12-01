@@ -134,7 +134,6 @@ trait ApiResponse
      */
     protected function noContent(): JsonResponse
     {
-        // Laravel already handle 204 with empty body
-        return response()->noContent();
+        return response()->json([], 204);
     }
 }
