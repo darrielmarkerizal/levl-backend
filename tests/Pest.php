@@ -11,14 +11,12 @@
 |
 */
 
-pest()->extend(Tests\TestCase::class)
-    ->in('Feature');
+pest()->extend(Tests\TestCase::class)->in("Feature");
 
-pest()->extend(Tests\TestCase::class)
-    ->in('Unit');
+pest()->extend(Tests\TestCase::class)->in("Unit");
 
-pest()->extend(Tests\TestCase::class)
-    ->in('Modules');
+// Configure Pest for module tests (located at project root level Modules/*/tests)
+pest()->extend(Tests\TestCase::class)->in("../Modules/*/tests");
 
 /*
 |--------------------------------------------------------------------------
@@ -31,8 +29,8 @@ pest()->extend(Tests\TestCase::class)
 |
 */
 
-expect()->extend('toBeOne', function () {
-    return $this->toBe(1);
+expect()->extend("toBeOne", function () {
+  return $this->toBe(1);
 });
 
 /*
@@ -51,7 +49,7 @@ expect()->extend('toBeOne', function () {
  */
 function assertDatabaseHas(string $table, array $data): void
 {
-    expect(\Illuminate\Support\Facades\DB::table($table)->where($data)->exists())->toBeTrue();
+  expect(\Illuminate\Support\Facades\DB::table($table)->where($data)->exists())->toBeTrue();
 }
 
 /**
@@ -59,7 +57,7 @@ function assertDatabaseHas(string $table, array $data): void
  */
 function assertDatabaseMissing(string $table, array $data): void
 {
-    expect(\Illuminate\Support\Facades\DB::table($table)->where($data)->exists())->toBeFalse();
+  expect(\Illuminate\Support\Facades\DB::table($table)->where($data)->exists())->toBeFalse();
 }
 
 /**
@@ -67,11 +65,11 @@ function assertDatabaseMissing(string $table, array $data): void
  */
 function createTestRoles(): void
 {
-    $guard = 'api';
-    \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Superadmin', 'guard_name' => $guard]);
-    \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Admin', 'guard_name' => $guard]);
-    \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Instructor', 'guard_name' => $guard]);
-    \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Student', 'guard_name' => $guard]);
+  $guard = "api";
+  \Spatie\Permission\Models\Role::firstOrCreate(["name" => "Superadmin", "guard_name" => $guard]);
+  \Spatie\Permission\Models\Role::firstOrCreate(["name" => "Admin", "guard_name" => $guard]);
+  \Spatie\Permission\Models\Role::firstOrCreate(["name" => "Instructor", "guard_name" => $guard]);
+  \Spatie\Permission\Models\Role::firstOrCreate(["name" => "Student", "guard_name" => $guard]);
 }
 
 /**
@@ -79,5 +77,5 @@ function createTestRoles(): void
  */
 function api(string $uri): string
 {
-    return "/api/v1" . $uri;
+  return "/api/v1" . $uri;
 }

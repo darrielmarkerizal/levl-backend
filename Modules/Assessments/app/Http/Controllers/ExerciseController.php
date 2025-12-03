@@ -43,9 +43,10 @@ class ExerciseController extends Controller
       "scope_id" => "required|integer",
       "title" => "required|string|max:255",
       "description" => "nullable|string",
-      "type" => "required|in:quiz,exam,homework",
+      "type" => "required|in:quiz,exam",
       "time_limit_minutes" => "nullable|integer|min:1",
-      "max_score" => "required|numeric|min:0",
+      "max_score" => "nullable|numeric|min:0",
+      "allow_retake" => "nullable|boolean",
       "available_from" => "nullable|date",
       "available_until" => "nullable|date|after:available_from",
     ]);
@@ -60,6 +61,7 @@ class ExerciseController extends Controller
    */
   public function show(Exercise $exercise)
   {
+    $exercise->load(["questions.options", "creator"]);
     return $this->success(["exercise" => $exercise], "Detail exercise berhasil diambil");
   }
 
@@ -73,9 +75,10 @@ class ExerciseController extends Controller
     $validated = $request->validate([
       "title" => "sometimes|string|max:255",
       "description" => "nullable|string",
-      "type" => "sometimes|in:quiz,exam,homework",
+      "type" => "sometimes|in:quiz,exam",
       "time_limit_minutes" => "nullable|integer|min:1",
       "max_score" => "sometimes|numeric|min:0",
+      "allow_retake" => "nullable|boolean",
       "available_from" => "nullable|date",
       "available_until" => "nullable|date|after:available_from",
     ]);

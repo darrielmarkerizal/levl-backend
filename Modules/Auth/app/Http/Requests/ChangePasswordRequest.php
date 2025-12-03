@@ -3,14 +3,9 @@
 namespace Modules\Auth\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Modules\Common\Http\Requests\Concerns\HasApiValidation;
-use Modules\Auth\Http\Requests\Concerns\HasAuthRequestRules;
-use Modules\Auth\Http\Requests\Concerns\HasPasswordRules;
 
 class ChangePasswordRequest extends FormRequest
 {
-    use HasApiValidation, HasAuthRequestRules, HasPasswordRules;
-
     public function authorize(): bool
     {
         return true;
@@ -18,11 +13,19 @@ class ChangePasswordRequest extends FormRequest
 
     public function rules(): array
     {
-        return $this->rulesChangePassword();
+        return [
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:8|confirmed',
+        ];
     }
 
     public function messages(): array
     {
-        return $this->messagesChangePassword();
+        return [
+            'current_password.required' => 'Current password is required.',
+            'new_password.required' => 'New password is required.',
+            'new_password.min' => 'New password must be at least 8 characters.',
+            'new_password.confirmed' => 'Password confirmation does not match.',
+        ];
     }
 }

@@ -8,10 +8,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Laravel\Scout\Searchable;
+use Modules\Schemes\Enums\CourseStatus;
+use Modules\Schemes\Enums\CourseType;
+use Modules\Schemes\Enums\EnrollmentType;
+use Modules\Schemes\Enums\LevelTag;
+use Modules\Schemes\Enums\ProgressionMode;
 
 class Course extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, Searchable, SoftDeletes;
 
     /**
      * Fields that support full-text search via QueryFilter.
@@ -25,12 +31,17 @@ class Course extends Model
         'level_tag', 'category_id', 'tags_json', 'prereq_text',
         'duration_estimate', 'thumbnail_path',
         'banner_path', 'progression_mode', 'enrollment_type', 'enrollment_key',
-        'status', 'published_at', 'instructor_id',
+        'status', 'published_at', 'instructor_id', 'deleted_by',
     ];
 
     protected $casts = [
         'tags_json' => 'array',
         'published_at' => 'datetime',
+        'status' => CourseStatus::class,
+        'type' => CourseType::class,
+        'level_tag' => LevelTag::class,
+        'enrollment_type' => EnrollmentType::class,
+        'progression_mode' => ProgressionMode::class,
     ];
 
     protected $appends = ['thumbnail_url', 'banner_url', 'tag_list'];
@@ -90,6 +101,14 @@ class Course extends Model
     public function instructor(): BelongsTo
     {
         return $this->belongsTo(\Modules\Auth\Models\User::class, 'instructor_id');
+    }
+
+    /**
+     * Get the user who deleted the course.
+     */
+    public function deletedBy(): BelongsTo
+    {
+        return $this->belongsTo(\Modules\Auth\Models\User::class, 'deleted_by');
     }
 
     /**
@@ -158,6 +177,48 @@ class Course extends Model
     public function outcomes(): HasMany
     {
         return $this->hasMany(CourseOutcome::class)->orderBy('order');
+    }
+
+    /**
+     * Get the indexable data array for the model.
+     */
+    public function toSearchableArray(): array
+    {
+        // Load relationships if not already loaded
+        $this->loadMissing(['category', 'instructor', 'tags']);
+
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'short_desc' => $this->short_desc,
+            'code' => $this->code,
+            'level_tag' => $this->level_tag,
+            'category_id' => $this->category_id,
+            'category_name' => $this->category?->name,
+            'instructor_id' => $this->instructor_id,
+            'instructor_name' => $this->instructor?->name,
+            'tags' => $this->tags->pluck('name')->toArray(),
+            'status' => $this->status,
+            'type' => $this->type,
+            'duration_estimate' => $this->duration_estimate,
+            'published_at' => $this->published_at?->timestamp,
+        ];
+    }
+
+    /**
+     * Get the name of the index associated with the model.
+     */
+    public function searchableAs(): string
+    {
+        return 'courses_index';
+    }
+
+    /**
+     * Determine if the model should be searchable.
+     */
+    public function shouldBeSearchable(): bool
+    {
+        return $this->status === CourseStatus::Published;
     }
 
     /**

@@ -136,4 +136,42 @@ trait ApiResponse
     {
         return response()->json([], 204);
     }
+
+    // Static methods for use without trait
+    public static function successStatic(
+        mixed $data = null,
+        string $message = 'Berhasil',
+        int $status = 200,
+        ?array $meta = null
+    ): JsonResponse {
+        return response()->json(
+            [
+                'success' => true,
+                'message' => $message,
+                'data' => $data,
+                'meta' => $meta,
+                'errors' => null,
+            ],
+            $status
+        );
+    }
+
+    public static function errorStatic(
+        string $message = 'Terjadi kesalahan',
+        int $status = 400,
+        ?array $errors = null,
+        mixed $data = null,
+        ?array $meta = null
+    ): JsonResponse {
+        return response()->json(
+            [
+                'success' => false,
+                'message' => $message,
+                'data' => $data,
+                'meta' => $meta,
+                'errors' => $errors,
+            ],
+            $status
+        );
+    }
 }

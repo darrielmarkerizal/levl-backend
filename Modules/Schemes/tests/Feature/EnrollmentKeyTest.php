@@ -5,6 +5,7 @@ namespace Modules\Schemes\Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Auth\Models\User;
 use Modules\Schemes\Models\Course;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class EnrollmentKeyTest extends TestCase
@@ -41,7 +42,7 @@ class EnrollmentKeyTest extends TestCase
     ]);
   }
 
-  /** @test */
+  #[Test]
   public function admin_can_generate_enrollment_key()
   {
     $response = $this->actingAs($this->admin, "api")->postJson(
@@ -63,7 +64,7 @@ class EnrollmentKeyTest extends TestCase
     $this->assertEquals($response->json("data.enrollment_key"), $this->course->enrollment_key);
   }
 
-  /** @test */
+  #[Test]
   public function student_cannot_generate_enrollment_key()
   {
     $response = $this->actingAs($this->student, "api")->postJson(
@@ -73,7 +74,7 @@ class EnrollmentKeyTest extends TestCase
     $response->assertStatus(403);
   }
 
-  /** @test */
+  #[Test]
   public function admin_can_update_enrollment_type_to_key_based()
   {
     $response = $this->actingAs($this->admin, "api")->putJson(
@@ -96,7 +97,7 @@ class EnrollmentKeyTest extends TestCase
     $this->assertEquals("CUSTOMKEY123", $this->course->enrollment_key);
   }
 
-  /** @test */
+  #[Test]
   public function enrollment_type_auto_accept_clears_key()
   {
     $this->course->update([
@@ -118,7 +119,7 @@ class EnrollmentKeyTest extends TestCase
     $this->assertNull($this->course->enrollment_key);
   }
 
-  /** @test */
+  #[Test]
   public function key_based_without_key_auto_generates()
   {
     $response = $this->actingAs($this->admin, "api")->putJson(
@@ -136,7 +137,7 @@ class EnrollmentKeyTest extends TestCase
     $this->assertEquals(12, strlen($this->course->enrollment_key));
   }
 
-  /** @test */
+  #[Test]
   public function admin_can_remove_enrollment_key()
   {
     $this->course->update([
@@ -155,7 +156,7 @@ class EnrollmentKeyTest extends TestCase
     $this->assertNull($this->course->enrollment_key);
   }
 
-  /** @test */
+  #[Test]
   public function student_cannot_update_enrollment_key()
   {
     $response = $this->actingAs($this->student, "api")->putJson(
@@ -169,7 +170,7 @@ class EnrollmentKeyTest extends TestCase
     $response->assertStatus(403);
   }
 
-  /** @test */
+  #[Test]
   public function invalid_enrollment_type_rejected()
   {
     $response = $this->actingAs($this->admin, "api")->putJson(
@@ -182,7 +183,7 @@ class EnrollmentKeyTest extends TestCase
     $response->assertStatus(422)->assertJsonValidationErrors(["enrollment_type"]);
   }
 
-  /** @test */
+  #[Test]
   public function enrollment_key_max_length_validation()
   {
     $longKey = str_repeat("A", 101); // 101 characters

@@ -111,7 +111,7 @@ class PasswordResetController extends Controller
         }
 
         $user->forceFill([
-            'password' => Hash::make($request->string('password')),
+            'password' => Hash::make($request->string('new_password')),
         ])->save();
 
         return $this->success([], 'Kata sandi berhasil diperbarui.');

@@ -1,0 +1,11 @@
+{
+    "name": "Forums",
+    "alias": "forums",
+    "description": "Forum and discussion system for scheme-based learning",
+    "keywords": ["forum", "discussion", "thread", "reply"],
+    "priority": 5,
+    "providers": [
+        "Modules\\Forums\\Providers\\ForumsServiceProvider"
+    ],
+    "files": []
+}

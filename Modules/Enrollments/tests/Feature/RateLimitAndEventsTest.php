@@ -11,6 +11,7 @@ use Modules\Schemes\Events\LessonCompleted;
 use Modules\Schemes\Models\Course;
 use Modules\Schemes\Models\Lesson;
 use Modules\Schemes\Models\Unit;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class EnrollmentRateLimitTest extends TestCase
@@ -33,7 +34,7 @@ class EnrollmentRateLimitTest extends TestCase
     ]);
   }
 
-  /** @test */
+  #[Test]
   public function enrollment_endpoint_is_rate_limited()
   {
     // Make 6 requests quickly (limit is 5 per minute)
@@ -102,7 +103,7 @@ class GamificationIntegrationTest extends TestCase
     ]);
   }
 
-  /** @test */
+  #[Test]
   public function lesson_completed_event_is_dispatched()
   {
     $response = $this->actingAs($this->student, "api")->postJson(
@@ -116,7 +117,7 @@ class GamificationIntegrationTest extends TestCase
     });
   }
 
-  /** @test */
+  #[Test]
   public function course_completed_event_is_dispatched_when_all_lessons_done()
   {
     // This is an integration test - would need to complete all lessons in course

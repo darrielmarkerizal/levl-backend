@@ -54,7 +54,7 @@ class GradingController extends Controller
    */
   public function addFeedback(Request $request, Answer $answer)
   {
-    $this->authorize("view", $answer->attempt);
+    $this->authorize("grade", $answer->attempt);
 
     $validated = $request->validate([
       "feedback" => "required|string",
@@ -71,7 +71,7 @@ class GradingController extends Controller
    */
   public function updateAttemptScore(Request $request, Attempt $attempt)
   {
-    $this->authorize("view", $attempt);
+    $this->authorize("grade", $attempt);
 
     $validated = $request->validate([
       "score" => "required|numeric|min:0",

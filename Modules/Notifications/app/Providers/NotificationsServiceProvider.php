@@ -36,6 +36,12 @@ class NotificationsServiceProvider extends ServiceProvider
     {
         $this->app->register(EventServiceProvider::class);
         $this->app->register(RouteServiceProvider::class);
+
+        // Register service bindings
+        $this->app->bind(
+            \Modules\Notifications\Contracts\NotificationPreferenceServiceInterface::class,
+            \Modules\Notifications\Services\NotificationPreferenceService::class
+        );
     }
 
     /**
@@ -129,7 +135,7 @@ class NotificationsServiceProvider extends ServiceProvider
 
         $this->loadViewsFrom(array_merge($this->getPublishableViewPaths(), [$sourcePath]), $this->nameLower);
 
-        Blade::componentNamespace(config('modules.namespace').'\\' . $this->name . '\\View\\Components', $this->nameLower);
+        Blade::componentNamespace(config('modules.namespace').'\\'.$this->name.'\\View\\Components', $this->nameLower);
     }
 
     /**

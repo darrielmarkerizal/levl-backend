@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->enum('type', [
                 'system', 'assignment', 'assessment', 'grading', 'gamification', 'news', 'custom',
-                'course_completed', 'enrollment',
+                'course_completed', 'enrollment', 'forum_reply_to_thread', 'forum_reply_to_reply',
             ])->default('system');
             $table->string('title', 255);
             $table->text('message')->nullable();

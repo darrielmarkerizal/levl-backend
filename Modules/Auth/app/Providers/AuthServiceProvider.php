@@ -4,13 +4,15 @@ namespace Modules\Auth\Providers;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Modules\Auth\Interfaces\AuthRepositoryInterface;
+use Modules\Auth\Interfaces\AuthServiceInterface;
+use Modules\Auth\Models\User;
+use Modules\Auth\Observers\UserObserver;
+use Modules\Auth\Repositories\AuthRepository;
+use Modules\Auth\Services\AuthService;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
-use Modules\Auth\Interfaces\AuthRepositoryInterface;
-use Modules\Auth\Interfaces\AuthServiceInterface;
-use Modules\Auth\Repositories\AuthRepository;
-use Modules\Auth\Services\AuthService;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -31,6 +33,9 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
+
+        // Register observers
+        User::observe(UserObserver::class);
     }
 
     /**
@@ -44,6 +49,12 @@ class AuthServiceProvider extends ServiceProvider
         // Bind interfaces
         $this->app->bind(AuthRepositoryInterface::class, AuthRepository::class);
         $this->app->bind(AuthServiceInterface::class, AuthService::class);
+
+        // Bind profile service interface to implementation
+        $this->app->bind(
+            \App\Contracts\Services\ProfileServiceInterface::class,
+            \Modules\Auth\Services\ProfileService::class
+        );
     }
 
     /**
@@ -137,7 +148,7 @@ class AuthServiceProvider extends ServiceProvider
 
         $this->loadViewsFrom(array_merge($this->getPublishableViewPaths(), [$sourcePath]), $this->nameLower);
 
-        Blade::componentNamespace(config('modules.namespace').'\\' . $this->name . '\\View\\Components', $this->nameLower);
+        Blade::componentNamespace(config('modules.namespace').'\\'.$this->name.'\\View\\Components', $this->nameLower);
     }
 
     /**

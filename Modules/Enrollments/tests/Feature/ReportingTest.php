@@ -7,6 +7,7 @@ use Modules\Auth\Models\User;
 use Modules\Enrollments\Models\CourseProgress;
 use Modules\Enrollments\Models\Enrollment;
 use Modules\Schemes\Models\Course;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class ReportingTest extends TestCase
@@ -46,7 +47,7 @@ class ReportingTest extends TestCase
     ]);
   }
 
-  /** @test */
+  #[Test]
   public function instructor_can_view_course_completion_rate()
   {
     // Create some enrollments with different statuses
@@ -96,7 +97,7 @@ class ReportingTest extends TestCase
     $this->assertEquals(50.0, $response->json("data.statistics.completion_rate"));
   }
 
-  /** @test */
+  #[Test]
   public function student_cannot_view_completion_rate()
   {
     $response = $this->actingAs($this->student, "api")->getJson(
@@ -106,7 +107,7 @@ class ReportingTest extends TestCase
     $response->assertStatus(403);
   }
 
-  /** @test */
+  #[Test]
   public function admin_can_view_enrollment_funnel()
   {
     // Create enrollments with different statuses
@@ -158,7 +159,7 @@ class ReportingTest extends TestCase
     $this->assertEquals(2, $response->json("data.funnel.completed.count"));
   }
 
-  /** @test */
+  #[Test]
   public function student_cannot_view_enrollment_funnel()
   {
     $response = $this->actingAs($this->student, "api")->getJson(
@@ -168,7 +169,7 @@ class ReportingTest extends TestCase
     $response->assertStatus(403);
   }
 
-  /** @test */
+  #[Test]
   public function instructor_can_export_enrollments_csv()
   {
     for ($i = 0; $i < 3; $i++) {
@@ -199,7 +200,7 @@ class ReportingTest extends TestCase
     $this->assertStringContainsString("Status", $content);
   }
 
-  /** @test */
+  #[Test]
   public function student_cannot_export_csv()
   {
     $response = $this->actingAs($this->student, "api")->get(
@@ -209,7 +210,7 @@ class ReportingTest extends TestCase
     $response->assertStatus(403);
   }
 
-  /** @test */
+  #[Test]
   public function unauthorized_instructor_cannot_view_other_course_reports()
   {
     $otherInstructor = User::factory()->create();
@@ -222,7 +223,7 @@ class ReportingTest extends TestCase
     $response->assertStatus(403);
   }
 
-  /** @test */
+  #[Test]
   public function superadmin_can_view_all_reports()
   {
     $superadmin = User::factory()->create();

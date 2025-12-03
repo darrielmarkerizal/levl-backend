@@ -7,10 +7,13 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "http-interop/http-factory-guzzle": "^1.2",
         "laravel/framework": "^12.0",
+        "laravel/scout": "*",
         "laravel/socialite": "^5.23",
         "laravel/tinker": "^2.10.1",
         "league/flysystem-aws-s3-v3": "*",
+        "meilisearch/meilisearch-php": "^1.16",
         "nwidart/laravel-modules": "^12.0",
         "scalar/laravel": "^0.2.0",
         "spatie/laravel-permission": "^6.22",
@@ -66,7 +69,16 @@
             "Modules\\Operations\\Database\\Seeders\\": "Modules/Operations/database/seeders/",
             "Modules\\Schemes\\": "Modules/Schemes/app/",
             "Modules\\Schemes\\Database\\Factories\\": "Modules/Schemes/database/factories/",
-            "Modules\\Schemes\\Database\\Seeders\\": "Modules/Schemes/database/seeders/"
+            "Modules\\Schemes\\Database\\Seeders\\": "Modules/Schemes/database/seeders/",
+            "Modules\\Forums\\": "Modules/Forums/app/",
+            "Modules\\Forums\\Database\\Factories\\": "Modules/Forums/database/factories/",
+            "Modules\\Forums\\Database\\Seeders\\": "Modules/Forums/database/seeders/",
+            "Modules\\Content\\": "Modules/Content/app/",
+            "Modules\\Content\\Database\\Factories\\": "Modules/Content/database/factories/",
+            "Modules\\Content\\Database\\Seeders\\": "Modules/Content/database/seeders/",
+            "Modules\\Search\\": "Modules/Search/app/",
+            "Modules\\Search\\Database\\Factories\\": "Modules/Search/database/factories/",
+            "Modules\\Search\\Database\\Seeders\\": "Modules/Search/database/seeders/"
         }
     },
     "autoload-dev": {
@@ -81,7 +93,10 @@
             "Modules\\Learning\\Tests\\": "Modules/Learning/tests/",
             "Modules\\Notifications\\Tests\\": "Modules/Notifications/tests/",
             "Modules\\Operations\\Tests\\": "Modules/Operations/tests/",
-            "Modules\\Schemes\\Tests\\": "Modules/Schemes/tests/"
+            "Modules\\Schemes\\Tests\\": "Modules/Schemes/tests/",
+            "Modules\\Forums\\Tests\\": "Modules/Forums/tests/",
+            "Modules\\Content\\Tests\\": "Modules/Content/tests/",
+            "Modules\\Search\\Tests\\": "Modules/Search/tests/"
         }
     },
     "scripts": {

@@ -49,6 +49,18 @@ class LogApiAction
                 foreach ($sensitiveFields as $field) {
                     unset($body[$field]);
                 }
+                // Filter out file uploads as they cannot be JSON encoded
+                $body = array_filter($body, function ($value) {
+                    return !($value instanceof \Illuminate\Http\UploadedFile);
+                });
+                // Also handle arrays of files
+                foreach ($body as $key => $value) {
+                    if (is_array($value)) {
+                        $body[$key] = array_filter($value, function ($item) {
+                            return !($item instanceof \Illuminate\Http\UploadedFile);
+                        });
+                    }
+                }
                 $meta['request_body'] = $body;
             }
 

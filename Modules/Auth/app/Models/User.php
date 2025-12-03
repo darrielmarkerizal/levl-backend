@@ -5,12 +5,15 @@ namespace Modules\Auth\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Modules\Auth\Enums\UserStatus;
+use Modules\Auth\Traits\HasProfilePrivacy;
+use Modules\Auth\Traits\TracksUserActivity;
 use Spatie\Permission\Traits\HasRoles;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use HasFactory, HasRoles, Notifiable;
+    use HasFactory, HasProfilePrivacy, HasRoles, Notifiable, TracksUserActivity;
 
     protected $guard_name = 'api';
 
@@ -23,6 +26,10 @@ class User extends Authenticatable implements JWTSubject
         'email_verified_at',
         'remember_token',
         'avatar_path',
+        'bio',
+        'phone',
+        'account_status',
+        'last_profile_update',
     ];
 
     protected $hidden = [
@@ -33,6 +40,8 @@ class User extends Authenticatable implements JWTSubject
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'last_profile_update' => 'datetime',
+        'status' => UserStatus::class,
     ];
 
     protected $appends = ['avatar_url'];
@@ -56,6 +65,36 @@ class User extends Authenticatable implements JWTSubject
     public function badges()
     {
         return $this->hasMany(\Modules\Gamification\Models\UserBadge::class);
+    }
+
+    public function privacySettings()
+    {
+        return $this->hasOne(ProfilePrivacySetting::class);
+    }
+
+    public function activities()
+    {
+        return $this->hasMany(UserActivity::class);
+    }
+
+    public function pinnedBadges()
+    {
+        return $this->hasMany(PinnedBadge::class);
+    }
+
+    public function auditLogs()
+    {
+        return $this->hasMany(ProfileAuditLog::class, 'user_id');
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('account_status', 'active');
+    }
+
+    public function scopeSuspended($query)
+    {
+        return $query->where('account_status', 'suspended');
     }
 
     public function getJWTIdentifier()

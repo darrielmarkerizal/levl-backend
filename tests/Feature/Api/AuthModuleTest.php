@@ -224,13 +224,11 @@ it("Auth - Negatif - blocks unauthenticated profile access", function () {
 it("Auth - Positif - updates profile information", function () {
   $response = $this->actingAs($this->student, "api")->putJson(api("/profile"), [
     "name" => "Updated Student",
-    "username" => "studentuser1",
   ]);
 
   $response
     ->assertStatus(200)
-    ->assertJsonPath("data.name", "Updated Student")
-    ->assertJsonPath("data.username", "studentuser1");
+    ->assertJsonPath("data.name", "Updated Student");
 
   $this->student->refresh();
   expect($this->student->name)->toBe("Updated Student");
@@ -695,8 +693,8 @@ it("resets password for authenticated user", function () {
 
   $response = $this->actingAs($user, "api")->postJson(api("/auth/password/reset"), [
     "current_password" => "OldPassword1!",
-    "password" => $newPassword,
-    "password_confirmation" => $newPassword,
+    "new_password" => $newPassword,
+    "new_password_confirmation" => $newPassword,
   ]);
 
   $response->assertStatus(200)->assertJsonPath("message", "Kata sandi berhasil diperbarui.");
@@ -710,8 +708,8 @@ it("rejects password reset with wrong current password", function () {
 
   $response = $this->actingAs($this->student, "api")->postJson(api("/auth/password/reset"), [
     "current_password" => "wrong",
-    "password" => $newPassword,
-    "password_confirmation" => $newPassword,
+    "new_password" => $newPassword,
+    "new_password_confirmation" => $newPassword,
   ]);
 
   $response->assertStatus(422)->assertJsonPath("message", "Password lama tidak cocok.");

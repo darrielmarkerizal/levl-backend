@@ -8,5 +8,8 @@
     "Gamification": true,
     "Notifications": true,
     "Operations": true,
-    "Common": true
+    "Common": true,
+    "Forums": true,
+    "Content": true,
+    "Search": true
 }
