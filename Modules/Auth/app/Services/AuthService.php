@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 use Modules\Auth\Contracts\AuthRepositoryInterface;
 use Modules\Auth\Contracts\AuthServiceInterface;
+use Modules\Auth\Enums\UserStatus;
 use Modules\Auth\Models\User;
 use Modules\Auth\Support\TokenPairDTO;
 use Modules\Enrollments\Models\Enrollment;
@@ -158,7 +159,7 @@ class AuthService implements AuthServiceInterface
             ]);
         }
 
-        if ($user->status !== 'active') {
+        if ($user->status !== UserStatus::Active) {
             throw ValidationException::withMessages([
                 'refresh_token' => 'Akun tidak aktif.',
             ]);
