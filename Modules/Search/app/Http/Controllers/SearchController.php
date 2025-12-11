@@ -4,6 +4,7 @@ namespace Modules\Search\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Support\ApiResponse;
+use App\Support\Traits\HandlesFiltering;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Modules\Search\Contracts\SearchServiceInterface;
@@ -15,6 +16,7 @@ use Modules\Search\Models\SearchHistory;
 class SearchController extends Controller
 {
     use ApiResponse;
+    use HandlesFiltering;
 
     protected SearchServiceInterface $searchService;
 
@@ -49,41 +51,36 @@ class SearchController extends Controller
     {
         $query = $request->input('search', '') ?? '';
 
-        // Build filters from request using filter[] notation
-        $filters = [];
+        // Extract standardized filter params
+        $params = $this->extractFilterParams($request);
 
-        if ($request->has('filter.category_id')) {
-            $filters['category_id'] = is_array($request->input('filter.category_id'))
-                ? $request->input('filter.category_id')
-                : [$request->input('filter.category_id')];
+        // Normalize array filters
+        $filters = $params['filter'] ?? [];
+
+        if (isset($filters['category_id']) && ! is_array($filters['category_id'])) {
+            $filters['category_id'] = [$filters['category_id']];
         }
 
-        if ($request->has('filter.level_tag')) {
-            $filters['level_tag'] = is_array($request->input('filter.level_tag'))
-                ? $request->input('filter.level_tag')
-                : [$request->input('filter.level_tag')];
+        if (isset($filters['level_tag']) && ! is_array($filters['level_tag'])) {
+            $filters['level_tag'] = [$filters['level_tag']];
         }
 
-        if ($request->has('filter.instructor_id')) {
-            $filters['instructor_id'] = is_array($request->input('filter.instructor_id'))
-                ? $request->input('filter.instructor_id')
-                : [$request->input('filter.instructor_id')];
+        if (isset($filters['instructor_id']) && ! is_array($filters['instructor_id'])) {
+            $filters['instructor_id'] = [$filters['instructor_id']];
         }
 
-        if ($request->has('filter.status')) {
-            $filters['status'] = is_array($request->input('filter.status'))
-                ? $request->input('filter.status')
-                : [$request->input('filter.status')];
+        if (isset($filters['status']) && ! is_array($filters['status'])) {
+            $filters['status'] = [$filters['status']];
         }
 
         // Add pagination parameters
-        $filters['per_page'] = $request->input('per_page', 15);
-        $filters['page'] = $request->input('page', 1);
+        $filters['per_page'] = $params['per_page'] ?? 15;
+        $filters['page'] = $params['page'] ?? 1;
 
-        // Build sort options
+        // Build sort options - support both old (sort_by/sort_direction) and new (sort) formats
         $sort = [
-            'field' => $request->input('sort_by', 'relevance'),
-            'direction' => $request->input('sort_direction', 'desc'),
+            'field' => $request->input('sort_by') ?? ($params['sort'] ? ltrim($params['sort'], '-') : 'relevance'),
+            'direction' => $request->input('sort_direction') ?? (isset($params['sort']) && str_starts_with($params['sort'], '-') ? 'desc' : 'asc'),
         ];
 
         // Perform search

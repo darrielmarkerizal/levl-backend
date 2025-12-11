@@ -4,32 +4,109 @@ namespace App\Repositories;
 
 use App\Models\MasterDataItem;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\QueryBuilder;
 
-class MasterDataRepository
+class MasterDataRepository extends BaseRepository
 {
     /**
-     * Get paginated master data by type using Spatie Query Builder.
+     * Allowed filter keys.
      *
-     * Supports:
-     * - filter[is_active], filter[is_system], filter[value], filter[label]
-     * - filter[search] for global search
-     * - sort: value, label, sort_order, created_at, updated_at (prefix with - for desc)
+     * @var array<int, string>
      */
-    public function paginate(string $type, int $perPage = 15): LengthAwarePaginator
+    protected array $allowedFilters = [
+        'is_active',
+        'is_system',
+        'value',
+        'label',
+    ];
+
+    /**
+     * Allowed sort fields.
+     *
+     * @var array<int, string>
+     */
+    protected array $allowedSorts = [
+        'value',
+        'label',
+        'sort_order',
+        'created_at',
+        'updated_at',
+    ];
+
+    /**
+     * Default sort field.
+     */
+    protected string $defaultSort = 'sort_order';
+
+    protected function model(): string
     {
-        return $this->buildQuery($type)->paginate($perPage);
+        return MasterDataItem::class;
     }
 
     /**
-     * Get all master data by type (no pagination).
+     * Get paginated master data by type with optional Scout search.
+     *
+     * Supports:
+     * - filter[is_active], filter[is_system], filter[value], filter[label]
+     * - filter[search] or search parameter for Scout/Meilisearch
+     * - sort: value, label, sort_order, created_at, updated_at (prefix with - for desc)
      */
-    public function all(string $type): Collection
+    public function paginateByType(string $type, array $params = [], int $perPage = 15): LengthAwarePaginator
     {
-        return $this->buildQuery($type)->get();
+        $query = $this->query()->where('type', $type);
+
+        // Handle Scout search if search parameter is provided
+        $searchQuery = $params['search'] ?? request('filter.search') ?? request('search');
+
+        if ($searchQuery && trim($searchQuery) !== '') {
+            $ids = MasterDataItem::search($searchQuery)
+                ->query(fn ($q) => $q->where('type', $type))
+                ->keys()
+                ->toArray();
+
+            if (! empty($ids)) {
+                $query->whereIn('id', $ids);
+            } else {
+                $query->whereRaw('1 = 0');
+            }
+        }
+
+        return $this->filteredPaginate(
+            $query,
+            $params,
+            $this->allowedFilters,
+            $this->allowedSorts,
+            $this->defaultSort,
+            $perPage
+        );
+    }
+
+    /**
+     * Get all master data by type (no pagination) with optional Scout search.
+     */
+    public function allByType(string $type, array $params = []): Collection
+    {
+        $query = $this->query()->where('type', $type);
+
+        // Handle Scout search if search parameter is provided
+        $searchQuery = $params['search'] ?? request('filter.search') ?? request('search');
+
+        if ($searchQuery && trim($searchQuery) !== '') {
+            $ids = MasterDataItem::search($searchQuery)
+                ->query(fn ($q) => $q->where('type', $type))
+                ->keys()
+                ->toArray();
+
+            if (! empty($ids)) {
+                $query->whereIn('id', $ids);
+            } else {
+                return new Collection;
+            }
+        }
+
+        $this->applyFiltering($query, $params, $this->allowedFilters, $this->allowedSorts, $this->defaultSort);
+
+        return $query->get();
     }
 
     /**
@@ -62,61 +139,5 @@ class MasterDataRepository
             ->where('value', $value)
             ->when($excludeId, fn ($q) => $q->where('id', '!=', $excludeId))
             ->exists();
-    }
-
-    /**
-     * Create a new master data item.
-     */
-    public function create(array $attributes): MasterDataItem
-    {
-        return MasterDataItem::create($attributes);
-    }
-
-    /**
-     * Update a master data item.
-     */
-    public function update(MasterDataItem $item, array $attributes): MasterDataItem
-    {
-        $item->fill($attributes)->save();
-
-        return $item;
-    }
-
-    /**
-     * Delete a master data item.
-     */
-    public function delete(MasterDataItem $item): bool
-    {
-        return $item->delete();
-    }
-
-    /**
-     * Build query with Spatie Query Builder + Scout search.
-     */
-    private function buildQuery(string $type): QueryBuilder
-    {
-        $searchQuery = request('filter.search');
-
-        $builder = QueryBuilder::for(MasterDataItem::class)
-            ->where('type', $type);
-
-        // If search query exists, use Scout to get matching IDs
-        if ($searchQuery && trim($searchQuery) !== '') {
-            $ids = MasterDataItem::search($searchQuery)
-                ->query(fn ($q) => $q->where('type', $type))
-                ->keys()
-                ->toArray();
-            $builder->whereIn('id', $ids);
-        }
-
-        return $builder
-            ->allowedFilters([
-                AllowedFilter::exact('is_active'),
-                AllowedFilter::exact('is_system'),
-                AllowedFilter::partial('value'),
-                AllowedFilter::partial('label'),
-            ])
-            ->allowedSorts(['value', 'label', 'sort_order', 'created_at', 'updated_at'])
-            ->defaultSort('sort_order');
     }
 }

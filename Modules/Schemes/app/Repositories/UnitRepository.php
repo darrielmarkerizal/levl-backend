@@ -2,73 +2,88 @@
 
 namespace Modules\Schemes\Repositories;
 
+use App\Repositories\BaseRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\Schemes\Contracts\Repositories\UnitRepositoryInterface;
 use Modules\Schemes\Models\Unit;
-use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\QueryBuilder;
 
-class UnitRepository implements UnitRepositoryInterface
+class UnitRepository extends BaseRepository implements UnitRepositoryInterface
 {
     /**
-     * Find units by course with Spatie Query Builder + Scout search.
+     * Allowed filter keys.
+     *
+     * @var array<int, string>
+     */
+    protected array $allowedFilters = [
+        'status',
+    ];
+
+    /**
+     * Allowed sort fields.
+     *
+     * @var array<int, string>
+     */
+    protected array $allowedSorts = [
+        'id',
+        'code',
+        'title',
+        'order',
+        'status',
+        'created_at',
+        'updated_at',
+    ];
+
+    /**
+     * Default sort field.
+     */
+    protected string $defaultSort = 'order';
+
+    protected function model(): string
+    {
+        return Unit::class;
+    }
+
+    /**
+     * Find units by course with optional Scout search.
      *
      * Supports:
-     * - filter[status], filter[search] (Meilisearch)
+     * - filter[status], filter[search] or search parameter (Meilisearch)
      * - sort: id, code, title, order, status, created_at, updated_at (prefix with - for desc)
      */
-    public function findByCourse(int $courseId, int $perPage = 15): LengthAwarePaginator
+    public function findByCourse(int $courseId, array $params = [], int $perPage = 15): LengthAwarePaginator
     {
-        $searchQuery = request('filter.search');
+        $query = $this->query()->where('course_id', $courseId);
 
-        $builder = QueryBuilder::for(Unit::class)
-            ->where('course_id', $courseId);
+        // Handle Scout search if search parameter is provided
+        $searchQuery = $params['search'] ?? request('filter.search') ?? request('search');
 
-        // If search query exists, use Scout to get matching IDs
         if ($searchQuery && trim($searchQuery) !== '') {
             $ids = Unit::search($searchQuery)
                 ->query(fn ($q) => $q->where('course_id', $courseId))
                 ->keys()
                 ->toArray();
-            $builder->whereIn('id', $ids);
+
+            if (! empty($ids)) {
+                $query->whereIn('id', $ids);
+            } else {
+                $query->whereRaw('1 = 0');
+            }
         }
 
-        return $builder
-            ->allowedFilters([
-                AllowedFilter::exact('status'),
-            ])
-            ->allowedSorts(['id', 'code', 'title', 'order', 'status', 'created_at', 'updated_at'])
-            ->defaultSort('order')
-            ->paginate($perPage);
-    }
-
-    public function findById(int $id): ?Unit
-    {
-        return Unit::find($id);
+        return $this->filteredPaginate(
+            $query,
+            $params,
+            $this->allowedFilters,
+            $this->allowedSorts,
+            $this->defaultSort,
+            $perPage
+        );
     }
 
     public function findByCourseAndId(int $courseId, int $id): ?Unit
     {
-        return Unit::where('course_id', $courseId)->find($id);
-    }
-
-    public function create(array $data): Unit
-    {
-        return Unit::create($data);
-    }
-
-    public function update(Unit $unit, array $data): Unit
-    {
-        $unit->update($data);
-
-        return $unit->fresh();
-    }
-
-    public function delete(Unit $unit): bool
-    {
-        return $unit->delete();
+        return $this->query()->where('course_id', $courseId)->find($id);
     }
 
     public function getMaxOrderForCourse(int $courseId): int
@@ -87,7 +102,8 @@ class UnitRepository implements UnitRepositoryInterface
 
     public function getAllByCourse(int $courseId): Collection
     {
-        return Unit::where('course_id', $courseId)
+        return $this->query()
+            ->where('course_id', $courseId)
             ->orderBy('order', 'asc')
             ->get();
     }

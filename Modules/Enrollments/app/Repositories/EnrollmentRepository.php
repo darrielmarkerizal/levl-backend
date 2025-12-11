@@ -2,150 +2,178 @@
 
 namespace Modules\Enrollments\Repositories;
 
+use App\Repositories\BaseRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
 use Modules\Enrollments\Contracts\Repositories\EnrollmentRepositoryInterface;
 use Modules\Enrollments\Models\Enrollment;
-use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\QueryBuilder;
 
-class EnrollmentRepository implements EnrollmentRepositoryInterface
+class EnrollmentRepository extends BaseRepository implements EnrollmentRepositoryInterface
 {
-    protected array $with = ['user:id,name,email', 'course:id,slug,title,enrollment_type'];
+    /**
+     * Allowed filter keys.
+     *
+     * @var array<int, string>
+     */
+    protected array $allowedFilters = [
+        'status',
+        'user_id',
+        'course_id',
+        'enrolled_at',
+        'completed_at',
+    ];
 
     /**
-     * Paginate enrollments by course with Spatie Query Builder + Scout search.
+     * Allowed sort fields.
+     *
+     * @var array<int, string>
+     */
+    protected array $allowedSorts = [
+        'id',
+        'created_at',
+        'updated_at',
+        'status',
+        'enrolled_at',
+        'completed_at',
+        'progress_percent',
+    ];
+
+    /**
+     * Default sort field.
+     */
+    protected string $defaultSort = '-created_at';
+
+    /**
+     * Default relations to load.
+     *
+     * @var array<int, string>
+     */
+    protected array $with = ['user:id,name,email', 'course:id,slug,title,enrollment_type'];
+
+    protected function model(): string
+    {
+        return Enrollment::class;
+    }
+
+    /**
+     * Paginate enrollments by course with optional Scout search.
      *
      * Supports:
-     * - filter[search] (Meilisearch), filter[status], filter[user_id], filter[enrolled_at], filter[completed_at]
+     * - filter[search] or search parameter (Meilisearch)
+     * - filter[status], filter[user_id], filter[enrolled_at], filter[completed_at]
      * - sort: id, created_at, updated_at, status, enrolled_at, completed_at, progress_percent
      */
-    public function paginateByCourse(int $courseId, int $perPage = 15): LengthAwarePaginator
+    public function paginateByCourse(int $courseId, array $params = [], int $perPage = 15): LengthAwarePaginator
     {
-        $searchQuery = request('filter.search');
-
-        $builder = QueryBuilder::for(Enrollment::class)
+        $query = $this->query()
             ->where('course_id', $courseId)
             ->with(['user:id,name,email']);
 
-        // Use Scout/Meilisearch for full-text search if available
+        // Handle Scout search if search parameter is provided
+        $searchQuery = $params['search'] ?? request('filter.search') ?? request('search');
+
         if ($searchQuery && trim($searchQuery) !== '') {
             $ids = Enrollment::search($searchQuery)
                 ->query(fn ($q) => $q->where('course_id', $courseId))
                 ->keys()
                 ->toArray();
-            $builder->whereIn('id', $ids);
+
+            if (! empty($ids)) {
+                $query->whereIn('id', $ids);
+            } else {
+                $query->whereRaw('1 = 0');
+            }
         }
 
-        return $builder
-            ->allowedFilters([
-                AllowedFilter::exact('status'),
-                AllowedFilter::exact('user_id'),
-                AllowedFilter::exact('enrolled_at'),
-                AllowedFilter::exact('completed_at'),
-            ])
-            ->allowedSorts(['id', 'created_at', 'updated_at', 'status', 'enrolled_at', 'completed_at', 'progress_percent'])
-            ->defaultSort('-created_at')
-            ->paginate($perPage);
+        return $this->filteredPaginate(
+            $query,
+            $params,
+            $this->allowedFilters,
+            $this->allowedSorts,
+            $this->defaultSort,
+            $perPage
+        );
     }
 
     /**
-     * Paginate enrollments by multiple course IDs with Spatie Query Builder + Scout.
+     * Paginate enrollments by multiple course IDs with optional Scout search.
      */
-    public function paginateByCourseIds(array $courseIds, int $perPage = 15): LengthAwarePaginator
+    public function paginateByCourseIds(array $courseIds, array $params = [], int $perPage = 15): LengthAwarePaginator
     {
-        $searchQuery = request('filter.search');
-
-        $builder = QueryBuilder::for(Enrollment::class)
+        $query = $this->query()
             ->with(['user:id,name,email', 'course:id,slug,title,enrollment_type']);
 
         if (! empty($courseIds)) {
-            $builder->whereIn('course_id', $courseIds);
+            $query->whereIn('course_id', $courseIds);
         } else {
-            $builder->whereRaw('1 = 0');
+            $query->whereRaw('1 = 0');
         }
 
-        // Use Scout/Meilisearch for full-text search if available
+        // Handle Scout search if search parameter is provided
+        $searchQuery = $params['search'] ?? request('filter.search') ?? request('search');
+
         if ($searchQuery && trim($searchQuery) !== '') {
             $ids = Enrollment::search($searchQuery)
                 ->query(fn ($q) => $q->whereIn('course_id', $courseIds))
                 ->keys()
                 ->toArray();
-            $builder->whereIn('id', $ids);
+
+            if (! empty($ids)) {
+                $query->whereIn('id', $ids);
+            } else {
+                $query->whereRaw('1 = 0');
+            }
         }
 
-        return $builder
-            ->allowedFilters([
-                AllowedFilter::exact('status'),
-                AllowedFilter::exact('course_id'),
-                AllowedFilter::exact('user_id'),
-                AllowedFilter::exact('enrolled_at'),
-                AllowedFilter::exact('completed_at'),
-            ])
-            ->allowedSorts(['id', 'created_at', 'updated_at', 'status', 'enrolled_at', 'completed_at', 'progress_percent'])
-            ->defaultSort('-created_at')
-            ->paginate($perPage);
+        return $this->filteredPaginate(
+            $query,
+            $params,
+            $this->allowedFilters,
+            $this->allowedSorts,
+            $this->defaultSort,
+            $perPage
+        );
     }
 
     /**
-     * Paginate enrollments by user with Spatie Query Builder + Scout.
+     * Paginate enrollments by user with optional Scout search.
      */
-    public function paginateByUser(int $userId, int $perPage = 15): LengthAwarePaginator
+    public function paginateByUser(int $userId, array $params = [], int $perPage = 15): LengthAwarePaginator
     {
-        $searchQuery = request('filter.search');
-
-        $builder = QueryBuilder::for(Enrollment::class)
+        $query = $this->query()
             ->where('user_id', $userId)
             ->with(['course:id,slug,title,status']);
 
-        // Use Scout/Meilisearch for full-text search if available
+        // Handle Scout search if search parameter is provided
+        $searchQuery = $params['search'] ?? request('filter.search') ?? request('search');
+
         if ($searchQuery && trim($searchQuery) !== '') {
             $ids = Enrollment::search($searchQuery)
                 ->query(fn ($q) => $q->where('user_id', $userId))
                 ->keys()
                 ->toArray();
-            $builder->whereIn('id', $ids);
+
+            if (! empty($ids)) {
+                $query->whereIn('id', $ids);
+            } else {
+                $query->whereRaw('1 = 0');
+            }
         }
 
-        return $builder
-            ->allowedFilters([
-                AllowedFilter::exact('status'),
-                AllowedFilter::exact('course_id'),
-                AllowedFilter::exact('enrolled_at'),
-                AllowedFilter::exact('completed_at'),
-            ])
-            ->allowedSorts(['id', 'created_at', 'updated_at', 'status', 'enrolled_at', 'completed_at', 'progress_percent'])
-            ->defaultSort('-created_at')
-            ->paginate($perPage);
+        return $this->filteredPaginate(
+            $query,
+            $params,
+            $this->allowedFilters,
+            $this->allowedSorts,
+            $this->defaultSort,
+            $perPage
+        );
     }
 
     public function findByCourseAndUser(int $courseId, int $userId): ?Enrollment
     {
-        return Enrollment::query()
+        return $this->query()
             ->where('course_id', $courseId)
             ->where('user_id', $userId)
             ->first();
-    }
-
-    public function findById(int $id): ?Enrollment
-    {
-        return Enrollment::find($id);
-    }
-
-    public function create(array $attributes): Enrollment
-    {
-        return Enrollment::create($attributes);
-    }
-
-    public function update(Enrollment $enrollment, array $attributes): Enrollment
-    {
-        $enrollment->fill($attributes)->save();
-
-        return $enrollment;
-    }
-
-    public function delete(Enrollment $enrollment): bool
-    {
-        return $enrollment->delete();
     }
 }

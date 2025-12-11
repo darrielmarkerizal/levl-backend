@@ -5,6 +5,7 @@ namespace Modules\Content\Http\Controllers;
 use App\Contracts\Services\ContentServiceInterface;
 use App\Http\Controllers\Controller;
 use App\Support\ApiResponse;
+use App\Support\Traits\HandlesFiltering;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Modules\Content\Http\Requests\CreateAnnouncementRequest;
@@ -18,6 +19,7 @@ use Modules\Schemes\Models\Course;
 class CourseAnnouncementController extends Controller
 {
     use ApiResponse;
+    use HandlesFiltering;
 
     protected ContentServiceInterface $contentService;
 
@@ -46,11 +48,9 @@ class CourseAnnouncementController extends Controller
     {
         $course = Course::findOrFail($courseId);
 
-        $filters = [
-            'per_page' => $request->input('per_page', 15),
-        ];
+        $params = $this->extractFilterParams($request);
 
-        $announcements = $this->announcementRepository->getAnnouncementsForCourse($courseId, $filters);
+        $announcements = $this->announcementRepository->getAnnouncementsForCourse($courseId, $params);
 
         return $this->success($announcements);
     }
@@ -73,32 +73,28 @@ class CourseAnnouncementController extends Controller
 
         $this->authorize('createCourseAnnouncement', [Announcement::class, $courseId]);
 
-        try {
-            $data = $request->validated();
-            $data['course_id'] = $courseId;
-            $data['target_type'] = 'course';
+        $data = $request->validated();
+        $data['course_id'] = $courseId;
+        $data['target_type'] = 'course';
 
-            $announcement = $this->contentService->createAnnouncement($data, auth()->user());
+        $announcement = $this->contentService->createAnnouncement($data, auth()->user());
 
-            // Auto-publish if status is published
-            if ($request->input('status') === 'published') {
-                $this->contentService->publishContent($announcement);
-            }
-
-            // Auto-schedule if scheduled_at is provided
-            if ($request->filled('scheduled_at')) {
-                $this->contentService->scheduleContent(
-                    $announcement,
-                    \Carbon\Carbon::parse($request->input('scheduled_at'))
-                );
-            }
-
-            return $this->created(
-                $announcement->load(['author', 'course']),
-                'Pengumuman kursus berhasil dibuat.'
-            );
-        } catch (\Exception $e) {
-            return $this->error($e->getMessage(), 422);
+        // Auto-publish if status is published
+        if ($request->input('status') === 'published') {
+            $this->contentService->publishContent($announcement);
         }
+
+        // Auto-schedule if scheduled_at is provided
+        if ($request->filled('scheduled_at')) {
+            $this->contentService->scheduleContent(
+                $announcement,
+                \Carbon\Carbon::parse($request->input('scheduled_at'))
+            );
+        }
+
+        return $this->created(
+            $announcement->load(['author', 'course']),
+            'Pengumuman kursus berhasil dibuat.'
+        );
     }
 }

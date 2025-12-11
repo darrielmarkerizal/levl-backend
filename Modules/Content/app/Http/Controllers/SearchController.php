@@ -5,6 +5,7 @@ namespace Modules\Content\Http\Controllers;
 use App\Contracts\Services\ContentServiceInterface;
 use App\Http\Controllers\Controller;
 use App\Support\ApiResponse;
+use App\Support\Traits\HandlesFiltering;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -14,6 +15,7 @@ use Illuminate\Http\Request;
 class SearchController extends Controller
 {
     use ApiResponse;
+    use HandlesFiltering;
 
     public function __construct(
         protected ContentServiceInterface $contentService
@@ -55,14 +57,9 @@ class SearchController extends Controller
         $query = $request->input('search');
         $type = $request->input('filter.type', 'all');
 
-        $filters = [
-            'category_id' => $request->input('filter.category_id'),
-            'date_from' => $request->input('filter.date_from'),
-            'date_to' => $request->input('filter.date_to'),
-            'per_page' => $request->input('per_page', 15),
-        ];
+        $params = $this->extractFilterParams($request);
 
-        $results = $this->contentService->searchContent($query, $type, $filters);
+        $results = $this->contentService->searchContent($query, $type, $params);
 
         return $this->success($results);
     }

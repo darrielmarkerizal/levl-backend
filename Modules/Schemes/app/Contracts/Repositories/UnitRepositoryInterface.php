@@ -10,19 +10,13 @@ interface UnitRepositoryInterface
 {
     /**
      * Find units by course ID with pagination.
-     * Uses Spatie Query Builder for filter/sort from request.
+     * Uses custom QueryFilter for filter/sort from params or request.
      *
      * @param  int  $courseId  Course ID
+     * @param  array  $params  Filter/sort parameters
      * @param  int  $perPage  Items per page
      */
-    public function findByCourse(int $courseId, int $perPage = 15): LengthAwarePaginator;
-
-    /**
-     * Find a unit by ID.
-     *
-     * @param  int  $id  Unit ID
-     */
-    public function findById(int $id): ?Unit;
+    public function findByCourse(int $courseId, array $params = [], int $perPage = 15): LengthAwarePaginator;
 
     /**
      * Find a unit by course ID and unit ID.
@@ -31,28 +25,6 @@ interface UnitRepositoryInterface
      * @param  int  $id  Unit ID
      */
     public function findByCourseAndId(int $courseId, int $id): ?Unit;
-
-    /**
-     * Create a new unit.
-     *
-     * @param  array  $data  Unit data
-     */
-    public function create(array $data): Unit;
-
-    /**
-     * Update an existing unit.
-     *
-     * @param  Unit  $unit  Unit instance
-     * @param  array  $data  Updated data
-     */
-    public function update(Unit $unit, array $data): Unit;
-
-    /**
-     * Delete a unit.
-     *
-     * @param  Unit  $unit  Unit instance
-     */
-    public function delete(Unit $unit): bool;
 
     /**
      * Get the maximum order value for units in a course.

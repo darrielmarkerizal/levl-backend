@@ -3,6 +3,7 @@
 namespace Modules\Learning\Http\Controllers;
 
 use App\Support\ApiResponse;
+use App\Support\Traits\HandlesFiltering;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\Learning\Models\Assignment;
@@ -15,6 +16,7 @@ use Modules\Learning\Services\SubmissionService;
 class SubmissionController extends Controller
 {
     use ApiResponse;
+    use HandlesFiltering;
 
     public function __construct(private SubmissionService $service) {}
 
@@ -49,7 +51,9 @@ class SubmissionController extends Controller
         /** @var \Modules\Auth\Models\User $user */
         $user = auth('api')->user();
 
-        $submissions = $this->service->listForAssignment($assignment, $user, $request->all());
+        $params = $this->extractFilterParams($request);
+
+        $submissions = $this->service->listForAssignment($assignment, $user, $params);
 
         return $this->success(['submissions' => $submissions]);
     }
@@ -109,9 +113,7 @@ class SubmissionController extends Controller
             return $this->error('Anda tidak memiliki akses untuk melihat submission ini.', 403);
         }
 
-        $submission->load(['assignment', 'user:id,name,email', 'enrollment', 'files', 'previousSubmission', 'grade']);
-
-        return $this->success(['submission' => $submission]);
+        return $this->success(['submission' => SubmissionResource::make($submission)]);
     }
 
     /**

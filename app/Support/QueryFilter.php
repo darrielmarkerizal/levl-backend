@@ -72,10 +72,76 @@ class QueryFilter
 
     public function apply(Builder $query)
     {
+        $this->validateFilters();
+        $this->validateSorts();
+
         $this->applyFilters($query);
         $this->applySorting($query);
 
         return $this->paginate($query);
+    }
+
+    private function validateFilters(): void
+    {
+        $filters = $this->params['filter'] ?? [];
+
+        if (! is_array($filters)) {
+            return;
+        }
+
+        if (empty($this->allowedFilters)) {
+            return;
+        }
+
+        $invalidFilters = array_diff(array_keys($filters), $this->allowedFilters);
+
+        if (! empty($invalidFilters)) {
+            throw new \InvalidArgumentException(
+                'Invalid filter fields: '.implode(', ', $invalidFilters).
+                '. Allowed filters: '.implode(', ', $this->allowedFilters)
+            );
+        }
+    }
+
+    private function validateSorts(): void
+    {
+        $sort = $this->params['sort'] ?? null;
+
+        if (empty($sort)) {
+            return;
+        }
+
+        if (empty($this->allowedSorts)) {
+            return;
+        }
+
+        $field = ltrim($sort, '-');
+
+        if (! in_array($field, $this->allowedSorts, true)) {
+            throw new \InvalidArgumentException(
+                "Invalid sort field: {$field}. Allowed sorts: ".
+                implode(', ', $this->allowedSorts)
+            );
+        }
+    }
+
+    private function validateSortDirection(): string
+    {
+        $sort = $this->params['sort'] ?? $this->defaultSort;
+
+        if (empty($sort)) {
+            $sort = $this->defaultSort;
+        }
+
+        $sort = trim((string) $sort);
+
+        // Extract direction from sort parameter
+        $direction = str_starts_with($sort, '-') ? 'desc' : 'asc';
+
+        // Validate direction is either 'asc' or 'desc'
+        // Since we only accept '-' prefix or no prefix, this is already validated
+        // But we normalize to ensure it's always 'asc' or 'desc'
+        return in_array($direction, ['asc', 'desc'], true) ? $direction : 'asc';
     }
 
     public function applyFiltersOnly(Builder $query): Builder
@@ -228,7 +294,7 @@ class QueryFilter
             return;
         }
 
-        $direction = str_starts_with($sort, '-') ? 'desc' : 'asc';
+        $direction = $this->validateSortDirection();
         $field = ltrim($sort, '-');
 
         if (! in_array($field, $this->allowedSorts, true)) {

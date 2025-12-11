@@ -4,6 +4,7 @@ namespace Modules\Content\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Support\ApiResponse;
+use App\Support\Traits\HandlesFiltering;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Modules\Content\Contracts\Services\ContentStatisticsServiceInterface;
@@ -16,6 +17,7 @@ use Modules\Content\Models\News;
 class ContentStatisticsController extends Controller
 {
     use ApiResponse;
+    use HandlesFiltering;
 
     public function __construct(
         protected ContentStatisticsServiceInterface $statisticsService
@@ -49,21 +51,16 @@ class ContentStatisticsController extends Controller
         $this->authorize('viewStatistics', [Announcement::class]);
 
         $type = $request->input('filter.type', 'all');
-        $filters = [
-            'course_id' => $request->input('filter.course_id'),
-            'category_id' => $request->input('filter.category_id'),
-            'date_from' => $request->input('filter.date_from'),
-            'date_to' => $request->input('filter.date_to'),
-        ];
+        $params = $this->extractFilterParams($request);
 
         $data = [];
 
         if ($type === 'all' || $type === 'announcements') {
-            $data['announcements'] = $this->statisticsService->getAllAnnouncementStatistics($filters);
+            $data['announcements'] = $this->statisticsService->getAllAnnouncementStatistics($params['filter'] ?? []);
         }
 
         if ($type === 'all' || $type === 'news') {
-            $data['news'] = $this->statisticsService->getAllNewsStatistics($filters);
+            $data['news'] = $this->statisticsService->getAllNewsStatistics($params['filter'] ?? []);
         }
 
         if ($type === 'all') {

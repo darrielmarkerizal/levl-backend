@@ -3,7 +3,6 @@
 namespace Modules\Learning\Http\Controllers;
 
 use App\Support\ApiResponse;
-use App\Traits\ManagesCourse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Validation\Rule;
@@ -18,7 +17,6 @@ use Modules\Learning\Services\AssignmentService;
 class AssignmentController extends Controller
 {
     use ApiResponse;
-    use ManagesCourse;
 
     public function __construct(private AssignmentService $service) {}
 
@@ -59,13 +57,10 @@ class AssignmentController extends Controller
      */
     public function store(Request $request, \Modules\Schemes\Models\Course $course, \Modules\Schemes\Models\Unit $unit, \Modules\Schemes\Models\Lesson $lesson)
     {
+        $this->authorize('create', Assignment::class);
+
         /** @var \Modules\Auth\Models\User $user */
         $user = auth('api')->user();
-
-        // Check if user can manage this course
-        if (! $this->userCanManageCourse($user, $course)) {
-            return $this->error('Anda tidak memiliki akses untuk membuat assignment di course ini.', 403);
-        }
 
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
@@ -101,9 +96,7 @@ class AssignmentController extends Controller
      */
     public function show(Assignment $assignment)
     {
-        $assignment->load(['creator:id,name,email', 'lesson:id,title,slug']);
-
-        return $this->success(['assignment' => $assignment]);
+        return $this->success(['assignment' => AssignmentResource::make($assignment)]);
     }
 
     /**
@@ -123,16 +116,7 @@ class AssignmentController extends Controller
      */
     public function update(Request $request, Assignment $assignment)
     {
-        /** @var \Modules\Auth\Models\User $user */
-        $user = auth('api')->user();
-
-        // Load lesson and course relationship
-        $assignment->loadMissing('lesson.unit.course');
-        $course = $assignment->lesson?->unit?->course;
-
-        if (! $course || ! $this->userCanManageCourse($user, $course)) {
-            return $this->error('Anda tidak memiliki akses untuk mengubah assignment ini.', 403);
-        }
+        $this->authorize('update', $assignment);
 
         $validated = $request->validate([
             'title' => ['sometimes', 'string', 'max:255'],
@@ -168,16 +152,7 @@ class AssignmentController extends Controller
      */
     public function destroy(Assignment $assignment)
     {
-        /** @var \Modules\Auth\Models\User $user */
-        $user = auth('api')->user();
-
-        // Load lesson and course relationship
-        $assignment->loadMissing('lesson.unit.course');
-        $course = $assignment->lesson?->unit?->course;
-
-        if (! $course || ! $this->userCanManageCourse($user, $course)) {
-            return $this->error('Anda tidak memiliki akses untuk menghapus assignment ini.', 403);
-        }
+        $this->authorize('delete', $assignment);
 
         $this->service->delete($assignment);
 
@@ -200,6 +175,8 @@ class AssignmentController extends Controller
      */
     public function publish(Assignment $assignment)
     {
+        $this->authorize('publish', $assignment);
+
         $updated = $this->service->publish($assignment);
 
         return $this->success(['assignment' => $updated], 'Assignment berhasil dipublish.');
@@ -221,6 +198,8 @@ class AssignmentController extends Controller
      */
     public function unpublish(Assignment $assignment)
     {
+        $this->authorize('publish', $assignment);
+
         $updated = $this->service->unpublish($assignment);
 
         return $this->success(['assignment' => $updated], 'Assignment berhasil diunpublish.');

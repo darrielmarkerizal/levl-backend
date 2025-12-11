@@ -2,74 +2,90 @@
 
 namespace Modules\Schemes\Repositories;
 
+use App\Repositories\BaseRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\Schemes\Contracts\Repositories\LessonRepositoryInterface;
 use Modules\Schemes\Models\Lesson;
-use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\QueryBuilder;
 
-class LessonRepository implements LessonRepositoryInterface
+class LessonRepository extends BaseRepository implements LessonRepositoryInterface
 {
     /**
-     * Find lessons by unit with Spatie Query Builder + Scout search.
+     * Allowed filter keys.
+     *
+     * @var array<int, string>
+     */
+    protected array $allowedFilters = [
+        'status',
+        'content_type',
+    ];
+
+    /**
+     * Allowed sort fields.
+     *
+     * @var array<int, string>
+     */
+    protected array $allowedSorts = [
+        'id',
+        'title',
+        'order',
+        'status',
+        'duration_minutes',
+        'created_at',
+        'updated_at',
+        'published_at',
+    ];
+
+    /**
+     * Default sort field.
+     */
+    protected string $defaultSort = 'order';
+
+    protected function model(): string
+    {
+        return Lesson::class;
+    }
+
+    /**
+     * Find lessons by unit with optional Scout search.
      *
      * Supports:
-     * - filter[status], filter[content_type], filter[search] (Meilisearch)
-     * - sort: id, title, order, status, duration_minutes, created_at, updated_at (prefix with - for desc)
+     * - filter[status], filter[content_type], filter[search] or search parameter (Meilisearch)
+     * - sort: id, title, order, status, duration_minutes, created_at, updated_at, published_at (prefix with - for desc)
      */
-    public function findByUnit(int $unitId, int $perPage = 15): LengthAwarePaginator
+    public function findByUnit(int $unitId, array $params = [], int $perPage = 15): LengthAwarePaginator
     {
-        $searchQuery = request('filter.search');
+        $query = $this->query()->where('unit_id', $unitId);
 
-        $builder = QueryBuilder::for(Lesson::class)
-            ->where('unit_id', $unitId);
+        // Handle Scout search if search parameter is provided
+        $searchQuery = $params['search'] ?? request('filter.search') ?? request('search');
 
-        // If search query exists, use Scout to get matching IDs
         if ($searchQuery && trim($searchQuery) !== '') {
             $ids = Lesson::search($searchQuery)
                 ->query(fn ($q) => $q->where('unit_id', $unitId))
                 ->keys()
                 ->toArray();
-            $builder->whereIn('id', $ids);
+
+            if (! empty($ids)) {
+                $query->whereIn('id', $ids);
+            } else {
+                $query->whereRaw('1 = 0');
+            }
         }
 
-        return $builder
-            ->allowedFilters([
-                AllowedFilter::exact('status'),
-                AllowedFilter::exact('content_type'),
-            ])
-            ->allowedSorts(['id', 'title', 'order', 'status', 'duration_minutes', 'created_at', 'updated_at', 'published_at'])
-            ->defaultSort('order')
-            ->paginate($perPage);
-    }
-
-    public function findById(int $id): ?Lesson
-    {
-        return Lesson::find($id);
+        return $this->filteredPaginate(
+            $query,
+            $params,
+            $this->allowedFilters,
+            $this->allowedSorts,
+            $this->defaultSort,
+            $perPage
+        );
     }
 
     public function findByUnitAndId(int $unitId, int $id): ?Lesson
     {
-        return Lesson::where('unit_id', $unitId)->find($id);
-    }
-
-    public function create(array $data): Lesson
-    {
-        return Lesson::create($data);
-    }
-
-    public function update(Lesson $lesson, array $data): Lesson
-    {
-        $lesson->update($data);
-
-        return $lesson->fresh();
-    }
-
-    public function delete(Lesson $lesson): bool
-    {
-        return $lesson->delete();
+        return $this->query()->where('unit_id', $unitId)->find($id);
     }
 
     public function getMaxOrderForUnit(int $unitId): int
@@ -79,7 +95,8 @@ class LessonRepository implements LessonRepositoryInterface
 
     public function getAllByUnit(int $unitId): Collection
     {
-        return Lesson::where('unit_id', $unitId)
+        return $this->query()
+            ->where('unit_id', $unitId)
             ->orderBy('order', 'asc')
             ->get();
     }

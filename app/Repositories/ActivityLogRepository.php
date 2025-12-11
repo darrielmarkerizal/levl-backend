@@ -4,22 +4,70 @@ namespace App\Repositories;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Spatie\Activitylog\Models\Activity;
-use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\QueryBuilder;
 
-class ActivityLogRepository
+class ActivityLogRepository extends BaseRepository
 {
     /**
-     * Get paginated activity logs using Spatie Query Builder.
+     * Allowed filter keys.
+     *
+     * @var array<int, string>
+     */
+    protected array $allowedFilters = [
+        'log_name',
+        'event',
+        'subject_type',
+        'subject_id',
+        'causer_type',
+        'causer_id',
+    ];
+
+    /**
+     * Allowed sort fields.
+     *
+     * @var array<int, string>
+     */
+    protected array $allowedSorts = [
+        'id',
+        'created_at',
+        'event',
+        'log_name',
+    ];
+
+    /**
+     * Default sort field.
+     */
+    protected string $defaultSort = '-created_at';
+
+    /**
+     * Default relations to load.
+     *
+     * @var array<int, string>
+     */
+    protected array $with = ['causer', 'subject'];
+
+    protected function model(): string
+    {
+        return Activity::class;
+    }
+
+    /**
+     * Get paginated activity logs.
      *
      * Supports:
      * - filter[log_name], filter[event], filter[subject_type], filter[subject_id]
      * - filter[causer_type], filter[causer_id]
      * - sort: id, created_at, event, log_name (prefix with - for desc)
      */
-    public function paginate(int $perPage = 15): LengthAwarePaginator
+    public function paginate(array $params = [], int $perPage = 15): LengthAwarePaginator
     {
-        return $this->buildQuery()->paginate($perPage);
+        return $this->filteredPaginate(
+            $this->query(),
+            $params,
+            $this->allowedFilters,
+            $this->allowedSorts,
+            $this->defaultSort,
+            $perPage
+        );
     }
 
     /**
@@ -27,25 +75,6 @@ class ActivityLogRepository
      */
     public function find(int $id): ?Activity
     {
-        return Activity::with(['causer', 'subject'])->find($id);
-    }
-
-    /**
-     * Build query with Spatie Query Builder.
-     */
-    private function buildQuery(): QueryBuilder
-    {
-        return QueryBuilder::for(Activity::class)
-            ->allowedFilters([
-                AllowedFilter::exact('log_name'),
-                AllowedFilter::exact('event'),
-                AllowedFilter::exact('subject_type'),
-                AllowedFilter::exact('subject_id'),
-                AllowedFilter::exact('causer_type'),
-                AllowedFilter::exact('causer_id'),
-            ])
-            ->allowedSorts(['id', 'created_at', 'event', 'log_name'])
-            ->defaultSort('-created_at')
-            ->with(['causer', 'subject']);
+        return $this->query()->find($id);
     }
 }

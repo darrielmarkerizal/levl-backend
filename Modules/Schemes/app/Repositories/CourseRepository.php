@@ -2,30 +2,57 @@
 
 namespace Modules\Schemes\Repositories;
 
+use App\Repositories\BaseRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 use Modules\Schemes\Contracts\Repositories\CourseRepositoryInterface;
 use Modules\Schemes\Models\Course;
-use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\QueryBuilder;
 
-class CourseRepository implements CourseRepositoryInterface
+class CourseRepository extends BaseRepository implements CourseRepositoryInterface
 {
     /**
+     * Allowed filter keys.
+     *
+     * @var array<int, string>
+     */
+    protected array $allowedFilters = [
+        'status',
+        'level_tag',
+        'type',
+        'category_id',
+    ];
+
+    /**
+     * Allowed sort fields.
+     *
+     * @var array<int, string>
+     */
+    protected array $allowedSorts = [
+        'id',
+        'code',
+        'title',
+        'created_at',
+        'updated_at',
+        'published_at',
+    ];
+
+    /**
+     * Default sort field.
+     */
+    protected string $defaultSort = 'title';
+
+    /**
      * Default relations to load.
+     *
+     * @var array<int, string>
      */
     protected array $with = ['tags'];
 
-    public function query(): Builder
+    protected function model(): string
     {
-        return Course::query()->with($this->with);
-    }
-
-    public function findById(int $id): ?Course
-    {
-        return $this->query()->find($id);
+        return Course::class;
     }
 
     public function findBySlug(string $slug): ?Course
@@ -34,56 +61,75 @@ class CourseRepository implements CourseRepositoryInterface
     }
 
     /**
-     * Paginate courses with Spatie Query Builder + Scout search.
+     * Paginate courses with optional Scout search and tag filtering.
      *
      * Supports:
-     * - filter[search] (Meilisearch), filter[status], filter[level_tag], filter[type], filter[category_id], filter[tag]
+     * - filter[search] or search parameter (Meilisearch)
+     * - filter[status], filter[level_tag], filter[type], filter[category_id], filter[tag]
      * - sort: id, code, title, created_at, updated_at, published_at
      */
-    public function paginate(int $perPage = 15): LengthAwarePaginator
+    public function paginate(array $params = [], int $perPage = 15): LengthAwarePaginator
     {
-        return $this->buildQuery()->paginate($perPage);
-    }
+        $query = $this->query();
 
-    /**
-     * List all courses with Spatie Query Builder + Scout search.
-     */
-    public function list(): Collection
-    {
-        return $this->buildQuery()->get();
-    }
+        // Handle Scout search if search parameter is provided
+        $searchQuery = $params['search'] ?? request('filter.search') ?? request('search');
 
-    /**
-     * Build query with Spatie Query Builder + Scout search.
-     */
-    private function buildQuery(): QueryBuilder
-    {
-        $searchQuery = request('filter.search');
-        $tagFilter = request('filter.tag');
-
-        $builder = QueryBuilder::for(Course::class)
-            ->with($this->with);
-
-        // Use Scout/Meilisearch for full-text search
         if ($searchQuery && trim($searchQuery) !== '') {
             $ids = Course::search($searchQuery)->keys()->toArray();
-            $builder->whereIn('id', $ids);
+
+            if (! empty($ids)) {
+                $query->whereIn('id', $ids);
+            } else {
+                $query->whereRaw('1 = 0');
+            }
         }
 
-        // Apply tag filters
+        // Apply tag filters if provided
+        $tagFilter = $params['filter']['tag'] ?? request('filter.tag');
         if ($tagFilter) {
-            $this->applyTagFilters($builder->getEloquentBuilder(), $tagFilter);
+            $this->applyTagFilters($query, $tagFilter);
         }
 
-        return $builder
-            ->allowedFilters([
-                AllowedFilter::exact('status'),
-                AllowedFilter::exact('level_tag'),
-                AllowedFilter::exact('type'),
-                AllowedFilter::exact('category_id'),
-            ])
-            ->allowedSorts(['id', 'code', 'title', 'created_at', 'updated_at', 'published_at'])
-            ->defaultSort('title');
+        return $this->filteredPaginate(
+            $query,
+            $params,
+            $this->allowedFilters,
+            $this->allowedSorts,
+            $this->defaultSort,
+            $perPage
+        );
+    }
+
+    /**
+     * List all courses with optional Scout search and tag filtering.
+     */
+    public function list(array $params = []): Collection
+    {
+        $query = $this->query();
+
+        // Handle Scout search if search parameter is provided
+        $searchQuery = $params['search'] ?? request('filter.search') ?? request('search');
+
+        if ($searchQuery && trim($searchQuery) !== '') {
+            $ids = Course::search($searchQuery)->keys()->toArray();
+
+            if (! empty($ids)) {
+                $query->whereIn('id', $ids);
+            } else {
+                return new Collection;
+            }
+        }
+
+        // Apply tag filters if provided
+        $tagFilter = $params['filter']['tag'] ?? request('filter.tag');
+        if ($tagFilter) {
+            $this->applyTagFilters($query, $tagFilter);
+        }
+
+        $this->applyFiltering($query, $params, $this->allowedFilters, $this->allowedSorts, $this->defaultSort);
+
+        return $query->get();
     }
 
     /**
@@ -148,22 +194,5 @@ class CourseRepository implements CourseRepositoryInterface
         }
 
         return [];
-    }
-
-    public function create(array $attributes): Course
-    {
-        return Course::create($attributes);
-    }
-
-    public function update(Course $course, array $attributes): Course
-    {
-        $course->fill($attributes)->save();
-
-        return $course;
-    }
-
-    public function delete(Course $course): bool
-    {
-        return $course->delete();
     }
 }

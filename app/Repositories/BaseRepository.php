@@ -96,4 +96,48 @@ abstract class BaseRepository implements BaseRepositoryInterface
 
         return $query->get();
     }
+
+    /**
+     * Check if this repository supports filtering.
+     */
+    public function supportsFiltering(): bool
+    {
+        return ! empty($this->allowedFilters);
+    }
+
+    /**
+     * Check if this repository supports sorting.
+     */
+    public function supportsSorting(): bool
+    {
+        return ! empty($this->allowedSorts);
+    }
+
+    /**
+     * Get allowed filters for this repository.
+     *
+     * @return array<int, string>
+     */
+    public function getAllowedFilters(): array
+    {
+        return $this->allowedFilters;
+    }
+
+    /**
+     * Get allowed sorts for this repository.
+     *
+     * @return array<int, string>
+     */
+    public function getAllowedSorts(): array
+    {
+        return $this->allowedSorts;
+    }
+
+    /**
+     * Get default sort for this repository.
+     */
+    public function getDefaultSort(): string
+    {
+        return $this->defaultSort;
+    }
 }

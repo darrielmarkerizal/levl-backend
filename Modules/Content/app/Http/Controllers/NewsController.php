@@ -6,6 +6,7 @@ use App\Contracts\Services\ContentServiceInterface;
 use App\Exceptions\ResourceNotFoundException;
 use App\Http\Controllers\Controller;
 use App\Support\ApiResponse;
+use App\Support\Traits\HandlesFiltering;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Modules\Content\Contracts\Services\ContentStatisticsServiceInterface;
@@ -19,6 +20,7 @@ use Modules\Content\Http\Requests\UpdateContentRequest;
 class NewsController extends Controller
 {
     use ApiResponse;
+    use HandlesFiltering;
 
     public function __construct(
         private ContentServiceInterface $contentService,
@@ -57,16 +59,14 @@ class NewsController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $filters = [
-            'category_id' => $request->input('filter.category_id'),
-            'tag_id' => $request->input('filter.tag_id'),
-            'featured' => $request->boolean('filter.featured'),
-            'date_from' => $request->input('filter.date_from'),
-            'date_to' => $request->input('filter.date_to'),
-            'per_page' => $request->input('per_page', 15),
-        ];
+        $params = $this->extractFilterParams($request);
 
-        $news = $this->contentService->getNewsFeed($filters);
+        // Add featured filter handling
+        if ($request->has('filter.featured')) {
+            $params['filter']['featured'] = $request->boolean('filter.featured');
+        }
+
+        $news = $this->contentService->getNewsFeed($params);
 
         return $this->paginateResponse($news);
     }
@@ -151,7 +151,7 @@ class NewsController extends Controller
         );
 
         return $this->success(
-            $news->load(['author', 'categories', 'tags']),
+            NewsResource::make($news),
             'Berita berhasil diperbarui.'
         );
     }

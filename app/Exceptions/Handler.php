@@ -17,60 +17,96 @@ use Throwable;
 
 class Handler extends ExceptionHandler
 {
-  use ApiResponse;
+    use ApiResponse;
 
-  protected $dontFlash = ["current_password", "password", "password_confirmation"];
+    protected $dontFlash = ['current_password', 'password', 'password_confirmation'];
 
-  public function register(): void
-  {
-    $this->reportable(function (Throwable $e) {
-      //
-    });
-  }
-
-  public function render($request, Throwable $e): Response
-  {
-    if ($request->expectsJson() || $request->is("api/*")) {
-      return $this->handleApiException($request, $e);
+    public function register(): void
+    {
+        $this->reportable(function (Throwable $e) {
+            //
+        });
     }
 
-    return parent::render($request, $e);
-  }
+    public function render($request, Throwable $e): Response
+    {
+        if ($request->expectsJson() || $request->is('api/*')) {
+            return $this->handleApiException($request, $e);
+        }
 
-  protected function handleApiException(Request $request, Throwable $e): JsonResponse
-  {
-    if ($e instanceof ValidationException) {
-      return $this->validationError($e->errors());
+        return parent::render($request, $e);
     }
 
-    if ($e instanceof NotFoundHttpException) {
-      return $this->notFound("Resource tidak ditemukan");
+    protected function handleApiException(Request $request, Throwable $e): JsonResponse
+    {
+        if ($e instanceof ValidationException) {
+            return $this->validationError($e->errors());
+        }
+
+        if ($e instanceof InvalidFilterException) {
+            return $this->error(
+                $e->getMessage(),
+                400,
+                ['filter' => $e->getInvalidFilters()]
+            );
+        }
+
+        if ($e instanceof InvalidSortException) {
+            return $this->error(
+                $e->getMessage(),
+                400,
+                ['sort' => [$e->getInvalidSort()]]
+            );
+        }
+
+        if ($e instanceof ResourceNotFoundException) {
+            return $this->notFound($e->getMessage() ?: 'Resource tidak ditemukan');
+        }
+
+        if ($e instanceof NotFoundHttpException) {
+            return $this->notFound('Resource tidak ditemukan');
+        }
+
+        if ($e instanceof UnauthorizedException) {
+            return $this->unauthorized($e->getMessage() ?: 'Tidak terotorisasi');
+        }
+
+        if ($e instanceof UnauthorizedHttpException) {
+            return $this->unauthorized($e->getMessage() ?: 'Tidak terotorisasi');
+        }
+
+        if ($e instanceof ForbiddenException) {
+            return $this->forbidden($e->getMessage() ?: 'Akses ditolak');
+        }
+
+        if ($e instanceof AccessDeniedHttpException) {
+            return $this->forbidden($e->getMessage() ?: 'Akses ditolak');
+        }
+
+        if ($e instanceof BusinessException) {
+            return $this->error($e->getMessage(), 422);
+        }
+
+        if ($e instanceof DuplicateResourceException) {
+            return $this->error($e->getMessage(), 409);
+        }
+
+        $statusCode = 500;
+        if ($e instanceof HttpExceptionInterface || $e instanceof HttpException) {
+            $statusCode = $e->getStatusCode();
+        }
+
+        $message = $e->getMessage() ?: 'Terjadi kesalahan pada server';
+
+        if (config('app.debug')) {
+            return $this->error($message, $statusCode, [
+                'exception' => get_class($e),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+        }
+
+        return $this->error($message, $statusCode);
     }
-
-    if ($e instanceof UnauthorizedHttpException) {
-      return $this->unauthorized($e->getMessage() ?: "Tidak terotorisasi");
-    }
-
-    if ($e instanceof AccessDeniedHttpException) {
-      return $this->forbidden($e->getMessage() ?: "Akses ditolak");
-    }
-
-    $statusCode = 500;
-    if ($e instanceof HttpExceptionInterface || $e instanceof HttpException) {
-      $statusCode = $e->getStatusCode();
-    }
-
-    $message = $e->getMessage() ?: "Terjadi kesalahan pada server";
-
-    if (config("app.debug")) {
-      return $this->error($message, $statusCode, [
-        "exception" => get_class($e),
-        "file" => $e->getFile(),
-        "line" => $e->getLine(),
-        "trace" => $e->getTraceAsString(),
-      ]);
-    }
-
-    return $this->error($message, $statusCode);
-  }
 }
