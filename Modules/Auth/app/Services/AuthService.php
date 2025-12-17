@@ -151,7 +151,7 @@ class AuthService implements AuthServiceInterface
         "status" =>
           $user->status instanceof UserStatus ? $user->status->value : (string) $user->status,
       ])
-      ->log("User logged in successfully");
+      ->log("Pengguna berhasil login");
 
     $userArray = $user->toArray();
     $userArray["roles"] = $user->getRoleNames()->values();
@@ -254,7 +254,7 @@ class AuthService implements AuthServiceInterface
         "action" => "logout",
         "refresh_token_revoked" => $refreshToken !== null,
       ])
-      ->log("User logged out");
+      ->log("Pengguna logout");
 
     $this->jwt->setToken($currentJwt)->invalidate();
     if ($refreshToken) {
