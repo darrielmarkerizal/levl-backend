@@ -10,110 +10,110 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SetLocale
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
-    public function handle(Request $request, Closure $next): Response
-    {
-        $locale = $this->detectLocale($request);
+  /**
+   * Handle an incoming request.
+   *
+   * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+   */
+  public function handle(Request $request, Closure $next): Response
+  {
+    $locale = $this->detectLocale($request);
 
-        App::setLocale($locale);
+    App::setLocale($locale);
 
-        Log::info('Locale set for request', [
-            'locale' => $locale,
-            'request_id' => $request->id ?? uniqid(),
-            'path' => $request->path(),
-        ]);
+    Log::info("Locale set for request", [
+      "locale" => $locale,
+      "request_id" => $request->id ?? uniqid(),
+      "path" => $request->path(),
+    ]);
 
-        return $next($request);
+    return $next($request);
+  }
+
+  /**
+   * Detect the locale from the request.
+   *
+   * Priority order:
+   * 1. lang query parameter
+   * 2. Accept-Language header
+   * 3. Default locale from config
+   */
+  private function detectLocale(Request $request): string
+  {
+    // Priority 1: Check lang query parameter
+    if ($request->has("lang")) {
+      $locale = $request->query("lang");
+      if ($this->isSupported($locale)) {
+        return $locale;
+      }
     }
 
-    /**
-     * Detect the locale from the request.
-     *
-     * Priority order:
-     * 1. lang query parameter
-     * 2. Accept-Language header
-     * 3. Default locale from config
-     */
-    private function detectLocale(Request $request): string
-    {
-        // Priority 1: Check lang query parameter
-        if ($request->has('lang')) {
-            $locale = $request->query('lang');
-            if ($this->isSupported($locale)) {
-                return $locale;
-            }
-        }
-
-        // Priority 2: Check Accept-Language header
-        $acceptLanguage = $request->header('Accept-Language');
-        if ($acceptLanguage) {
-            $locale = $this->parseAcceptLanguageHeader($acceptLanguage);
-            if ($locale && $this->isSupported($locale)) {
-                return $locale;
-            }
-        }
-
-        // Priority 3: Return default locale
-        return config('app.locale', 'id');
+    // Priority 2: Check Accept-Language header
+    $acceptLanguage = $request->header("Accept-Language");
+    if ($acceptLanguage) {
+      $locale = $this->parseAcceptLanguageHeader($acceptLanguage);
+      if ($locale && $this->isSupported($locale)) {
+        return $locale;
+      }
     }
 
-    /**
-     * Parse the Accept-Language header and return the first supported locale.
-     */
-    private function parseAcceptLanguageHeader(string $header): ?string
-    {
-        // Parse Accept-Language header format: "en-US,en;q=0.9,id;q=0.8"
-        $locales = [];
+    // Priority 3: Return default locale
+    return config("app.locale", "id");
+  }
 
-        // Split by comma to get individual language preferences
-        $parts = explode(',', $header);
+  /**
+   * Parse the Accept-Language header and return the first supported locale.
+   */
+  private function parseAcceptLanguageHeader(string $header): ?string
+  {
+    // Parse Accept-Language header format: "en-US,en;q=0.9,id;q=0.8"
+    $locales = [];
 
-        foreach ($parts as $part) {
-            $part = trim($part);
+    // Split by comma to get individual language preferences
+    $parts = explode(",", $header);
 
-            // Extract locale and quality value
-            if (preg_match('/^([a-z]{2}(?:-[A-Z]{2})?)(?:;q=([0-9.]+))?$/i', $part, $matches)) {
-                $locale = strtolower($matches[1]);
-                $quality = isset($matches[2]) ? (float) $matches[2] : 1.0;
+    foreach ($parts as $part) {
+      $part = trim($part);
 
-                // Extract just the language code (e.g., "en" from "en-US")
-                if (str_contains($locale, '-')) {
-                    $locale = explode('-', $locale)[0];
-                }
+      // Extract locale and quality value
+      if (preg_match('/^([a-z]{2}(?:-[A-Z]{2})?)(?:;q=([0-9.]+))?$/i', $part, $matches)) {
+        $locale = strtolower($matches[1]);
+        $quality = isset($matches[2]) ? (float) $matches[2] : 1.0;
 
-                $locales[] = [
-                    'locale' => $locale,
-                    'quality' => $quality,
-                ];
-            }
+        // Extract just the language code (e.g., "en" from "en-US")
+        if (str_contains($locale, "-")) {
+          $locale = explode("-", $locale)[0];
         }
 
-        // Sort by quality value (highest first)
-        usort($locales, function ($a, $b) {
-            return $b['quality'] <=> $a['quality'];
-        });
-
-        // Return the first supported locale
-        foreach ($locales as $item) {
-            if ($this->isSupported($item['locale'])) {
-                return $item['locale'];
-            }
-        }
-
-        return null;
+        $locales[] = [
+          "locale" => $locale,
+          "quality" => $quality,
+        ];
+      }
     }
 
-    /**
-     * Check if a locale is supported.
-     */
-    private function isSupported(string $locale): bool
-    {
-        $supportedLocales = config('app.supported_locales', ['en', 'id']);
+    // Sort by quality value (highest first)
+    usort($locales, function ($a, $b) {
+      return $b["quality"] <=> $a["quality"];
+    });
 
-        return in_array($locale, $supportedLocales, true);
+    // Return the first supported locale
+    foreach ($locales as $item) {
+      if ($this->isSupported($item["locale"])) {
+        return $item["locale"];
+      }
     }
+
+    return null;
+  }
+
+  /**
+   * Check if a locale is supported.
+   */
+  private function isSupported(string $locale): bool
+  {
+    $supportedLocales = config("app.supported_locales", ["en", "id"]);
+
+    return in_array($locale, $supportedLocales, true);
+  }
 }

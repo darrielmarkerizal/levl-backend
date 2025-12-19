@@ -4,6 +4,7 @@ namespace Modules\Common\Http\Controllers;
 
 use App\Support\ApiResponse;
 use App\Support\Traits\HandlesFiltering;
+use App\Support\Traits\ProvidesMetadata;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\Common\Http\Requests\CategoryStoreRequest;
@@ -17,6 +18,7 @@ class CategoriesController extends Controller
 {
   use ApiResponse;
   use HandlesFiltering;
+  use ProvidesMetadata;
 
   public function __construct(private readonly CategoryService $service) {}
 
@@ -38,8 +40,23 @@ class CategoriesController extends Controller
 
     $paginator = $this->service->paginate($perPage);
 
-    return $this->paginateResponse($paginator);
+    $metadata = $this->buildMetadata(
+        allowedSorts: ['name', 'value', 'created_at', 'updated_at'],
+        filters: [
+            'status' => [
+                'label' => __('categories.filters.status'),
+                'type' => 'select',
+                'options' => array_map(
+                    fn($case) => ['value' => $case->value, 'label' => $case->label()],
+                    \Modules\Common\Enums\CategoryStatus::cases()
+                ),
+            ],
+        ]
+    );
+
+    return $this->paginateResponse($paginator, additionalMeta: $metadata);
   }
+
 
   /**
    * Buat Kategori Baru

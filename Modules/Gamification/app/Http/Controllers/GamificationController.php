@@ -158,24 +158,19 @@ class GamificationController extends Controller
         $totalXp = $stats?->total_xp ?? 0;
         $level = $stats?->global_level ?? 0;
 
-        // Define milestones
-        $milestones = [
-            ['name' => 'Pemula', 'xp_required' => 100, 'level_required' => 1],
-            ['name' => 'Pelajar Aktif', 'xp_required' => 500, 'level_required' => 5],
-            ['name' => 'Pembelajar Tekun', 'xp_required' => 1000, 'level_required' => 10],
-            ['name' => 'Ahli Muda', 'xp_required' => 2500, 'level_required' => 15],
-            ['name' => 'Master', 'xp_required' => 5000, 'level_required' => 20],
-            ['name' => 'Grandmaster', 'xp_required' => 10000, 'level_required' => 30],
-        ];
+        // Get milestones from database
+        $milestones = \Modules\Gamification\Models\Milestone::active()
+            ->ordered()
+            ->get();
 
-        $achievements = collect($milestones)->map(function ($milestone) use ($totalXp) {
-            $achieved = $totalXp >= $milestone['xp_required'];
-            $progress = min(100, ($totalXp / $milestone['xp_required']) * 100);
+        $achievements = $milestones->map(function ($milestone) use ($totalXp) {
+            $achieved = $totalXp >= $milestone->xp_required;
+            $progress = min(100, ($totalXp / $milestone->xp_required) * 100);
 
             return [
-                'name' => $milestone['name'],
-                'xp_required' => $milestone['xp_required'],
-                'level_required' => $milestone['level_required'],
+                'name' => $milestone->name,
+                'xp_required' => $milestone->xp_required,
+                'level_required' => $milestone->level_required,
                 'achieved' => $achieved,
                 'progress' => round($progress, 2),
             ];

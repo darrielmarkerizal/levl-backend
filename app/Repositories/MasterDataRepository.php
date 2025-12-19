@@ -143,11 +143,9 @@ class MasterDataRepository extends BaseRepository
       ->defaultSort("type")
       ->get()
       ->map(function ($item) {
-        $crudTypes = ["categories", "difficulty-levels", "content-types"];
         $labelMap = [
           "categories" => "Kategori",
-          "difficulty-levels" => "Tingkat Kesulitan",
-          "content-types" => "Tipe Konten",
+          "tags" => "Tags",
         ];
 
         return [
@@ -155,7 +153,7 @@ class MasterDataRepository extends BaseRepository
           "label" => $labelMap[$item->type] ?? ucwords(str_replace("-", " ", $item->type)),
           "count" => $item->count,
           "last_updated" => $item->last_updated,
-          "is_crud" => in_array($item->type, $crudTypes),
+          "is_crud" => true, // All types from database are CRUD
         ];
       });
 

@@ -53,12 +53,22 @@ class MasterDataService
     // Make sure we don't duplicate keys when merging with enum-based types
     $existingKeys = $crudTypes->pluck("key")->all();
 
-    // Enum-based (read-only) master data types
+    //Enum-based (read-only) master data types
     $enumTypes = $this->getEnumTypes()->reject(
       fn(array $type) => in_array($type["key"], $existingKeys, true)
     );
 
-    return $crudTypes->concat($enumTypes)->values();
+    $allTypes = $crudTypes->concat($enumTypes)->values();
+
+    // Apply is_crud filter if provided
+    if (isset($params['filter']['is_crud'])) {
+      $filterIsCrud = filter_var($params['filter']['is_crud'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+      if ($filterIsCrud !== null) {
+        $allTypes = $allTypes->filter(fn($type) => $type['is_crud'] === $filterIsCrud)->values();
+      }
+    }
+
+    return $allTypes;
   }
 
   /**

@@ -1,4 +1,127 @@
-<?php
+{
+    "success": true,
+    "message": "Daftar tipe master data",
+    "data": [
+        {
+            "key": "user-status",
+            "label": "Status Pengguna",
+            "count": 4,
+            "last_updated": null,
+            "is_crud": false
+        },
+        {
+            "key": "roles",
+            "label": "Peran",
+            "count": 4,
+            "last_updated": null,
+            "is_crud": false
+        },
+        {
+            "key": "course-status",
+            "label": "Status Kursus",
+            "count": 3,
+            "last_updated": null,
+            "is_crud": false
+        },
+        {
+            "key": "course-types",
+            "label": "Tipe Kursus",
+            "count": 2,
+            "last_updated": null,
+            "is_crud": false
+        },
+        {
+            "key": "enrollment-types",
+            "label": "Tipe Pendaftaran",
+            "count": 3,
+            "last_updated": null,
+            "is_crud": false
+        },
+        {
+            "key": "level-tags",
+            "label": "Level Kesulitan",
+            "count": 3,
+            "last_updated": null,
+            "is_crud": false
+        },
+        {
+            "key": "progression-modes",
+            "label": "Mode Progres",
+            "count": 2,
+            "last_updated": null,
+            "is_crud": false
+        },
+        {
+            "key": "content-types",
+            "label": "Tipe Konten",
+            "count": 3,
+            "last_updated": null,
+            "is_crud": false
+        },
+        {
+            "key": "enrollment-status",
+            "label": "Status Pendaftaran",
+            "count": 4,
+            "last_updated": null,
+            "is_crud": false
+        },
+        {
+            "key": "progress-status",
+            "label": "Status Progres",
+            "count": 3,
+            "last_updated": null,
+            "is_crud": false
+        },
+        {
+            "key": "assignment-status",
+            "label": "Status Tugas",
+            "count": 3,
+            "last_updated": null,
+            "is_crud": false
+        },
+        {
+            "key": "submission-status",
+            "label": "Status Pengumpulan",
+            "count": 4,
+            "last_updated": null,
+            "is_crud": false
+        },
+        {
+            "key": "submission-types",
+            "label": "Tipe Pengumpulan",
+            "count": 3,
+            "last_updated": null,
+            "is_crud": false
+        },
+        {
+            "key": "content-status",
+            "label": "Status Konten",
+            "count": 8,
+            "last_updated": null,
+            "is_crud": false
+        },
+        {
+            "key": "priorities",
+            "label": "Prioritas",
+            "count": 3,
+            "last_updated": null,
+            "is_crud": false
+        }
+    ],
+    "meta": {
+        "pagination": {
+            "current_page": 1,
+            "per_page": 15,
+            "total": 29,
+            "last_page": 2,
+            "from": 1,
+            "to": 15,
+            "has_next": true,
+            "has_prev": false
+        }
+    },
+    "errors": null
+}<?php
 
 namespace Modules\Gamification\Http\Controllers;
 

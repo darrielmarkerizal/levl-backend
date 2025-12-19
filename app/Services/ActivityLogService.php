@@ -25,4 +25,27 @@ class ActivityLogService
   {
     return $this->repository->find($id);
   }
+
+  /**
+   * Get distinct filter options for activity logs.
+   */
+  public function getFilterOptions(): array
+  {
+    return [
+      'log_names' => ActivityLog::query()
+        ->distinct()
+        ->whereNotNull('log_name')
+        ->pluck('log_name')
+        ->filter()
+        ->sort()
+        ->values(),
+      'browsers' => ActivityLog::query()
+        ->distinct()
+        ->whereNotNull('browser')
+        ->pluck('browser')
+        ->filter()
+        ->sort()
+        ->values(),
+    ];
+  }
 }
