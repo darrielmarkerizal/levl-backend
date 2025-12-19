@@ -37,7 +37,7 @@ class ProfileAccountController extends Controller
 
     return $this->success(
       null,
-      "Akun berhasil dihapus. Anda memiliki 30 hari untuk memulihkannya.",
+      __('messages.profile.account_deleted'),
     );
   }
 

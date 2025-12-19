@@ -86,6 +86,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Supported Locales
+    |--------------------------------------------------------------------------
+    |
+    | This array contains all the locales that your application supports.
+    | These locales should have corresponding translation files in the
+    | lang/ directory. The API will validate requested locales against
+    | this list and fall back to the default locale if unsupported.
+    |
+    */
+
+    'supported_locales' => ['en', 'id'],
+
+    /*
+    |--------------------------------------------------------------------------
     | Encryption Key
     |--------------------------------------------------------------------------
     |

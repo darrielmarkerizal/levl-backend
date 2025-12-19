@@ -115,6 +115,6 @@ class ProfileController extends Controller
         $user = $request->user();
         $this->profileService->deleteAvatar($user);
 
-        return $this->success(null, 'Avatar deleted successfully.');
+        return $this->success(null, __('messages.auth.avatar_deleted'));
     }
 }

@@ -90,7 +90,7 @@ class ChallengeController extends Controller
     $challenge = Challenge::with("badge")->find($challengeId);
 
     if (!$challenge) {
-      return $this->notFound("Challenge tidak ditemukan.");
+      return $this->notFound(__('messages.challenges.not_found'));
     }
 
     $userId = $request->user()?->id;
@@ -209,7 +209,7 @@ class ChallengeController extends Controller
     $rewards = $this->challengeService->claimReward($userId, $challengeId);
 
     return $this->success([
-      "message" => "Reward berhasil diklaim!",
+      "message" => __('messages.challenges.reward_claimed'),
       "rewards" => $rewards,
     ]);
   }

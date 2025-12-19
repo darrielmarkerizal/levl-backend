@@ -30,7 +30,7 @@ class MasterDataCrudController extends Controller
         
         $paginator = $this->service->getTypesPaginated($request->all(), $perPage);
 
-        return $this->paginateResponse($paginator, 'Daftar tipe master data');
+        return $this->paginateResponse($paginator, __('messages.master_data.types_retrieved'));
     }
 
     /**
@@ -56,12 +56,12 @@ class MasterDataCrudController extends Controller
         if ($request->get('all') === 'true') {
             $data = $query->get();
 
-            return $this->success(['items' => $data], "Daftar master data: {$type}");
+            return $this->success(['items' => $data], __('messages.master_data.items_retrieved', ['type' => $type]));
         }
 
         $paginator = $query->paginate($perPage);
 
-        return $this->paginateResponse($paginator, "Daftar master data: {$type}");
+        return $this->paginateResponse($paginator, __('messages.master_data.items_retrieved', ['type' => $type]));
     }
 
     /**
@@ -74,10 +74,10 @@ class MasterDataCrudController extends Controller
         $item = $this->service->find($type, $id);
 
         if (! $item) {
-            return $this->error('Master data tidak ditemukan', 404);
+            return $this->error(__('messages.master_data.not_found'), 404);
         }
 
-        return $this->success(['item' => $item], 'Detail master data');
+        return $this->success(['item' => $item], __('messages.master_data.item_retrieved'));
     }
 
     /**
@@ -92,7 +92,7 @@ class MasterDataCrudController extends Controller
         $typeInfo = $allTypes->firstWhere('key', $type);
         
         if (!$typeInfo || ($typeInfo['is_crud'] ?? true) === false) {
-            return $this->error('Item untuk tipe enum tidak dapat dibuat', 403);
+            return $this->error(__('messages.master_data.enum_cannot_create'), 403);
         }
 
         $validated = $request->validated();
@@ -105,12 +105,12 @@ class MasterDataCrudController extends Controller
 
         // Check for duplicate
         if ($this->service->valueExists($type, $validated['value'])) {
-            return $this->error('Value sudah ada untuk tipe ini', 422);
+            return $this->error(__('messages.master_data.value_exists'), 422);
         }
 
         $item = $this->service->create($type, $validated);
 
-        return $this->created(['item' => $item], 'Master data berhasil ditambahkan');
+        return $this->created(['item' => $item], __('messages.master_data.created'));
     }
 
     /**
@@ -125,7 +125,7 @@ class MasterDataCrudController extends Controller
         $typeInfo = $allTypes->firstWhere('key', $type);
         
         if (!$typeInfo || ($typeInfo['is_crud'] ?? true) === false) {
-            return $this->error('Item dari tipe enum tidak dapat diedit', 403);
+            return $this->error(__('messages.master_data.enum_cannot_edit'), 403);
         }
 
         $validated = $request->validated();
@@ -140,17 +140,17 @@ class MasterDataCrudController extends Controller
         // Check for duplicate value if changing
         if (isset($validated['value'])) {
             if ($this->service->valueExists($type, $validated['value'], $id)) {
-                return $this->error('Value sudah ada untuk tipe ini', 422);
+                return $this->error(__('messages.master_data.value_exists'), 422);
             }
         }
 
         $updated = $this->service->update($type, $id, $validated);
 
         if (! $updated) {
-            return $this->error('Master data tidak ditemukan', 404);
+            return $this->error(__('messages.master_data.not_found'), 404);
         }
 
-        return $this->success(['item' => $updated], 'Master data berhasil diperbarui');
+        return $this->success(['item' => $updated], __('messages.master_data.updated'));
     }
 
     /**
@@ -165,7 +165,7 @@ class MasterDataCrudController extends Controller
         $typeInfo = $allTypes->firstWhere('key', $type);
         
         if (!$typeInfo || ($typeInfo['is_crud'] ?? true) === false) {
-            return $this->error('Item dari tipe enum tidak dapat dihapus', 403);
+            return $this->error(__('messages.master_data.enum_cannot_delete'), 403);
         }
 
         Log::info('Master data delete request', [
@@ -177,13 +177,13 @@ class MasterDataCrudController extends Controller
         $result = $this->service->delete($type, $id);
 
         if ($result === 'not_found') {
-            return $this->error('Master data tidak ditemukan', 404);
+            return $this->error(__('messages.master_data.not_found'), 404);
         }
 
         if ($result === 'system_protected') {
-            return $this->error('Master data sistem tidak dapat dihapus', 403);
+            return $this->error(__('messages.master_data.system_protected'), 403);
         }
 
-        return $this->success([], 'Master data berhasil dihapus');
+        return $this->success([], __('messages.master_data.deleted'));
     }
 }

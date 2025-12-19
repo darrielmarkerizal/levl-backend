@@ -275,8 +275,8 @@ class CourseController extends Controller
     $user = auth("api")->user();
     if (!\Illuminate\Support\Facades\Gate::forUser($user)->allows("update", $course)) {
       return $this->error(
-        "Anda tidak memiliki akses untuk generate enrollment key course ini.",
-        403,
+        __('messages.courses.no_generate_key_access'),
+        403
       );
     }
 
@@ -294,7 +294,7 @@ class CourseController extends Controller
         "course" => $updated,
         "enrollment_key" => $newKey,
       ],
-      "Enrollment key berhasil digenerate.",
+      __('messages.courses.key_generated'),
     );
   }
 
@@ -386,7 +386,7 @@ class CourseController extends Controller
 
     return $this->success(
       ["course" => $updated],
-      "Enrollment key berhasil dihapus dan enrollment type diubah ke auto_accept.",
+      __('messages.courses.key_removed'),
     );
   }
 
@@ -396,10 +396,10 @@ class CourseController extends Controller
 
     $errors = [];
     if (str_contains($message, "courses_code_unique")) {
-      $errors["code"][] = "Kode sudah digunakan.";
+      $errors["code"][] = __('messages.courses.code_exists');
     }
     if (str_contains($message, "courses_slug_unique")) {
-      $errors["slug"][] = "Slug sudah digunakan.";
+      $errors["slug"][] = __('messages.courses.slug_exists');
     }
 
     if (!empty($errors)) {
@@ -407,7 +407,7 @@ class CourseController extends Controller
     }
 
     return $this->validationError([
-      "general" => ["Data duplikat. Periksa kembali isian Anda."],
+      "general" => [__('messages.courses.duplicate_data')],
     ]);
   }
 }

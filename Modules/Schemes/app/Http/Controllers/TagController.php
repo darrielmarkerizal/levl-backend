@@ -35,14 +35,14 @@ class TagController extends Controller
     $result = $this->service->list($perPage);
 
     if ($result instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator) {
-      return $this->paginateResponse($result, "Daftar tag berhasil diambil.");
+      return $this->paginateResponse($result, __('messages.tags.list_retrieved'));
     }
 
     return $this->success(
       [
         "items" => $result,
       ],
-      "Daftar tag berhasil diambil.",
+      __('messages.tags.list_retrieved'),
     );
   }
 

@@ -27,7 +27,7 @@ class ActivityLogController extends Controller
     $perPage = max(1, min((int) $request->input("per_page", 15), 100));
     $activities = $this->service->paginate($perPage);
 
-    return $this->paginateResponse($activities, "Daftar activity log berhasil diambil");
+    return $this->paginateResponse($activities, __('messages.activity_logs.retrieved'));
   }
 
   /**
@@ -40,9 +40,9 @@ class ActivityLogController extends Controller
     $activity = $this->service->find($id);
 
     if (!$activity) {
-      return $this->notFound("Activity log tidak ditemukan");
+      return $this->notFound(__('messages.activity_logs.not_found'));
     }
 
-    return $this->success($activity, "Detail activity log berhasil diambil");
+    return $this->success($activity, __('messages.activity_logs.item_retrieved'));
   }
 }

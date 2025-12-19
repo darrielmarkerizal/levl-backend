@@ -109,7 +109,7 @@ class AnnouncementController extends Controller
 
     return $this->created(
       ["announcement" => AnnouncementResource::make($announcement)],
-      "Pengumuman berhasil dibuat.",
+      __('messages.announcements.created'),
     );
   }
 
@@ -171,7 +171,7 @@ class AnnouncementController extends Controller
 
     return $this->success(
       ["announcement" => AnnouncementResource::make($announcement)],
-      "Pengumuman berhasil diperbarui.",
+      __('messages.announcements.updated'),
     );
   }
 
@@ -226,7 +226,7 @@ class AnnouncementController extends Controller
 
     return $this->success(
       ["announcement" => $announcement->fresh()],
-      "Pengumuman berhasil dipublikasikan.",
+      __('messages.announcements.published'),
     );
   }
 
@@ -259,7 +259,7 @@ class AnnouncementController extends Controller
 
     return $this->success(
       ["announcement" => $announcement->fresh()],
-      "Pengumuman berhasil dijadwalkan.",
+      __('messages.announcements.scheduled'),
     );
   }
 

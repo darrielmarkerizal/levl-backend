@@ -311,7 +311,7 @@ class MasterDataController extends Controller
    */
   public function userStatuses(): JsonResponse
   {
-    return $this->success($this->transformEnum(UserStatus::class), "Daftar status pengguna");
+    return $this->success($this->transformEnum(UserStatus::class), __('messages.master_data.user_statuses'));
   }
 
   /**
@@ -356,7 +356,7 @@ class MasterDataController extends Controller
    */
   public function courseStatuses(): JsonResponse
   {
-    return $this->success($this->transformEnum(CourseStatus::class), "Daftar status kursus");
+    return $this->success($this->transformEnum(CourseStatus::class), __('messages.master_data.course_statuses'));
   }
 
   /**
@@ -373,7 +373,7 @@ class MasterDataController extends Controller
    */
   public function courseTypes(): JsonResponse
   {
-    return $this->success($this->transformEnum(CourseType::class), "Daftar tipe kursus");
+    return $this->success($this->transformEnum(CourseType::class), __('messages.master_data.course_types'));
   }
 
   /**
@@ -390,7 +390,7 @@ class MasterDataController extends Controller
    */
   public function enrollmentTypes(): JsonResponse
   {
-    return $this->success($this->transformEnum(EnrollmentType::class), "Daftar tipe pendaftaran");
+    return $this->success($this->transformEnum(EnrollmentType::class), __('messages.master_data.enrollment_types'));
   }
 
   /**
@@ -405,7 +405,7 @@ class MasterDataController extends Controller
    */
   public function levelTags(): JsonResponse
   {
-    return $this->success($this->transformEnum(LevelTag::class), "Daftar level kesulitan");
+    return $this->success($this->transformEnum(LevelTag::class), __('messages.master_data.level_tags'));
   }
 
   /**
@@ -420,7 +420,7 @@ class MasterDataController extends Controller
    */
   public function progressionModes(): JsonResponse
   {
-    return $this->success($this->transformEnum(ProgressionMode::class), "Daftar mode progres");
+    return $this->success($this->transformEnum(ProgressionMode::class), __('messages.master_data.progression_modes'));
   }
 
   /**
@@ -435,7 +435,7 @@ class MasterDataController extends Controller
    */
   public function contentTypes(): JsonResponse
   {
-    return $this->success($this->transformEnum(ContentType::class), "Daftar tipe konten");
+    return $this->success($this->transformEnum(ContentType::class), __('messages.master_data.content_types'));
   }
 
   // ==================== ENROLLMENTS ====================
@@ -454,7 +454,7 @@ class MasterDataController extends Controller
   {
     return $this->success(
       $this->transformEnum(EnrollmentStatus::class),
-      "Daftar status pendaftaran",
+      __('messages.master_data.enrollment_statuses'),
     );
   }
 
@@ -470,7 +470,7 @@ class MasterDataController extends Controller
    */
   public function progressStatuses(): JsonResponse
   {
-    return $this->success($this->transformEnum(ProgressStatus::class), "Daftar status progres");
+    return $this->success($this->transformEnum(ProgressStatus::class), __('messages.master_data.progress_statuses'));
   }
 
   // ==================== LEARNING ====================
@@ -487,7 +487,7 @@ class MasterDataController extends Controller
    */
   public function assignmentStatuses(): JsonResponse
   {
-    return $this->success($this->transformEnum(AssignmentStatus::class), "Daftar status tugas");
+    return $this->success($this->transformEnum(AssignmentStatus::class), __('messages.master_data.assignment_statuses'));
   }
 
   /**
@@ -504,7 +504,7 @@ class MasterDataController extends Controller
   {
     return $this->success(
       $this->transformEnum(SubmissionStatus::class),
-      "Daftar status pengumpulan",
+      __('messages.master_data.submission_statuses'),
     );
   }
 
@@ -520,7 +520,7 @@ class MasterDataController extends Controller
    */
   public function submissionTypes(): JsonResponse
   {
-    return $this->success($this->transformEnum(SubmissionType::class), "Daftar tipe pengumpulan");
+    return $this->success($this->transformEnum(SubmissionType::class), __('messages.master_data.submission_types'));
   }
 
   // ==================== CONTENT ====================
@@ -537,7 +537,7 @@ class MasterDataController extends Controller
    */
   public function contentStatuses(): JsonResponse
   {
-    return $this->success($this->transformEnum(ContentStatus::class), "Daftar status konten");
+    return $this->success($this->transformEnum(ContentStatus::class), __('messages.master_data.content_statuses'));
   }
 
   /**
@@ -552,7 +552,7 @@ class MasterDataController extends Controller
    */
   public function priorities(): JsonResponse
   {
-    return $this->success($this->transformEnum(Priority::class), "Daftar prioritas");
+    return $this->success($this->transformEnum(Priority::class), __('messages.master_data.priorities'));
   }
 
   /**
@@ -567,7 +567,7 @@ class MasterDataController extends Controller
    */
   public function targetTypes(): JsonResponse
   {
-    return $this->success($this->transformEnum(TargetType::class), "Daftar tipe target");
+    return $this->success($this->transformEnum(TargetType::class), __('messages.master_data.target_types'));
   }
 
   // ==================== GAMIFICATION ====================
@@ -584,7 +584,7 @@ class MasterDataController extends Controller
    */
   public function challengeTypes(): JsonResponse
   {
-    return $this->success($this->transformEnum(ChallengeType::class), "Daftar tipe tantangan");
+    return $this->success($this->transformEnum(ChallengeType::class), __('messages.master_data.challenge_types'));
   }
 
   /**
@@ -601,7 +601,7 @@ class MasterDataController extends Controller
   {
     return $this->success(
       $this->transformEnum(ChallengeAssignmentStatus::class),
-      "Daftar status tantangan user",
+      __('messages.master_data.challenge_assignment_statuses'),
     );
   }
 
@@ -619,7 +619,7 @@ class MasterDataController extends Controller
   {
     return $this->success(
       $this->transformEnum(ChallengeCriteriaType::class),
-      "Daftar tipe kriteria tantangan",
+      __('messages.master_data.challenge_criteria_types'),
     );
   }
 
@@ -635,7 +635,7 @@ class MasterDataController extends Controller
    */
   public function badgeTypes(): JsonResponse
   {
-    return $this->success($this->transformEnum(BadgeType::class), "Daftar tipe badge");
+    return $this->success($this->transformEnum(BadgeType::class), __('messages.master_data.badge_types'));
   }
 
   /**
@@ -650,7 +650,7 @@ class MasterDataController extends Controller
    */
   public function pointSourceTypes(): JsonResponse
   {
-    return $this->success($this->transformEnum(PointSourceType::class), "Daftar sumber poin");
+    return $this->success($this->transformEnum(PointSourceType::class), __('messages.master_data.point_source_types'));
   }
 
   /**
@@ -665,7 +665,7 @@ class MasterDataController extends Controller
    */
   public function pointReasons(): JsonResponse
   {
-    return $this->success($this->transformEnum(PointReason::class), "Daftar alasan poin");
+    return $this->success($this->transformEnum(PointReason::class), __('messages.master_data.point_reasons'));
   }
 
   // ==================== NOTIFICATIONS ====================
@@ -682,7 +682,7 @@ class MasterDataController extends Controller
    */
   public function notificationTypes(): JsonResponse
   {
-    return $this->success($this->transformEnum(NotificationType::class), "Daftar tipe notifikasi");
+    return $this->success($this->transformEnum(NotificationType::class), __('messages.master_data.notification_types'));
   }
 
   /**
@@ -699,7 +699,7 @@ class MasterDataController extends Controller
   {
     return $this->success(
       $this->transformEnum(NotificationChannel::class),
-      "Daftar channel notifikasi",
+      __('messages.master_data.notification_channels'),
     );
   }
 
@@ -717,7 +717,7 @@ class MasterDataController extends Controller
   {
     return $this->success(
       $this->transformEnum(NotificationFrequency::class),
-      "Daftar frekuensi notifikasi",
+      __('messages.master_data.notification_frequencies'),
     );
   }
 
@@ -735,7 +735,7 @@ class MasterDataController extends Controller
    */
   public function gradeStatuses(): JsonResponse
   {
-    return $this->success($this->transformEnum(GradeStatus::class), "Daftar status nilai");
+    return $this->success($this->transformEnum(GradeStatus::class), __('messages.master_data.grade_statuses'));
   }
 
   /**
@@ -750,7 +750,7 @@ class MasterDataController extends Controller
    */
   public function gradeSourceTypes(): JsonResponse
   {
-    return $this->success($this->transformEnum(SourceType::class), "Daftar sumber nilai");
+    return $this->success($this->transformEnum(SourceType::class), __('messages.master_data.grade_source_types'));
   }
 
   // ==================== COMMON ====================
@@ -767,7 +767,7 @@ class MasterDataController extends Controller
    */
   public function categoryStatuses(): JsonResponse
   {
-    return $this->success($this->transformEnum(CategoryStatus::class), "Daftar status kategori");
+    return $this->success($this->transformEnum(CategoryStatus::class), __('messages.master_data.category_statuses'));
   }
 
   /**
@@ -782,6 +782,6 @@ class MasterDataController extends Controller
    */
   public function settingTypes(): JsonResponse
   {
-    return $this->success($this->transformEnum(SettingType::class), "Daftar tipe pengaturan");
+    return $this->success($this->transformEnum(SettingType::class), __('messages.master_data.setting_types'));
   }
 }

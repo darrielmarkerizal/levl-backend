@@ -86,7 +86,7 @@ class NotificationPreferenceController extends Controller
 
       return $this->success(
         data: $preferences,
-        message: "Preferensi notifikasi berhasil diperbarui",
+        message: __('messages.notifications.preferences_updated'),
       );
     }
 
@@ -118,7 +118,7 @@ class NotificationPreferenceController extends Controller
 
       return $this->success(
         data: $preferences,
-        message: "Preferensi notifikasi berhasil direset ke default",
+        message: __('messages.notifications.preferences_reset'),
       );
     }
 

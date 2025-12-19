@@ -104,7 +104,7 @@ class EnrollmentsController extends Controller
     $perPage = max(1, (int) $request->query("per_page", 15));
     $paginator = $this->service->paginateByCourse($course->id, $perPage);
 
-    return $this->paginateResponse($paginator, "Daftar enrollment course berhasil diambil.");
+    return $this->paginateResponse($paginator, __('messages.enrollments.course_list_retrieved'));
   }
 
   /**
@@ -159,7 +159,7 @@ class EnrollmentsController extends Controller
       $course = $courses->firstWhere("slug", $courseSlug);
       if (!$course) {
         return $this->error(
-          "Course tidak ditemukan atau tidak berada di bawah pengelolaan Anda.",
+          __('messages.enrollments.course_not_managed'),
           404,
         );
       }
@@ -168,7 +168,7 @@ class EnrollmentsController extends Controller
       $paginator = $this->service->paginateByCourseIds($courseIds, $perPage);
     }
 
-    return $this->paginateResponse($paginator, "Daftar enrollment berhasil diambil.");
+    return $this->paginateResponse($paginator, __('messages.enrollments.list_retrieved'));
   }
 
   /**
@@ -285,7 +285,7 @@ class EnrollmentsController extends Controller
 
     if (!$this->canModifyEnrollment($user, $enrollment)) {
       return $this->error(
-        "Anda tidak memiliki akses untuk mengundurkan diri dari enrollment ini.",
+        __('messages.enrollm ents.no_withdraw_access'),
         403,
       );
     }
@@ -294,7 +294,7 @@ class EnrollmentsController extends Controller
 
     return $this->success(
       ["enrollment" => $updated],
-      "Anda berhasil mengundurkan diri dari course.",
+      __('messages.enrollments.withdrawn'),
     );
   }
 
@@ -352,7 +352,7 @@ class EnrollmentsController extends Controller
         "status" => $enrollmentData->status,
         "enrollment" => $enrollmentData,
       ],
-      "Status enrollment berhasil diambil.",
+      __('messages.enrollments.status_retrieved'),
     );
   }
 
@@ -442,7 +442,7 @@ class EnrollmentsController extends Controller
 
     if (!$enrollment->course || !$this->userCanManageCourse($user, $enrollment->course)) {
       return $this->error(
-        "Anda tidak memiliki akses untuk mengeluarkan peserta dari course ini.",
+        __('messages.enrollments.no_remove_access'),
         403,
       );
     }

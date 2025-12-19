@@ -7,16 +7,36 @@ use Illuminate\Http\JsonResponse;
 
 trait ApiResponse
 {
+    /**
+     * Translate a message key or return the string as-is for backward compatibility
+     *
+     * @param  string  $message  Translation key or plain string
+     * @param  array  $params  Parameters for translation substitution
+     */
+    private function translateMessage(string $message, array $params = []): string
+    {
+        // Check if the message looks like a translation key (contains a dot)
+        // and if the translation exists
+        if (str_contains($message, '.') && trans()->has($message)) {
+            return __($message, $params);
+        }
+
+        // For backward compatibility, return the message as-is if it's not a translation key
+        // or if the translation doesn't exist
+        return $message;
+    }
+
     protected function success(
         mixed $data = null,
-        string $message = 'Berhasil',
+        string $message = 'messages.success',
+        array $params = [],
         int $status = 200,
         ?array $meta = null
     ): JsonResponse {
         return response()->json(
             [
                 'success' => true,
-                'message' => $message,
+                'message' => $this->translateMessage($message, $params),
                 'data' => $data,
                 'meta' => $meta,
                 'errors' => null,
@@ -27,14 +47,16 @@ trait ApiResponse
 
     protected function created(
         mixed $data = null,
-        string $message = 'Berhasil dibuat',
+        string $message = 'messages.created',
+        array $params = [],
         ?array $meta = null
     ): JsonResponse {
-        return $this->success($data, $message, 201, $meta);
+        return $this->success($data, $message, $params, 201, $meta);
     }
 
     protected function error(
-        string $message = 'Terjadi kesalahan',
+        string $message = 'messages.error',
+        array $params = [],
         int $status = 400,
         ?array $errors = null,
         mixed $data = null,
@@ -43,7 +65,7 @@ trait ApiResponse
         return response()->json(
             [
                 'success' => false,
-                'message' => $message,
+                'message' => $this->translateMessage($message, $params),
                 'data' => $data,
                 'meta' => $meta,
                 'errors' => $errors,
@@ -54,12 +76,13 @@ trait ApiResponse
 
     protected function paginateResponse(
         LengthAwarePaginator $paginator,
-        string $message = 'Berhasil',
+        string $message = 'messages.success',
         int $status = 200,
-        ?array $additionalMeta = null
+        ?array $additionalMeta = null,
+        array $params = []
     ): JsonResponse {
         $request = request();
-        
+
         $meta = [
             'pagination' => [
                 'current_page' => $paginator->currentPage(),
@@ -105,6 +128,7 @@ trait ApiResponse
         return $this->success(
             data: $paginator->items(),
             message: $message,
+            params: $params,
             status: $status,
             meta: $meta
         );
@@ -112,31 +136,36 @@ trait ApiResponse
 
     protected function validationError(
         array $errors,
-        string $message = 'Data yang Anda kirim tidak valid. Periksa kembali isian Anda.'
+        string $message = 'messages.validation_failed',
+        array $params = []
     ): JsonResponse {
         return $this->error(
             message: $message,
+            params: $params,
             status: 422,
             errors: $errors
         );
     }
 
     protected function notFound(
-        string $message = 'Resource tidak ditemukan'
+        string $message = 'messages.not_found',
+        array $params = []
     ): JsonResponse {
-        return $this->error($message, 404);
+        return $this->error($message, $params, 404);
     }
 
     protected function unauthorized(
-        string $message = 'Tidak terotorisasi'
+        string $message = 'messages.unauthorized',
+        array $params = []
     ): JsonResponse {
-        return $this->error($message, 401);
+        return $this->error($message, $params, 401);
     }
 
     protected function forbidden(
-        string $message = 'Akses ditolak'
+        string $message = 'messages.forbidden',
+        array $params = []
     ): JsonResponse {
-        return $this->error($message, 403);
+        return $this->error($message, $params, 403);
     }
 
     protected function noContent(): JsonResponse
@@ -144,16 +173,36 @@ trait ApiResponse
         return response()->json([], 204);
     }
 
+    /**
+     * Static helper to translate a message key or return the string as-is
+     *
+     * @param  string  $message  Translation key or plain string
+     * @param  array  $params  Parameters for translation substitution
+     */
+    private static function translateMessageStatic(string $message, array $params = []): string
+    {
+        // Check if the message looks like a translation key (contains a dot)
+        // and if the translation exists
+        if (str_contains($message, '.') && trans()->has($message)) {
+            return __($message, $params);
+        }
+
+        // For backward compatibility, return the message as-is if it's not a translation key
+        // or if the translation doesn't exist
+        return $message;
+    }
+
     public static function successStatic(
         mixed $data = null,
-        string $message = 'Berhasil',
+        string $message = 'messages.success',
+        array $params = [],
         int $status = 200,
         ?array $meta = null
     ): JsonResponse {
         return response()->json(
             [
                 'success' => true,
-                'message' => $message,
+                'message' => self::translateMessageStatic($message, $params),
                 'data' => $data,
                 'meta' => $meta,
                 'errors' => null,
@@ -163,7 +212,8 @@ trait ApiResponse
     }
 
     public static function errorStatic(
-        string $message = 'Terjadi kesalahan',
+        string $message = 'messages.error',
+        array $params = [],
         int $status = 400,
         ?array $errors = null,
         mixed $data = null,
@@ -172,7 +222,7 @@ trait ApiResponse
         return response()->json(
             [
                 'success' => false,
-                'message' => $message,
+                'message' => self::translateMessageStatic($message, $params),
                 'data' => $data,
                 'meta' => $meta,
                 'errors' => $errors,

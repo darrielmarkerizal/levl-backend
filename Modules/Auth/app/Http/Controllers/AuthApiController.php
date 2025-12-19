@@ -73,7 +73,7 @@ class AuthApiController extends Controller
 
     return $this->created(
       $data,
-      "Registrasi berhasil. Silakan periksa email Anda untuk verifikasi.",
+      __('messages.auth.register_success'),
     );
   }
 
@@ -111,7 +111,7 @@ class AuthApiController extends Controller
       return $this->success($data, $data["message"]);
     }
 
-    return $this->success($data, "Login berhasil.");
+    return $this->success($data, __('messages.auth.login_success'));
   }
 
   /**
@@ -197,10 +197,10 @@ class AuthApiController extends Controller
       $refreshToken = $request->string("refresh_token");
       $data = $this->auth->refresh($refreshToken, $request->ip(), $request->userAgent());
     } catch (ValidationException $e) {
-      return $this->error("Refresh token tidak valid atau kadaluarsa.", 401);
+      return $this->error(__('messages.auth.refresh_invalid'), 401);
     }
 
-    return $this->success($data, "Token akses berhasil diperbarui.");
+    return $this->success($data, __('messages.auth.refresh_success'));
   }
 
   /**
@@ -223,17 +223,17 @@ class AuthApiController extends Controller
     /** @var \Modules\Auth\Models\User|null $user */
     $user = auth("api")->user();
     if (!$user) {
-      return $this->error("Tidak terotorisasi.", 401);
+      return $this->error(__('messages.unauthorized'), 401);
     }
 
     $currentJwt = $request->bearerToken();
     if (!$currentJwt) {
-      return $this->error("Tidak terotorisasi.", 401);
+      return $this->error(__('messages.unauthorized'), 401);
     }
 
     $this->auth->logout($user, $currentJwt, $request->input("refresh_token"));
 
-    return $this->success([], "Logout berhasil.");
+    return $this->success([], __('messages.auth.logout_success'));
   }
 
   /**
@@ -254,10 +254,10 @@ class AuthApiController extends Controller
     /** @var \Modules\Auth\Models\User|null $user */
     $user = auth("api")->user();
     if (!$user) {
-      return $this->error("Tidak terotorisasi.", 401);
+      return $this->error(__('messages.unauthorized'), 401);
     }
 
-    return $this->success($user->toArray(), "Profil berhasil diambil.");
+    return $this->success($user->toArray(), __('messages.auth.profile_retrieved'));
   }
 
   /**
@@ -283,7 +283,7 @@ class AuthApiController extends Controller
     /** @var \Modules\Auth\Models\User|null $user */
     $user = auth("api")->user();
     if (!$user) {
-      return $this->error("Tidak terotorisasi.", 401);
+      return $this->error(__('messages.unauthorized'), 401);
     }
 
     $validated = $request->validated();
@@ -310,7 +310,7 @@ class AuthApiController extends Controller
 
     $this->auth->logProfileUpdate($user, $changes, $request->ip(), $request->userAgent());
 
-    return $this->success($user->fresh()->toArray(), "Profil berhasil diperbarui.");
+    return $this->success($user->fresh()->toArray(), __('messages.auth.profile_updated'));
   }
 
   /**
@@ -338,7 +338,7 @@ class AuthApiController extends Controller
 
       return $redirectResponse;
     } catch (\Throwable $e) {
-      return $this->error("Tidak dapat menginisiasi Google OAuth. Silakan login manual.", 400);
+      return $this->error(__('messages.auth.google_oauth_failed'), 400);
     }
   }
 
@@ -448,21 +448,21 @@ class AuthApiController extends Controller
     /** @var \Modules\Auth\Models\User|null $user */
     $user = auth("api")->user();
     if (!$user) {
-      return $this->error("Tidak terotorisasi.", 401);
+      return $this->error(__('messages.unauthorized'), 401);
     }
 
     if ($user->email_verified_at && $user->status === UserStatus::Active) {
-      return $this->success([], "Email Anda sudah terverifikasi.");
+      return $this->success([], __('messages.auth.email_already_verified'));
     }
 
     $uuid = $this->emailVerification->sendVerificationLink($user);
     if ($uuid === null) {
-      return $this->success([], "Email Anda sudah terverifikasi.");
+      return $this->success([], __('messages.auth.email_already_verified'));
     }
 
     return $this->success(
       ["uuid" => $uuid],
-      "Tautan verifikasi telah dikirim ke email Anda. Berlaku 3 menit dan hanya bisa digunakan sekali.",
+      __('messages.auth.verification_sent'),
     );
   }
 
@@ -485,7 +485,7 @@ class AuthApiController extends Controller
     /** @var \Modules\Auth\Models\User|null $user */
     $user = auth("api")->user();
     if (!$user) {
-      return $this->error("Tidak terotorisasi.", 401);
+      return $this->error(__('messages.unauthorized'), 401);
     }
 
     $validated = $request->validated();
@@ -502,7 +502,7 @@ class AuthApiController extends Controller
 
     return $this->success(
       ["uuid" => $uuid],
-      "Tautan verifikasi perubahan email telah dikirim. Berlaku 3 menit.",
+      __('messages.auth.email_change_sent'),
     );
   }
 
@@ -529,22 +529,22 @@ class AuthApiController extends Controller
     $result = $this->emailVerification->verifyChangeByCode($validated["uuid"], $validated["code"]);
 
     if ($result["status"] === "ok") {
-      return $this->success([], "Email berhasil diubah dan terverifikasi.");
+      return $this->success([], __('messages.auth.email_changed'));
     }
     if ($result["status"] === "expired") {
-      return $this->error("Kode verifikasi telah kedaluwarsa.", 422);
+      return $this->error(__('messages.auth.verification_expired'), 422);
     }
     if ($result["status"] === "invalid") {
-      return $this->error("Kode verifikasi salah.", 422);
+      return $this->error(__('messages.auth.verification_invalid'), 422);
     }
     if ($result["status"] === "email_taken") {
-      return $this->error("Email sudah digunakan oleh akun lain.", 422);
+      return $this->error(__('messages.auth.email_taken'), 422);
     }
     if ($result["status"] === "not_found") {
-      return $this->error("Tautan verifikasi tidak ditemukan.", 404);
+      return $this->error(__('messages.auth.verification_not_found'), 404);
     }
 
-    return $this->error("Verifikasi perubahan email gagal.", 422);
+    return $this->error(__('messages.auth.verification_failed'), 422);
   }
 
   /**
@@ -581,22 +581,22 @@ class AuthApiController extends Controller
     $result = $this->emailVerification->verifyByCode($uuidOrToken, $code);
 
     if ($result["status"] === "ok") {
-      return $this->success([], "Email Anda berhasil diverifikasi.");
+      return $this->success([], __('messages.auth.email_verified'));
     }
 
     if ($result["status"] === "expired") {
-      return $this->error("Kode verifikasi telah kedaluwarsa.", 422);
+      return $this->error(__('messages.auth.verification_expired'), 422);
     }
 
     if ($result["status"] === "invalid") {
-      return $this->error("Kode verifikasi salah atau token tidak valid.", 422);
+      return $this->error(__('messages.auth.verification_invalid_or_token'), 422);
     }
 
     if ($result["status"] === "not_found") {
-      return $this->error("Tautan verifikasi tidak ditemukan.", 404);
+      return $this->error(__('messages.auth.verification_not_found'), 404);
     }
 
-    return $this->error("Verifikasi gagal.", 422);
+    return $this->error(__('messages.auth.verification_failed'), 422);
   }
 
   /**
@@ -634,22 +634,22 @@ class AuthApiController extends Controller
     $result = $this->emailVerification->verifyByToken($token);
 
     if ($result["status"] === "ok") {
-      return $this->success([], "Email Anda berhasil diverifikasi.");
+      return $this->success([], __('messages.auth.email_verified'));
     }
 
     if ($result["status"] === "expired") {
-      return $this->error("Link verifikasi telah kedaluwarsa.", 422);
+      return $this->error(__('messages.auth.link_expired'), 422);
     }
 
     if ($result["status"] === "invalid") {
-      return $this->error("Link verifikasi tidak valid atau sudah digunakan.", 422);
+      return $this->error(__('messages.auth.link_invalid'), 422);
     }
 
     if ($result["status"] === "not_found") {
-      return $this->error("Link verifikasi tidak ditemukan.", 404);
+      return $this->error(__('messages.auth.link_not_found'), 404);
     }
 
-    return $this->error("Verifikasi gagal.", 422);
+    return $this->error(__('messages.auth.verification_failed'), 422);
   }
 
   /**
@@ -673,7 +673,7 @@ class AuthApiController extends Controller
     $validated = $request->validated();
     $target = User::query()->find($validated["user_id"]);
     if (!$target) {
-      return $this->error("User tidak ditemukan", 404);
+      return $this->error(__('messages.auth.user_not_found'), 404);
     }
 
     $isAllowedRole =
@@ -681,7 +681,7 @@ class AuthApiController extends Controller
     $isPending = ($target->status ?? null) === UserStatus::Pending;
     if (!($isAllowedRole && $isPending)) {
       return $this->error(
-        "Hanya untuk akun Admin, Superadmin, atau Instructor yang berstatus pending.",
+        __('messages.auth.admin_only'),
         422,
       );
     }
@@ -697,7 +697,7 @@ class AuthApiController extends Controller
       ->getMethod("sendGeneratedPasswordEmail")
       ->invoke($this->auth, $target, $passwordPlain);
 
-    return $this->success(["user" => $target->toArray()], "Kredensial berhasil dikirim ulang.");
+    return $this->success(["user" => $target->toArray()], __('messages.auth.credentials_resent'));
   }
 
   /**
@@ -723,7 +723,7 @@ class AuthApiController extends Controller
       return $this->validationError($e->errors());
     }
 
-    return $this->success(["user" => $updated->toArray()], "Status pengguna berhasil diperbarui.");
+    return $this->success(["user" => $updated->toArray()], __('messages.auth.status_updated'));
   }
 
   /**

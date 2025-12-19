@@ -44,6 +44,6 @@ class ProfilePasswordController extends Controller
             $request->input('new_password')
         );
 
-        return $this->success(null, 'Password changed successfully.');
+        return $this->success(null, __('messages.auth.password_changed'));
     }
 }

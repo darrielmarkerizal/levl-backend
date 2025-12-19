@@ -139,14 +139,14 @@ class NewsController extends Controller
     $news = $this->newsService->findBySlug($slug);
 
     if (!$news) {
-      throw new ResourceNotFoundException("Berita tidak ditemukan.");
+      throw new ResourceNotFoundException(__('messages.news.not_found'));
     }
 
     $this->authorize("update", $news);
 
     $news = $this->contentService->updateNews($news, $request->validated(), auth()->user());
 
-    return $this->success(NewsResource::make($news), "Berita berhasil diperbarui.");
+    return $this->success(NewsResource::make($news), __('messages.news.updated'));
   }
 
   /**
@@ -169,7 +169,7 @@ class NewsController extends Controller
     $news = $this->newsService->findBySlug($slug);
 
     if (!$news) {
-      throw new ResourceNotFoundException("Berita tidak ditemukan.");
+      throw new ResourceNotFoundException(__('messages.news.not_found'));
     }
 
     $this->authorize("delete", $news);
@@ -199,7 +199,7 @@ class NewsController extends Controller
     $news = $this->newsService->findBySlug($slug);
 
     if (!$news) {
-      throw new ResourceNotFoundException("Berita tidak ditemukan.");
+      throw new ResourceNotFoundException(__('messages.news.not_found'));
     }
 
     $this->authorize("publish", $news);
@@ -230,7 +230,7 @@ class NewsController extends Controller
     $news = $this->newsService->findBySlug($slug);
 
     if (!$news) {
-      throw new ResourceNotFoundException("Berita tidak ditemukan.");
+      throw new ResourceNotFoundException(__('messages.news.not_found'));
     }
 
     $this->authorize("schedule", $news);
