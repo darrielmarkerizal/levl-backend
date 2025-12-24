@@ -16,10 +16,10 @@ class SuperAdminSeeder extends Seeder
         Role::findOrCreate('Instructor', 'api');
         Role::findOrCreate('Student', 'api');
 
-        $email = env('SUPERADMIN_EMAIL', 'superadmin@example.com');
-        $name = env('SUPERADMIN_NAME', 'Super Admin');
-        $username = env('SUPERADMIN_USERNAME', 'superadmin');
-        $password = env('SUPERADMIN_PASSWORD', 'supersecret');
+        $email = config('app.superadmin.email');
+        $name = config('app.superadmin.name');
+        $username = config('app.superadmin.username');
+        $password = config('app.superadmin.password');
 
         $user = User::query()->firstOrCreate(
             ['email' => $email],

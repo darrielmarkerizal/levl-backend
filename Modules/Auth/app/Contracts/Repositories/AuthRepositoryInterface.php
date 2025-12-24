@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Auth\Contracts;
+namespace Modules\Auth\Contracts\Repositories;
 
 use Modules\Auth\Models\JwtRefreshToken;
 use Modules\Auth\Models\User;

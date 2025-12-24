@@ -6,9 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Support\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Modules\Forums\Contracts\Repositories\ThreadRepositoryInterface;
 use Modules\Forums\Contracts\Services\ForumServiceInterface;
 use Modules\Forums\Http\Requests\UpdateThreadRequest;
-use Modules\Forums\Models\Thread;
 use Modules\Forums\Services\ModerationService;
 
 /**
@@ -18,17 +18,11 @@ class ThreadController extends Controller
 {
     use ApiResponse;
 
-    protected ForumServiceInterface $forumService;
-
-    protected ModerationService $moderationService;
-
     public function __construct(
-        ForumServiceInterface $forumService,
-        ModerationService $moderationService
-    ) {
-        $this->forumService = $forumService;
-        $this->moderationService = $moderationService;
-    }
+        private ForumServiceInterface $forumService,
+        private ModerationService $moderationService,
+        private ThreadRepositoryInterface $threadRepository
+    ) {}
 
     /**
      * Daftar Thread Forum
@@ -37,6 +31,7 @@ class ThreadController extends Controller
      *
      *
      * @summary Daftar Thread Forum
+     *
      * @queryParam page integer Halaman pagination. Example: 1
      * @queryParam per_page integer Jumlah item per halaman. Default: 20. Example: 20
      * @queryParam filter[user_id] integer Filter berdasarkan pembuat thread. Example: 5
@@ -45,7 +40,7 @@ class ThreadController extends Controller
      * @queryParam filter[is_locked] boolean Filter thread yang dikunci. Example: false
      * @queryParam sort string Sorting field. Example: -created_at
      *
-     * @allowedFilters user_id,is_pinned,is_solved,is_locked 
+     * @allowedFilters user_id,is_pinned,is_solved,is_locked
      *
      * @allowedSorts created_at,updated_at,replies_count,views_count
      *
@@ -54,7 +49,7 @@ class ThreadController extends Controller
      * @response 200 scenario="Success" {"success": true, "data": [{"id": 1, "title": "Pertanyaan tentang Laravel", "content": "...", "is_pinned": false, "is_resolved": false, "is_closed": false, "replies_count": 5}], "meta": {"current_page": 1, "per_page": 20, "total": 50}}
      *
      * @authenticated
-     */    
+     */
     public function index(Request $request, int $schemeId): JsonResponse
     {
         $filters = [
@@ -76,6 +71,7 @@ class ThreadController extends Controller
      *
      *
      * @summary Buat Thread Baru
+     *
      * @bodyParam title string required Judul thread. Example: Pertanyaan tentang Laravel
      * @bodyParam content string required Konten thread. Example: Bagaimana cara menggunakan Eloquent?
      *
@@ -84,7 +80,7 @@ class ThreadController extends Controller
      * @response 500 scenario="Server Error" {"success":false,"message":"Gagal membuat thread."}
      *
      * @authenticated
-     */    
+     */
     public function store(CreateThreadRequest $request, int $schemeId): JsonResponse
     {
         $thread = $this->forumService->createThread($schemeId, $request->validated(), auth()->id());
@@ -99,11 +95,12 @@ class ThreadController extends Controller
      *
      *
      * @summary Detail Thread
+     *
      * @response 200 scenario="Success" {"success": true, "data": {"id": 1, "title": "Pertanyaan tentang Laravel", "content": "...", "user": {"id": 1, "name": "John"}, "replies": []}}
      * @response 404 scenario="Not Found" {"success":false,"message":"Thread tidak ditemukan."}
      *
      * @authenticated
-     */    
+     */
     public function show(int $schemeId, int $threadId): JsonResponse
     {
         $thread = $this->forumService->getThreadDetail($threadId);
@@ -122,15 +119,16 @@ class ThreadController extends Controller
      *
      *
      * @summary Perbarui Thread
+     *
      * @response 200 scenario="Success" {"success": true, "data": {"id": 1, "title": "Judul Baru"}, "message": "Thread berhasil diperbarui."}
      * @response 403 scenario="Forbidden" {"success":false,"message":"Anda tidak memiliki akses untuk mengubah thread ini."}
      * @response 404 scenario="Not Found" {"success":false,"message":"Thread tidak ditemukan."}
      *
      * @authenticated
-     */    
+     */
     public function update(UpdateThreadRequest $request, int $schemeId, int $threadId): JsonResponse
     {
-        $thread = Thread::find($threadId);
+        $thread = $this->threadRepository->find($threadId);
 
         if (! $thread || $thread->scheme_id != $schemeId) {
             return $this->notFound(__('forums.thread_not_found'));
@@ -150,15 +148,16 @@ class ThreadController extends Controller
      *
      *
      * @summary Hapus Thread
+     *
      * @response 200 scenario="Success" {"success":true,"data":null,"message":"Thread berhasil dihapus."}
      * @response 403 scenario="Forbidden" {"success":false,"message":"Anda tidak memiliki akses untuk menghapus thread ini."}
      * @response 404 scenario="Not Found" {"success":false,"message":"Thread tidak ditemukan."}
      *
      * @authenticated
-     */    
+     */
     public function destroy(Request $request, int $schemeId, int $threadId): JsonResponse
     {
-        $thread = Thread::find($threadId);
+        $thread = $this->threadRepository->find($threadId);
 
         if (! $thread || $thread->scheme_id != $schemeId) {
             return $this->notFound(__('forums.thread_not_found'));
@@ -180,15 +179,16 @@ class ThreadController extends Controller
      *
      *
      * @summary Sematkan Thread
+     *
      * @response 200 scenario="Success" {"success": true, "data": {"id": 1, "is_pinned": true}, "message": "Thread berhasil disematkan."}
      * @response 403 scenario="Forbidden" {"success":false,"message":"Anda tidak memiliki akses untuk menyematkan thread ini."}
      * @response 404 scenario="Not Found" {"success":false,"message":"Thread tidak ditemukan."}
      *
      * @authenticated
-     */    
+     */
     public function pin(Request $request, int $schemeId, int $threadId): JsonResponse
     {
-        $thread = Thread::find($threadId);
+        $thread = $this->threadRepository->find($threadId);
 
         if (! $thread || $thread->scheme_id != $schemeId) {
             return $this->notFound(__('forums.thread_not_found'));
@@ -210,15 +210,16 @@ class ThreadController extends Controller
      *
      *
      * @summary Tutup Thread
+     *
      * @response 200 scenario="Success" {"success": true, "data": {"id": 1, "is_closed": true}, "message": "Thread berhasil ditutup."}
      * @response 403 scenario="Forbidden" {"success":false,"message":"Anda tidak memiliki akses untuk menutup thread ini."}
      * @response 404 scenario="Not Found" {"success":false,"message":"Thread tidak ditemukan."}
      *
      * @authenticated
-     */    
+     */
     public function close(Request $request, int $schemeId, int $threadId): JsonResponse
     {
-        $thread = Thread::find($threadId);
+        $thread = $this->threadRepository->find($threadId);
 
         if (! $thread || $thread->scheme_id != $schemeId) {
             return $this->notFound(__('forums.thread_not_found'));
@@ -238,13 +239,14 @@ class ThreadController extends Controller
      *
      *
      * @summary Cari Thread
+     *
      * @queryParam search string required Kata kunci pencarian. Example: laravel
      *
      * @response 200 scenario="Success" {"success": true, "data": [{"id": 1, "title": "Pertanyaan tentang Laravel"}], "message": "Hasil pencarian berhasil diambil."}
      * @response 400 scenario="Bad Request" {"success":false,"message":"Query pencarian diperlukan."}
      *
      * @authenticated
-     */    
+     */
     public function search(Request $request, int $schemeId): JsonResponse
     {
         $query = $request->input('search', '');

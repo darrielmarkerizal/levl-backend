@@ -31,4 +31,14 @@ interface EnrollmentServiceInterface
     public function decline(Enrollment $enrollment): Enrollment;
 
     public function remove(Enrollment $enrollment): Enrollment;
+
+    /**
+     * Check if user is enrolled in a course with active or completed status
+     */
+    public function isUserEnrolledInCourse(int $userId, int $courseId): bool;
+
+    /**
+     * Get active enrollment for user in a course
+     */
+    public function getActiveEnrollment(int $userId, int $courseId): ?Enrollment;
 }

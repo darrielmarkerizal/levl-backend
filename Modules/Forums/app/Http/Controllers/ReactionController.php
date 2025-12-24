@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Support\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Modules\Forums\Contracts\Repositories\ReactionRepositoryInterface;
 use Modules\Forums\Models\Reaction;
 use Modules\Forums\Models\Reply;
 use Modules\Forums\Models\Thread;
@@ -17,6 +18,10 @@ class ReactionController extends Controller
 {
     use ApiResponse;
 
+    public function __construct(
+        private ReactionRepositoryInterface $reactionRepository
+    ) {}
+
     /**
      * Toggle Reaksi pada Thread
      *
@@ -24,13 +29,14 @@ class ReactionController extends Controller
      *
      *
      * @summary Toggle Reaksi pada Thread
+     *
      * @response 200 scenario="Success" {"success": true, "data": {"added": true}, "message": "Reaksi berhasil ditambahkan."}
      * @response 200 scenario="Success" {"success": true, "data": {"added": false}, "message": "Reaksi berhasil dihapus."}
      * @response 404 scenario="Not Found" {"success":false,"message":"Thread tidak ditemukan."}
      * @response 422 scenario="Validation Error" {"success": false, "message": "Validation error", "errors": {"type": ["The selected type is invalid."]}}
      *
      * @authenticated
-     */    
+     */
     public function toggleThreadReaction(Request $request, int $threadId): JsonResponse
     {
         $request->validate([
@@ -53,12 +59,11 @@ class ReactionController extends Controller
         $message = $added ? __('forums.reaction_added') : __('forums.reaction_removed');
 
         if ($added) {
-            $reaction = Reaction::where([
-                'user_id' => $request->user()->id,
-                'reactable_type' => Thread::class,
-                'reactable_id' => $threadId,
-                'type' => $request->input('type'),
-            ])->first();
+            $reaction = $this->reactionRepository->findByUserAndReactable(
+                $request->user()->id,
+                Thread::class,
+                $threadId
+            );
 
             if ($reaction) {
                 event(new \Modules\Forums\Events\ReactionAdded($reaction));
@@ -75,13 +80,14 @@ class ReactionController extends Controller
      *
      *
      * @summary Toggle Reaksi pada Balasan
+     *
      * @response 200 scenario="Success" {"success": true, "data": {"added": true}, "message": "Reaksi berhasil ditambahkan."}
      * @response 200 scenario="Success" {"success": true, "data": {"added": false}, "message": "Reaksi berhasil dihapus."}
      * @response 404 scenario="Not Found" {"success":false,"message":"Balasan tidak ditemukan."}
      * @response 422 scenario="Validation Error" {"success": false, "message": "Validation error", "errors": {"type": ["The selected type is invalid."]}}
      *
      * @authenticated
-     */    
+     */
     public function toggleReplyReaction(Request $request, int $replyId): JsonResponse
     {
         $request->validate([
@@ -104,12 +110,11 @@ class ReactionController extends Controller
         $message = $added ? __('forums.reaction_added') : __('forums.reaction_removed');
 
         if ($added) {
-            $reaction = Reaction::where([
-                'user_id' => $request->user()->id,
-                'reactable_type' => Reply::class,
-                'reactable_id' => $replyId,
-                'type' => $request->input('type'),
-            ])->first();
+            $reaction = $this->reactionRepository->findByUserAndReactable(
+                $request->user()->id,
+                Reply::class,
+                $replyId
+            );
 
             if ($reaction) {
                 event(new \Modules\Forums\Events\ReactionAdded($reaction));

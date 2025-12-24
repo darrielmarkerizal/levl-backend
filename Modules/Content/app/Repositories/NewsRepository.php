@@ -146,4 +146,9 @@ class NewsRepository implements NewsRepositoryInterface
             ->where('scheduled_at', '<=', now())
             ->get();
     }
+
+    public function findBySlugOrFail(string $slug): News
+    {
+        return News::where('slug', $slug)->firstOrFail();
+    }
 }

@@ -7,10 +7,10 @@ use App\Support\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Modules\Content\Contracts\ContentWorkflowServiceInterface;
+use Modules\Content\Contracts\Services\ContentWorkflowServiceInterface;
+use Modules\Content\Contracts\Repositories\AnnouncementRepositoryInterface;
+use Modules\Content\Contracts\Repositories\NewsRepositoryInterface;
 use Modules\Content\Exceptions\InvalidTransitionException;
-use Modules\Content\Models\Announcement;
-use Modules\Content\Models\News;
 
 /**
  * @tags Konten & Berita
@@ -20,7 +20,9 @@ class ContentApprovalController extends Controller
     use ApiResponse;
 
     public function __construct(
-        private ContentWorkflowServiceInterface $workflowService
+        private ContentWorkflowServiceInterface $workflowService,
+        private NewsRepositoryInterface $newsRepository,
+        private AnnouncementRepositoryInterface $announcementRepository
     ) {}
 
     /**
@@ -31,6 +33,7 @@ class ContentApprovalController extends Controller
      *
      * @response 200 scenario="Success" {"success":true,"message":"Success","data":{"id":1,"name":"Example ContentApproval"}}
      * @response 401 scenario="Unauthorized" {"success":false,"message":"Tidak terotorisasi."}
+     *
      * @authenticated
      */
     public function submit(Request $request, string $type, int $id): JsonResponse
@@ -60,6 +63,7 @@ class ContentApprovalController extends Controller
      *
      * @response 200 scenario="Success" {"success":true,"message":"Success","data":{"id":1,"name":"Example ContentApproval"}}
      * @response 401 scenario="Unauthorized" {"success":false,"message":"Tidak terotorisasi."}
+     *
      * @authenticated
      */
     public function approve(Request $request, string $type, int $id): JsonResponse
@@ -97,6 +101,7 @@ class ContentApprovalController extends Controller
      *
      * @response 200 scenario="Success" {"success":true,"message":"Success","data":{"id":1,"name":"Example ContentApproval"}}
      * @response 401 scenario="Unauthorized" {"success":false,"message":"Tidak terotorisasi."}
+     *
      * @authenticated
      */
     public function reject(Request $request, string $type, int $id): JsonResponse
@@ -134,6 +139,7 @@ class ContentApprovalController extends Controller
      *
      * @response 200 scenario="Success" {"success":true,"message":"Success","data":{"id":1,"name":"Example ContentApproval"}}
      * @response 401 scenario="Unauthorized" {"success":false,"message":"Tidak terotorisasi."}
+     *
      * @authenticated
      */
     public function pendingReview(Request $request): JsonResponse
@@ -194,8 +200,8 @@ class ContentApprovalController extends Controller
     private function findContent(string $type, int $id)
     {
         return match ($type) {
-            'news' => News::find($id),
-            'announcement' => Announcement::find($id),
+            'news' => $this->newsRepository->findWithRelations($id),
+            'announcement' => $this->announcementRepository->findById($id),
             default => null,
         };
     }

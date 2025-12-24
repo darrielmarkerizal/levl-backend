@@ -96,4 +96,9 @@ class AnnouncementRepository implements AnnouncementRepositoryInterface
             })
             ->count();
     }
+
+    public function findById(int $id): ?Announcement
+    {
+        return Announcement::find($id);
+    }
 }

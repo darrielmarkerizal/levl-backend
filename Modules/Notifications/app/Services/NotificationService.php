@@ -16,12 +16,20 @@ class NotificationService
         $this->preferenceService = $preferenceService;
     }
 
-    public function create(array $data): Notification
+    /**
+     * Create notification from DTO or array.
+     */
+    public function create(CreateNotificationDTO|array $data): Notification
     {
-        $userId = $data['user_id'] ?? null;
-        unset($data['user_id']);
+        // Convert array to DTO if needed
+        if (is_array($data)) {
+            $data = CreateNotificationDTO::from($data);
+        }
 
-        $notification = Notification::create($data);
+        $userId = $data->userId;
+        $notificationData = $data->toModelArray();
+
+        $notification = Notification::create($notificationData);
 
         if ($userId) {
             $notification->users()->attach($userId);
@@ -42,10 +50,27 @@ class NotificationService
             ->update(['read_at' => now()]);
     }
 
-    public function send(int $userId, string $type, string $title, string $message, ?array $data = null): Notification
+    /**
+     * Send notification from DTO or parameters.
+     */
+    public function send(SendNotificationDTO|int $userIdOrDto, ?string $type = null, ?string $title = null, ?string $message = null, ?array $data = null): Notification
     {
+        // Handle DTO or individual parameters
+        if ($userIdOrDto instanceof SendNotificationDTO) {
+            $dto = $userIdOrDto;
+
+            return $this->create([
+                'user_id' => $dto->userId,
+                'type' => $dto->type,
+                'title' => $dto->title,
+                'message' => $dto->message,
+                'data' => $dto->data,
+            ]);
+        }
+
+        // Legacy parameter support
         return $this->create([
-            'user_id' => $userId,
+            'user_id' => $userIdOrDto,
             'type' => $type,
             'title' => $title,
             'message' => $message,

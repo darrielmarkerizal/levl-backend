@@ -16,7 +16,7 @@ class LessonBlockRequest extends FormRequest
 
     public function rules(): array
     {
-        $maxMb = (int) env('LESSON_BLOCK_MAX_UPLOAD_MB', 50);
+        $maxMb = config('app.lesson_block_max_upload_mb', 50);
         $maxKb = $maxMb * 1024;
 
         return [

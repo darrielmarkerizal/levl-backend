@@ -4,12 +4,14 @@ namespace Modules\Content\Services;
 
 use App\Contracts\Services\ContentServiceInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Modules\Auth\Models\User;
+use Modules\Content\DTOs\CreateAnnouncementDTO;
+use Modules\Content\DTOs\CreateNewsDTO;
+use Modules\Content\DTOs\UpdateAnnouncementDTO;
+use Modules\Content\DTOs\UpdateNewsDTO;
 use Modules\Content\Models\Announcement;
-use Modules\Content\Models\ContentRevision;
 use Modules\Content\Models\News;
 use Modules\Content\Repositories\AnnouncementRepository;
 use Modules\Content\Repositories\NewsRepository;
@@ -29,75 +31,78 @@ class ContentService implements ContentServiceInterface
     }
 
     /**
+     * Create announcement from DTO or array.
+     *
      * @throws \Exception
      */
-    public function createAnnouncement(array $data, User $author): Announcement
+    public function createAnnouncement(CreateAnnouncementDTO|array $data, User $author): Announcement
     {
-        if (empty($data['title']) || empty($data['content'])) {
-            throw new \Exception('Title and content are required.');
+        // Convert array to DTO if needed
+        if (is_array($data)) {
+            $data = CreateAnnouncementDTO::from($data);
         }
 
         return DB::transaction(function () use ($data, $author) {
-            $announcementData = [
+            $announcementData = array_merge($data->toModelArray(), [
                 'author_id' => $author->id,
-                'course_id' => $data['course_id'] ?? null,
-                'title' => $data['title'],
-                'content' => $data['content'],
-                'status' => $data['status'] ?? 'draft',
-                'target_type' => $data['target_type'] ?? 'all',
-                'target_value' => $data['target_value'] ?? null,
-                'priority' => $data['priority'] ?? 'normal',
-            ];
+            ]);
 
             return $this->announcementRepository->create($announcementData);
         });
     }
 
     /**
+     * Create news from DTO or array.
+     *
      * @throws \Exception
      */
-    public function createNews(array $data, User $author): News
+    public function createNews(CreateNewsDTO|array $data, User $author): News
     {
-        if (empty($data['title']) || empty($data['content'])) {
-            throw new \Exception('Title and content are required.');
+        // Convert array to DTO if needed
+        if (is_array($data)) {
+            $data = CreateNewsDTO::from($data);
         }
 
         return DB::transaction(function () use ($data, $author) {
-            $newsData = [
+            $newsData = array_merge($data->toModelArray(), [
                 'author_id' => $author->id,
-                'title' => $data['title'],
-                'slug' => $data['slug'] ?? null,
-                'excerpt' => $data['excerpt'] ?? null,
-                'content' => $data['content'],
-                'status' => $data['status'] ?? 'draft',
-                'is_featured' => $data['is_featured'] ?? false,
-                'category_ids' => $data['category_ids'] ?? [],
-                'tag_ids' => $data['tag_ids'] ?? [],
-            ];
+            ]);
 
             return $this->newsRepository->create($newsData);
         });
     }
 
-    public function updateAnnouncement(Announcement $announcement, array $data, User $editor): Announcement
+    /**
+     * Update announcement from DTO or array.
+     */
+    public function updateAnnouncement(Announcement $announcement, UpdateAnnouncementDTO|array $data, User $editor): Announcement
     {
+        // Convert array to DTO if needed
+        if (is_array($data)) {
+            $data = UpdateAnnouncementDTO::from($data);
+        }
+
         return DB::transaction(function () use ($announcement, $data, $editor) {
             $announcement->saveRevision($editor);
 
-            $updateData = Arr::only($data, ['title', 'content', 'target_type', 'target_value', 'priority']);
-
-            return $this->announcementRepository->update($announcement, $updateData);
+            return $this->announcementRepository->update($announcement, $data->toModelArray());
         });
     }
 
-    public function updateNews(News $news, array $data, User $editor): News
+    /**
+     * Update news from DTO or array.
+     */
+    public function updateNews(News $news, UpdateNewsDTO|array $data, User $editor): News
     {
+        // Convert array to DTO if needed
+        if (is_array($data)) {
+            $data = UpdateNewsDTO::from($data);
+        }
+
         return DB::transaction(function () use ($news, $data, $editor) {
             $news->saveRevision($editor);
 
-            $updateData = Arr::only($data, ['title', 'content', 'excerpt', 'is_featured', 'category_ids', 'tag_ids']);
-
-            return $this->newsRepository->update($news, $updateData);
+            return $this->newsRepository->update($news, $data->toModelArray());
         });
     }
 

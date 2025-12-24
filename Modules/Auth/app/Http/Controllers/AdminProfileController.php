@@ -6,7 +6,7 @@ use App\Contracts\Services\ProfileServiceInterface;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Modules\Auth\Models\ProfileAuditLog;
+use Modules\Auth\Contracts\Repositories\ProfileAuditLogRepositoryInterface;
 use Modules\Auth\Models\User;
 
 /**
@@ -15,7 +15,8 @@ use Modules\Auth\Models\User;
 class AdminProfileController extends Controller
 {
     public function __construct(
-        private ProfileServiceInterface $profileService
+        private ProfileServiceInterface $profileService,
+        private ProfileAuditLogRepositoryInterface $auditLogRepository
     ) {
         $this->middleware('role:Admin');
     }
@@ -29,6 +30,7 @@ class AdminProfileController extends Controller
      * @response 200 scenario="Success" {"success":true,"message":"Success","data":{"id":1,"name":"Example AdminProfile"}}
      * @response 401 scenario="Unauthorized" {"success":false,"message":"Tidak terotorisasi."}
      * @response 404 scenario="Not Found" {"success":false,"message":"AdminProfile tidak ditemukan."}
+     *
      * @authenticated
      */
     public function show(Request $request, int $userId): JsonResponse
@@ -52,6 +54,7 @@ class AdminProfileController extends Controller
      * @response 401 scenario="Unauthorized" {"success":false,"message":"Tidak terotorisasi."}
      * @response 404 scenario="Not Found" {"success":false,"message":"AdminProfile tidak ditemukan."}
      * @response 422 scenario="Validation Error" {"success":false,"message":"Validasi gagal.","errors":{"field":["Field wajib diisi."]}}
+     *
      * @authenticated
      */
     public function update(Request $request, int $userId): JsonResponse
@@ -72,7 +75,7 @@ class AdminProfileController extends Controller
         $updatedUser = $this->profileService->updateProfile($user, $request->all());
 
         // Log admin action
-        ProfileAuditLog::create([
+        $this->auditLogRepository->create([
             'user_id' => $user->id,
             'admin_id' => $admin->id,
             'action' => 'profile_updated',
@@ -99,6 +102,7 @@ class AdminProfileController extends Controller
      *
      * @response 200 scenario="Success" {"success":true,"message":"Success","data":{"id":1,"name":"Example AdminProfile"}}
      * @response 401 scenario="Unauthorized" {"success":false,"message":"Tidak terotorisasi."}
+     *
      * @authenticated
      */
     public function suspend(Request $request, int $userId): JsonResponse
@@ -110,7 +114,7 @@ class AdminProfileController extends Controller
         $user->save();
 
         // Log admin action
-        ProfileAuditLog::create([
+        $this->auditLogRepository->create([
             'user_id' => $user->id,
             'admin_id' => $admin->id,
             'action' => 'account_suspended',
@@ -133,6 +137,7 @@ class AdminProfileController extends Controller
      *
      * @response 200 scenario="Success" {"success":true,"message":"Success","data":{"id":1,"name":"Example AdminProfile"}}
      * @response 401 scenario="Unauthorized" {"success":false,"message":"Tidak terotorisasi."}
+     *
      * @authenticated
      */
     public function activate(Request $request, int $userId): JsonResponse
@@ -144,7 +149,7 @@ class AdminProfileController extends Controller
         $user->save();
 
         // Log admin action
-        ProfileAuditLog::create([
+        $this->auditLogRepository->create([
             'user_id' => $user->id,
             'admin_id' => $admin->id,
             'action' => 'account_activated',
@@ -164,6 +169,7 @@ class AdminProfileController extends Controller
      *
      *
      * @summary Riwayat Audit Pengguna
+     *
      * @authenticated
 
      *
@@ -171,10 +177,7 @@ class AdminProfileController extends Controller
      * @queryParam per_page integer Jumlah item per halaman (default: 15, max: 100). Example: 15     */
     public function auditLogs(Request $request, int $userId): JsonResponse
     {
-        $logs = ProfileAuditLog::where('user_id', $userId)
-            ->with('admin:id,name,email')
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
+        $logs = $this->auditLogRepository->findByUserId($userId, 20);
 
         return response()->json([
             'success' => true,

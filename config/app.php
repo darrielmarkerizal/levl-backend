@@ -149,4 +149,31 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Lesson Block Max Upload Size
+    |--------------------------------------------------------------------------
+    |
+    | Maximum file size in MB for lesson block uploads.
+    |
+    */
+
+    'lesson_block_max_upload_mb' => (int) env('LESSON_BLOCK_MAX_UPLOAD_MB', 50),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Super Admin Credentials
+    |--------------------------------------------------------------------------
+    |
+    | Default credentials for super admin seeder.
+    |
+    */
+
+    'superadmin' => [
+        'email' => env('SUPERADMIN_EMAIL', 'superadmin@example.com'),
+        'name' => env('SUPERADMIN_NAME', 'Super Admin'),
+        'username' => env('SUPERADMIN_USERNAME', 'superadmin'),
+        'password' => env('SUPERADMIN_PASSWORD', 'supersecret'),
+    ],
+
 ];

@@ -1,0 +1,15 @@
+services:
+    -
+        class: App\Support\PHPStan\Rules\ServiceMustImplementInterfaceRule
+        tags:
+            - phpstan.rules.rule
+
+    -
+        class: App\Support\PHPStan\Rules\ControllerMustNotQueryModelsDirectlyRule
+        tags:
+            - phpstan.rules.rule
+
+    -
+        class: App\Support\PHPStan\Rules\RepositoryMustImplementInterfaceRule
+        tags:
+            - phpstan.rules.rule

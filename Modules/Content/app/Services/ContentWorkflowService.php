@@ -5,7 +5,7 @@ namespace Modules\Content\Services;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Modules\Auth\Models\User;
-use Modules\Content\Contracts\ContentWorkflowServiceInterface;
+use Modules\Content\Contracts\Services\ContentWorkflowServiceInterface;
 use Modules\Content\Enums\ContentStatus;
 use Modules\Content\Events\ContentApproved;
 use Modules\Content\Events\ContentPublished;

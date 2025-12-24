@@ -1,6 +1,7 @@
 includes:
     - ./vendor/nunomaduro/larastan/extension.neon
     - phpstan-baseline.neon
+    - phpstan-architecture-rules.neon
 
 parameters:
     # Level scan paling ketat
@@ -20,8 +21,8 @@ parameters:
         - */storage/*
         - */node_modules/*
 
-    # Autoload file Laravel supaya container & service provider dikenali
-    autoload_files:
+    # Bootstrap file untuk Laravel
+    bootstrapFiles:
         - bootstrap/app.php
 
     # Abaikan error pada ignoreErrors yang tidak ada

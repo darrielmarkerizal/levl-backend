@@ -66,6 +66,10 @@ class EnrollmentsServiceProvider extends ServiceProvider
             \Modules\Enrollments\Contracts\Services\EnrollmentServiceInterface::class,
             EnrollmentService::class
         );
+        $this->app->bind(
+            \Modules\Enrollments\Contracts\Services\EnrollmentReportServiceInterface::class,
+            \Modules\Enrollments\Services\EnrollmentReportService::class
+        );
     }
 
     /**

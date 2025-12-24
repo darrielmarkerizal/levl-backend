@@ -4,7 +4,7 @@ namespace Modules\Search\Services;
 
 use Modules\Auth\Models\User;
 use Modules\Schemes\Models\Course;
-use Modules\Search\Contracts\SearchServiceInterface;
+use Modules\Search\Contracts\Services\SearchServiceInterface;
 use Modules\Search\DTOs\SearchResultDTO;
 use Modules\Search\Models\SearchHistory;
 

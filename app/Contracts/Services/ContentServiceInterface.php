@@ -13,44 +13,44 @@ interface ContentServiceInterface
     /**
      * Create a new announcement.
      *
-     * @param  array  $data  Announcement data including title, content, target_type, etc.
+     * @param  \Modules\Content\DTOs\CreateAnnouncementDTO|array  $data  Announcement data including title, content, target_type, etc.
      * @param  User  $author  The user creating the announcement
      * @return Announcement The created announcement
      *
      * @throws \Exception If required fields are missing or creation fails
      */
-    public function createAnnouncement(array $data, User $author): Announcement;
+    public function createAnnouncement(\Modules\Content\DTOs\CreateAnnouncementDTO|array $data, User $author): Announcement;
 
     /**
      * Create a new news article.
      *
-     * @param  array  $data  News data including title, content, excerpt, etc.
+     * @param  \Modules\Content\DTOs\CreateNewsDTO|array  $data  News data including title, content, excerpt, etc.
      * @param  User  $author  The user creating the news article
      * @return News The created news article
      *
      * @throws \Exception If required fields are missing or creation fails
      */
-    public function createNews(array $data, User $author): News;
+    public function createNews(\Modules\Content\DTOs\CreateNewsDTO|array $data, User $author): News;
 
     /**
      * Update an announcement.
      *
      * @param  Announcement  $announcement  The announcement to update
-     * @param  array  $data  Update data
+     * @param  \Modules\Content\DTOs\UpdateAnnouncementDTO|array  $data  Update data
      * @param  User  $editor  The user performing the update
      * @return Announcement The updated announcement
      */
-    public function updateAnnouncement(Announcement $announcement, array $data, User $editor): Announcement;
+    public function updateAnnouncement(Announcement $announcement, \Modules\Content\DTOs\UpdateAnnouncementDTO|array $data, User $editor): Announcement;
 
     /**
      * Update a news article.
      *
      * @param  News  $news  The news article to update
-     * @param  array  $data  Update data
+     * @param  \Modules\Content\DTOs\UpdateNewsDTO|array  $data  Update data
      * @param  User  $editor  The user performing the update
      * @return News The updated news article
      */
-    public function updateNews(News $news, array $data, User $editor): News;
+    public function updateNews(News $news, \Modules\Content\DTOs\UpdateNewsDTO|array $data, User $editor): News;
 
     /**
      * Publish content immediately.

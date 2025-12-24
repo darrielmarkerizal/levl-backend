@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Search\Contracts;
+namespace Modules\Search\Contracts\Services;
 
 use Modules\Auth\Models\User;
 use Modules\Search\DTOs\SearchResultDTO;

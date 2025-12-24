@@ -62,6 +62,18 @@ class GamificationServiceProvider extends ServiceProvider
             \Modules\Gamification\Contracts\Repositories\ChallengeRepositoryInterface::class,
             \Modules\Gamification\Repositories\ChallengeRepository::class
         );
+        $this->app->bind(
+            \Modules\Gamification\Contracts\Repositories\UserGamificationStatRepositoryInterface::class,
+            \Modules\Gamification\Repositories\UserGamificationStatRepository::class
+        );
+        $this->app->bind(
+            \Modules\Gamification\Contracts\Repositories\UserBadgeRepositoryInterface::class,
+            \Modules\Gamification\Repositories\UserBadgeRepository::class
+        );
+        $this->app->bind(
+            \Modules\Gamification\Contracts\Repositories\PointRepositoryInterface::class,
+            \Modules\Gamification\Repositories\PointRepository::class
+        );
 
         // Register Service bindings
         $this->app->singleton(

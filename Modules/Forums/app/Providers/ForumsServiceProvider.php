@@ -69,6 +69,20 @@ class ForumsServiceProvider extends ServiceProvider
             \Modules\Forums\Contracts\Services\ModerationServiceInterface::class,
             \Modules\Forums\Services\ModerationService::class
         );
+
+        // Repository bindings
+        $this->app->bind(
+            \Modules\Forums\Contracts\Repositories\ThreadRepositoryInterface::class,
+            \Modules\Forums\Repositories\ThreadRepository::class
+        );
+        $this->app->bind(
+            \Modules\Forums\Contracts\Repositories\ReplyRepositoryInterface::class,
+            \Modules\Forums\Repositories\ReplyRepository::class
+        );
+        $this->app->bind(
+            \Modules\Forums\Contracts\Repositories\ReactionRepositoryInterface::class,
+            \Modules\Forums\Repositories\ReactionRepository::class
+        );
     }
 
     /**

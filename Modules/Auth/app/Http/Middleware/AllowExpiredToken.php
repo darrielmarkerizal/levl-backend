@@ -4,7 +4,7 @@ namespace Modules\Auth\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Modules\Auth\Contracts\AuthRepositoryInterface;
+use Modules\Auth\Contracts\Repositories\AuthRepositoryInterface;
 use Modules\Auth\Enums\UserStatus;
 use Symfony\Component\HttpFoundation\Response;
 

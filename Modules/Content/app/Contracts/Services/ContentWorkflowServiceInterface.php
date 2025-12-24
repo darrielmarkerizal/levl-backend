@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Content\Contracts;
+namespace Modules\Content\Contracts\Services;
 
 use Illuminate\Database\Eloquent\Model;
 use Modules\Auth\Models\User;

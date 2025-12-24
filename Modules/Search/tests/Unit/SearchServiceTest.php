@@ -6,7 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Auth\Models\User;
 use Modules\Common\Models\Category;
 use Modules\Schemes\Models\Course;
-use Modules\Search\Contracts\SearchServiceInterface;
+use Modules\Search\Contracts\Services\SearchServiceInterface;
 use Modules\Search\Models\SearchHistory;
 use Modules\Search\Services\SearchService;
 use Tests\TestCase;

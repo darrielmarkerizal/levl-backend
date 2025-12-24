@@ -41,6 +41,12 @@ class SearchServiceProvider extends ServiceProvider
             \Modules\Search\Contracts\SearchServiceInterface::class,
             \Modules\Search\Services\SearchService::class
         );
+
+        // Bind SearchHistoryRepository interface
+        $this->app->bind(
+            \Modules\Search\Contracts\Repositories\SearchHistoryRepositoryInterface::class,
+            \Modules\Search\Repositories\SearchHistoryRepository::class
+        );
     }
 
     /**

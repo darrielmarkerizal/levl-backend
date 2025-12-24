@@ -389,4 +389,20 @@ class EnrollmentService implements EnrollmentServiceInterface
     {
         return UrlHelper::getEnrollmentsUrl($course);
     }
+
+    public function isUserEnrolledInCourse(int $userId, int $courseId): bool
+    {
+        return Enrollment::where('user_id', $userId)
+            ->where('course_id', $courseId)
+            ->whereIn('status', [EnrollmentStatus::Active->value, EnrollmentStatus::Completed->value])
+            ->exists();
+    }
+
+    public function getActiveEnrollment(int $userId, int $courseId): ?Enrollment
+    {
+        return Enrollment::where('user_id', $userId)
+            ->where('course_id', $courseId)
+            ->whereIn('status', [EnrollmentStatus::Active->value, EnrollmentStatus::Completed->value])
+            ->first();
+    }
 }

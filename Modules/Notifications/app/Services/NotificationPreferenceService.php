@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Modules\Auth\Models\User;
 use Modules\Notifications\Contracts\Services\NotificationPreferenceServiceInterface;
+use Modules\Notifications\DTOs\UpdateNotificationPreferencesDTO;
 use Modules\Notifications\Models\NotificationPreference;
 
 class NotificationPreferenceService implements NotificationPreferenceServiceInterface
@@ -27,21 +28,26 @@ class NotificationPreferenceService implements NotificationPreferenceServiceInte
     }
 
     /**
-     * Update user's notification preferences.
+     * Update user's notification preferences from DTO or array.
      */
-    public function updatePreferences(User $user, array $preferences): bool
+    public function updatePreferences(User $user, UpdateNotificationPreferencesDTO|array $preferences): bool
     {
+        // Convert array to DTO if needed
+        if (is_array($preferences)) {
+            $preferences = UpdateNotificationPreferencesDTO::from(['preferences' => $preferences]);
+        }
+
         return DB::transaction(function () use ($user, $preferences) {
-            foreach ($preferences as $preference) {
+            foreach ($preferences->preferences as $preference) {
                 NotificationPreference::updateOrCreate(
                     [
                         'user_id' => $user->id,
-                        'category' => $preference['category'],
-                        'channel' => $preference['channel'],
+                        'category' => $preference->category,
+                        'channel' => $preference->channel,
                     ],
                     [
-                        'enabled' => $preference['enabled'] ?? true,
-                        'frequency' => $preference['frequency'] ?? NotificationPreference::FREQUENCY_IMMEDIATE,
+                        'enabled' => $preference->enabled,
+                        'frequency' => $preference->frequency,
                     ]
                 );
             }
@@ -107,7 +113,7 @@ class NotificationPreferenceService implements NotificationPreferenceServiceInte
 
         return collect($categories)
             ->crossJoin($channels)
-            ->map(fn($item) => [
+            ->map(fn ($item) => [
                 'category' => $item[0],
                 'channel' => $item[1],
                 'enabled' => $this->getDefaultEnabledState($item[0], $item[1]),

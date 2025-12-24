@@ -4,6 +4,7 @@ namespace Modules\Notifications\Contracts\Services;
 
 use Illuminate\Support\Collection;
 use Modules\Auth\Models\User;
+use Modules\Notifications\DTOs\UpdateNotificationPreferencesDTO;
 
 interface NotificationPreferenceServiceInterface
 {
@@ -15,7 +16,7 @@ interface NotificationPreferenceServiceInterface
     /**
      * Update user's notification preferences.
      */
-    public function updatePreferences(User $user, array $preferences): bool;
+    public function updatePreferences(User $user, UpdateNotificationPreferencesDTO|array $preferences): bool;
 
     /**
      * Check if notification should be sent based on user preferences.

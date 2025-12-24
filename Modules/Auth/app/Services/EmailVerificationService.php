@@ -48,7 +48,7 @@ class EmailVerificationService
             'expires_at' => now()->addMinutes($ttlMinutes),
         ]);
 
-        $frontendUrl = rtrim(env('FRONTEND_URL', config('app.url')), '/');
+        $frontendUrl = config('app.frontend_url');
         $verifyUrl = $frontendUrl.'/auth/verify-email?token='.$token.'&uuid='.$uuid;
 
         Mail::to($user)->send(new VerifyEmailLinkMail($user, $verifyUrl, $ttlMinutes, $code));

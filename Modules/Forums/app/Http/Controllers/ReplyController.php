@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Support\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Modules\Forums\Contracts\Repositories\ReplyRepositoryInterface;
 use Modules\Forums\Contracts\Services\ForumServiceInterface;
 use Modules\Forums\Http\Requests\CreateReplyRequest;
 use Modules\Forums\Http\Requests\UpdateReplyRequest;
@@ -20,17 +21,11 @@ class ReplyController extends Controller
 {
     use ApiResponse;
 
-    protected ForumServiceInterface $forumService;
-
-    protected ModerationService $moderationService;
-
     public function __construct(
-        ForumServiceInterface $forumService,
-        ModerationService $moderationService
-    ) {
-        $this->forumService = $forumService;
-        $this->moderationService = $moderationService;
-    }
+        private ForumServiceInterface $forumService,
+        private ModerationService $moderationService,
+        private ReplyRepositoryInterface $replyRepository
+    ) {}
 
     /**
      * Buat Balasan Baru
@@ -39,13 +34,14 @@ class ReplyController extends Controller
      *
      *
      * @summary Buat Balasan Baru
+     *
      * @response 201 scenario="Created" {"success": true, "data": {"id": 1, "thread_id": 1, "content": "Ini balasan saya...", "user_id": 1, "parent_id": null}, "message": "Balasan berhasil dibuat."}
      * @response 400 scenario="Bad Request" {"success":false,"message":"Parent reply tidak valid."}
      * @response 403 scenario="Forbidden" {"success":false,"message":"Anda tidak memiliki akses untuk membalas thread ini."}
      * @response 404 scenario="Not Found" {"success":false,"message":"Thread tidak ditemukan."}
      *
      * @authenticated
-     */    
+     */
     public function store(CreateReplyRequest $request, int $threadId): JsonResponse
     {
         $thread = Thread::find($threadId);
@@ -58,7 +54,7 @@ class ReplyController extends Controller
 
         $parentId = $request->input('parent_id');
         if ($parentId) {
-            $parent = Reply::find($parentId);
+            $parent = $this->replyRepository->find($parentId);
             if (! $parent || $parent->thread_id != $threadId) {
                 return $this->error(__('forums.invalid_parent_reply'), 400);
             }
@@ -81,15 +77,16 @@ class ReplyController extends Controller
      *
      *
      * @summary Perbarui Balasan
+     *
      * @response 200 scenario="Success" {"success": true, "data": {"id": 1, "content": "Konten yang diperbarui..."}, "message": "Balasan berhasil diperbarui."}
      * @response 403 scenario="Forbidden" {"success":false,"message":"Anda tidak memiliki akses untuk mengubah balasan ini."}
      * @response 404 scenario="Not Found" {"success":false,"message":"Balasan tidak ditemukan."}
      *
      * @authenticated
-     */    
+     */
     public function update(UpdateReplyRequest $request, int $replyId): JsonResponse
     {
-        $reply = Reply::find($replyId);
+        $reply = $this->replyRepository->find($replyId);
 
         if (! $reply) {
             return $this->notFound(__('forums.reply_not_found'));
@@ -109,15 +106,16 @@ class ReplyController extends Controller
      *
      *
      * @summary Hapus Balasan
+     *
      * @response 200 scenario="Success" {"success":true,"data":null,"message":"Balasan berhasil dihapus."}
      * @response 403 scenario="Forbidden" {"success":false,"message":"Anda tidak memiliki akses untuk menghapus balasan ini."}
      * @response 404 scenario="Not Found" {"success":false,"message":"Balasan tidak ditemukan."}
      *
      * @authenticated
-     */    
+     */
     public function destroy(Request $request, int $replyId): JsonResponse
     {
-        $reply = Reply::find($replyId);
+        $reply = $this->replyRepository->find($replyId);
 
         if (! $reply) {
             return $this->notFound(__('forums.reply_not_found'));
@@ -137,15 +135,16 @@ class ReplyController extends Controller
      *
      *
      * @summary Terima Balasan sebagai Jawaban
+     *
      * @response 200 scenario="Success" {"success": true, "data": {"id": 1, "is_accepted": true}, "message": "Balasan diterima sebagai jawaban."}
      * @response 403 scenario="Forbidden" {"success":false,"message":"Anda tidak memiliki akses untuk menerima balasan ini."}
      * @response 404 scenario="Not Found" {"success":false,"message":"Balasan tidak ditemukan."}
      *
      * @authenticated
-     */    
+     */
     public function accept(Request $request, int $replyId): JsonResponse
     {
-        $reply = Reply::find($replyId);
+        $reply = $this->replyRepository->find($replyId);
 
         if (! $reply) {
             return $this->notFound(__('forums.reply_not_found'));

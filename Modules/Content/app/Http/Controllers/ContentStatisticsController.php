@@ -7,6 +7,7 @@ use App\Support\ApiResponse;
 use App\Support\Traits\HandlesFiltering;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Modules\Content\Contracts\Repositories\NewsRepositoryInterface;
 use Modules\Content\Contracts\Services\ContentStatisticsServiceInterface;
 use Modules\Content\Models\Announcement;
 use Modules\Content\Models\News;
@@ -20,7 +21,8 @@ class ContentStatisticsController extends Controller
     use HandlesFiltering;
 
     public function __construct(
-        protected ContentStatisticsServiceInterface $statisticsService
+        protected ContentStatisticsServiceInterface $statisticsService,
+        protected NewsRepositoryInterface $newsRepository
     ) {}
 
     /**
@@ -106,7 +108,7 @@ class ContentStatisticsController extends Controller
     {
         $this->authorize('viewStatistics', [News::class]);
 
-        $news = News::where('slug', $slug)->firstOrFail();
+        $news = $this->newsRepository->findBySlugOrFail($slug);
         $statistics = $this->statisticsService->getNewsStatistics($news);
 
         return $this->success($statistics);

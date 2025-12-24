@@ -3,7 +3,7 @@
 namespace Modules\Auth\Repositories;
 
 use Illuminate\Support\Str;
-use Modules\Auth\Contracts\AuthRepositoryInterface;
+use Modules\Auth\Contracts\Repositories\AuthRepositoryInterface;
 use Modules\Auth\Enums\UserStatus;
 use Modules\Auth\Models\JwtRefreshToken;
 use Modules\Auth\Models\User;
