@@ -260,12 +260,21 @@ jobs:
             # Optional: HTTP health check if web server is running
             set +e  # Don't exit on error for HTTP check
             if command -v curl > /dev/null 2>&1; then
-              if curl -f -s -o /dev/null --max-time 5 http://localhost/api/health 2>/dev/null || \
-                 curl -f -s -o /dev/null --max-time 5 http://localhost/up 2>/dev/null; then
+              curl -f -s -o /dev/null --max-time 5 http://localhost/api/health 2>/dev/null
+              health_result=$?
+              if [ $health_result -eq 0 ]; then
                 echo "::notice::✓ HTTP health check passed"
               else
-                echo "::warning::HTTP health check not available (server may not be running on localhost)"
+                curl -f -s -o /dev/null --max-time 5 http://localhost/up 2>/dev/null
+                up_result=$?
+                if [ $up_result -eq 0 ]; then
+                  echo "::notice::✓ HTTP health check passed (via /up)"
+                else
+                  echo "::warning::HTTP endpoints not accessible (server may not be running on localhost)"
+                fi
               fi
+            else
+              echo "::warning::curl not available for HTTP health check"
             fi
             set -e  # Re-enable exit on error
             
