@@ -28,7 +28,7 @@ test('create creates assignment with defaults', function () {
     expect($assignment->title)->toEqual('Test Assignment');
     expect($assignment->submission_type)->toEqual('text');
     expect($assignment->max_score)->toEqual(100);
-    expect($assignment->status)->toEqual('draft');
+    expect($assignment->status->value)->toEqual('draft');
 });
 
 test('create uses provided values', function () {
@@ -51,7 +51,7 @@ test('create uses provided values', function () {
     expect($assignment->description)->toEqual('Test Description');
     expect($assignment->submission_type)->toEqual('file');
     expect($assignment->max_score)->toEqual(50);
-    expect($assignment->status)->toEqual('published');
+    expect($assignment->status->value)->toEqual('published');
     expect($assignment->allow_resubmit)->toBeFalse();
     expect($assignment->late_penalty_percent)->toEqual(20);
 });
@@ -92,7 +92,7 @@ test('publish changes status to published', function () {
 
     $result = $this->service->publish($assignment);
 
-    expect($result->status)->toEqual('published');
+    expect($result->status->value)->toEqual('published');
     Event::assertDispatched(AssignmentPublished::class);
 });
 
@@ -130,7 +130,7 @@ test('unpublish changes status to draft', function () {
 
     $result = $this->service->unpublish($assignment);
 
-    expect($result->status)->toEqual('draft');
+    expect($result->status->value)->toEqual('draft');
 });
 
 test('delete removes assignment', function () {

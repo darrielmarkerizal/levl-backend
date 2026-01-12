@@ -46,7 +46,7 @@ test('create submission creates submission with correct status', function () {
     ]);
 
     expect($submission)->not->toBeNull();
-    expect($submission->status)->toEqual('submitted');
+    expect($submission->status->value)->toEqual('submitted');
     expect($submission->attempt_number)->toEqual(1);
     expect($submission->is_late)->toBeFalse();
     expect($submission->is_resubmission)->toBeFalse();
@@ -74,7 +74,7 @@ test('create submission marks as late when past deadline', function () {
         'answer_text' => 'Late submission',
     ]);
 
-    expect($submission->status)->toEqual('late');
+    expect($submission->status->value)->toEqual('late');
     expect($submission->is_late)->toBeTrue();
 });
 
@@ -187,7 +187,7 @@ test('grade applies late penalty when submission is late', function () {
 
     $graded = $this->service->grade($submission, 100, 'Good work');
 
-    expect($graded->status)->toEqual('graded');
+    expect($graded->status->value)->toEqual('graded');
     expect($graded->grade)->not->toBeNull();
     expect($graded->grade->score)->toEqual(80);
     expect($graded->grade->feedback)->toEqual('Good work');
