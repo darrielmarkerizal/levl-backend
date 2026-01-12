@@ -35,40 +35,42 @@ class AuthService implements AuthServiceInterface
 
     public function register(RegisterDTO|array $data, string $ip, ?string $userAgent): array
     {
-        $validated = $data instanceof RegisterDTO ? $data->toArray() : $data;
-        $validated['password'] = Hash::make($validated['password']);
-        $user = $this->authRepository->createUser($validated);
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($data, $ip, $userAgent) {
+            $validated = $data instanceof RegisterDTO ? $data->toArray() : $data;
+            $validated['password'] = Hash::make($validated['password']);
+            $user = $this->authRepository->createUser($validated);
 
-        $user->assignRole('Student');
+            $user->assignRole('Student');
 
-        $token = $this->jwt->fromUser($user);
+            $token = $this->jwt->fromUser($user);
 
-        $deviceId = hash('sha256', ($ip ?? '').($userAgent ?? '').$user->id);
-        $refresh = $this->authRepository->createRefreshToken(
-            userId: $user->id,
-            ip: $ip,
-            userAgent: $userAgent,
-            deviceId: $deviceId,
-        );
+            $deviceId = hash('sha256', ($ip ?? '').($userAgent ?? '').$user->id);
+            $refresh = $this->authRepository->createRefreshToken(
+                userId: $user->id,
+                ip: $ip,
+                userAgent: $userAgent,
+                deviceId: $deviceId,
+            );
 
-        $pair = new TokenPairDTO(
-            accessToken: $token,
-            expiresIn: $this->jwt->factory()->getTTL() * 60,
-            refreshToken: $refresh->getAttribute('plain_token'),
-        );
+            $pair = new TokenPairDTO(
+                accessToken: $token,
+                expiresIn: $this->jwt->factory()->getTTL() * 60,
+                refreshToken: $refresh->getAttribute('plain_token'),
+            );
 
-        $verificationUuid = $this->emailVerification->sendVerificationLink($user);
+            $verificationUuid = $this->emailVerification->sendVerificationLink($user);
 
-        $userArray = $user->toArray();
-        $userArray['roles'] = $user->getRoleNames()->values();
+            $userArray = $user->toArray();
+            $userArray['roles'] = $user->getRoleNames()->values();
 
-        $response = ['user' => $userArray] + $pair->toArray();
+            $response = ['user' => $userArray] + $pair->toArray();
 
-        if ($verificationUuid) {
-            $response['verification_uuid'] = $verificationUuid;
-        }
+            if ($verificationUuid) {
+                $response['verification_uuid'] = $verificationUuid;
+            }
 
-        return $response;
+            return $response;
+        });
     }
 
     public function login(
