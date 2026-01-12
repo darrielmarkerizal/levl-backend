@@ -6,7 +6,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Modules\Auth\Models\User;
-use Modules\Forums\Contracts\Services\ForumServiceInterface;
+use Modules\Forums\Contracts\Services\ForumServiceInterface as ModuleForumServiceInterface;
 use Modules\Forums\Models\Reply;
 use Modules\Forums\Models\Thread;
 use Modules\Forums\Repositories\ReplyRepository;
@@ -14,7 +14,7 @@ use Modules\Forums\Repositories\ThreadRepository;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class ForumService implements ForumServiceInterface
+class ForumService implements ModuleForumServiceInterface, \App\Contracts\Services\ForumServiceInterface
 {
     protected ThreadRepository $threadRepository;
 
@@ -111,9 +111,9 @@ class ForumService implements ForumServiceInterface
     /**
      * Search threads by query.
      */
-    public function searchThreads(string $query, ?int $schemeId = null): Collection
+    public function searchThreads(string $query, int $schemeId): LengthAwarePaginator
     {
-        return $this->threadRepository->searchThreads($query, $schemeId)->getCollection();
+        return $this->threadRepository->searchThreads($query, $schemeId);
     }
 
     /**
