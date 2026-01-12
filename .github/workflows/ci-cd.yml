@@ -68,8 +68,28 @@ jobs:
           DB_USERNAME: postgres
           DB_PASSWORD: postgres
       
-      - name: Run Tests
-        run: php artisan test
+      - name: Run Unit Tests
+        run: php artisan test --testsuite=Unit
+        env:
+          DB_CONNECTION: pgsql
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_DATABASE: levl_test
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+      
+      - name: Run Feature Tests
+        run: php artisan test --testsuite=Feature
+        env:
+          DB_CONNECTION: pgsql
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_DATABASE: levl_test
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+      
+      - name: Run Module Tests
+        run: php artisan test --testsuite=Modules
         env:
           DB_CONNECTION: pgsql
           DB_HOST: localhost
