@@ -20,7 +20,7 @@ test('award xp creates point record', function () {
     expect($point)->not->toBeNull();
     expect($point->points)->toEqual(50);
     expect($point->reason->value)->toEqual('completion');
-    expect($point->source_type)->toEqual('lesson');
+    expect($point->source_type->value)->toEqual('lesson');
     expect($point->source_id)->toEqual(1);
 });
 
