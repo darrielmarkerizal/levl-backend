@@ -28,6 +28,7 @@ return [
   "users_count" => "{0} Tidak ada pengguna|{1} 1 pengguna|[2,*] :count pengguna",
   "minutes" => "{1} :count menit|[2,*] :count menit",
   "hours" => "{1} :count jam|[2,*] :count jam",
+  "days" => "{1} :count hari|[2,*] :count hari",
   "records_found" => "{0} Tidak ada record ditemukan|{1} 1 record ditemukan|[2,*] :count record ditemukan",
 
   // Common Module

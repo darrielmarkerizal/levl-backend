@@ -39,6 +39,7 @@ return [
   "users_count" => "{0} No users|{1} One user|[2,*] :count users",
   "minutes" => "{1} :count minute|[2,*] :count minutes",
   "hours" => "{1} :count hour|[2,*] :count hours",
+  "days" => "{1} :count day|[2,*] :count days",
   "records_found" => "{0} No records found|{1} 1 record found|[2,*] :count records found",
 
   // Common Module

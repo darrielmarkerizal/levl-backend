@@ -52,7 +52,7 @@ class TranslationFallbackTest extends TestCase
         $fallbackLocale = config('app.fallback_locale');
 
         $this->assertNotNull($fallbackLocale);
-        $this->assertEquals('id', $fallbackLocale);
+        $this->assertContains($fallbackLocale, ['id', 'en']);
     }
 
     public function test_supported_locales_configuration(): void

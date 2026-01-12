@@ -127,7 +127,7 @@ test('mark lesson completed updates lesson progress', function () {
         ->first();
 
     expect($progress)->not->toBeNull();
-    expect($progress->status)->toEqual('completed');
+    expect($progress->status->value)->toEqual('completed');
     expect($progress->progress_percent)->toEqual(100);
 });
 
@@ -157,5 +157,5 @@ test('mark lesson completed updates unit progress when all lessons complete', fu
         ->first();
 
     expect($unitProgress)->not->toBeNull();
-    expect($unitProgress->status)->toEqual('completed');
+    expect($unitProgress->status->value)->toEqual('completed');
 });
