@@ -2,7 +2,7 @@
 
 namespace App\Contracts\Services;
 
-use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Modules\Auth\Models\User;
 use Modules\Forums\Models\Reply;
 use Modules\Forums\Models\Thread;

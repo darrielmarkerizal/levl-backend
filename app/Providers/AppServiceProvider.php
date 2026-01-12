@@ -20,6 +20,12 @@ class AppServiceProvider extends ServiceProvider
   public function register(): void
   {
     $this->app->bind(EnrollmentKeyHasherInterface::class, EnrollmentKeyHasher::class);
+    
+    // Bind app-level interfaces to module implementations
+    $this->app->bind(
+      \App\Contracts\Services\ForumServiceInterface::class,
+      \Modules\Forums\Services\ForumService::class
+    );
   }
 
   /**
