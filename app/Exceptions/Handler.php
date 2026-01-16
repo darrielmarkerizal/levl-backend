@@ -16,6 +16,8 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Spatie\QueryBuilder\Exceptions\InvalidFilterQuery;
+use Spatie\QueryBuilder\Exceptions\InvalidSortQuery;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -98,6 +100,14 @@ class Handler extends ExceptionHandler
                 400,
                 ['sort' => [$e->getInvalidSort()]]
             );
+        }
+
+        if ($e instanceof InvalidFilterQuery) {
+            return $this->error($e->getMessage(), [], 400);
+        }
+
+        if ($e instanceof InvalidSortQuery) {
+            return $this->error($e->getMessage(), [], 400);
         }
 
         if ($e instanceof ResourceNotFoundException) {

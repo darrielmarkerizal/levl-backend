@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Schemes\Http\Controllers;
 
 use App\Support\ApiResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\Schemes\Http\Requests\LessonBlockRequest;
 use Modules\Schemes\Http\Resources\LessonBlockResource;
@@ -20,12 +21,13 @@ class LessonBlockController extends Controller
 
     public function __construct(private readonly LessonBlockService $service) {}
 
-    public function index(Course $course, Unit $unit, Lesson $lesson)
+    public function index(Request $request, Course $course, Unit $unit, Lesson $lesson)
     {
         $this->service->validateHierarchy($course->id, $unit->id, $lesson->id);
         $this->authorize('view', $lesson);
 
-        return $this->success(LessonBlockResource::collection($this->service->list($lesson->id)));
+        $blocks = $this->service->list($lesson->id, $request->query('filter', []));
+        return $this->success(LessonBlockResource::collection($blocks));
     }
 
     public function store(LessonBlockRequest $request, Course $course, Unit $unit, Lesson $lesson)

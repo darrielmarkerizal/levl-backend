@@ -56,7 +56,7 @@ class CourseService implements CourseServiceInterface
     private function buildQuery(array $filters = []): QueryBuilder
     {
         $searchQuery = data_get($filters, 'search');
-        $builder = QueryBuilder::for(Course::class, new \Illuminate\Http\Request($filters));
+        $builder = QueryBuilder::for(Course::class, new \Illuminate\Http\Request(['filter' => $filters]));
 
         if ($searchQuery && trim((string) $searchQuery) !== '') {
             $ids = Course::search($searchQuery)->keys()->toArray();

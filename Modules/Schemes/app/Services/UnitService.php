@@ -29,11 +29,11 @@ class UnitService
         }
     }
 
-    public function paginate(int $courseId, int $perPage = 15): LengthAwarePaginator
+    public function paginate(int $courseId, array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
         $perPage = max(1, $perPage);
 
-        $query = QueryBuilder::for(Unit::class)
+        $query = QueryBuilder::for(Unit::class, new \Illuminate\Http\Request(['filter' => $filters]))
             ->where('course_id', $courseId)
             ->allowedFilters([
                 AllowedFilter::exact('status'),

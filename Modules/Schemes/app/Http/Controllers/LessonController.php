@@ -31,7 +31,11 @@ class LessonController extends Controller
         $this->service->validateHierarchy($course->id, $unit->id, null);
         $this->authorize('view', $unit);
 
-        $paginator = $this->service->paginate($unit->id, (int) $request->query('per_page', 15));
+        $paginator = $this->service->paginate(
+            $unit->id,
+            $request->query('filter', []),
+            (int) $request->query('per_page', 15)
+        );
         return $this->paginateResponse($paginator, LessonResource::class);
     }
 

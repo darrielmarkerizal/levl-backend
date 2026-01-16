@@ -31,9 +31,9 @@ class LessonBlockService
         }
     }
 
-    public function list(int $lessonId): Collection
+    public function list(int $lessonId, array $filters = []): Collection
     {
-        $query = QueryBuilder::for(LessonBlock::class)
+        $query = QueryBuilder::for(LessonBlock::class, new \Illuminate\Http\Request(['filter' => $filters]))
             ->where('lesson_id', $lessonId)
             ->allowedFilters([
                 AllowedFilter::exact('block_type'),

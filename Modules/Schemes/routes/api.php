@@ -5,6 +5,7 @@ use Modules\Schemes\Http\Controllers\CourseController;
 use Modules\Schemes\Http\Controllers\LessonBlockController;
 use Modules\Schemes\Http\Controllers\LessonController;
 use Modules\Schemes\Http\Controllers\ProgressController;
+use Modules\Schemes\Http\Controllers\TagController;
 use Modules\Schemes\Http\Controllers\UnitController;
 
 Route::prefix('v1')->scopeBindings()->group(function () {
@@ -100,5 +101,15 @@ Route::prefix('v1')->scopeBindings()->group(function () {
             ->name('courses.units.lessons.blocks.update');
         Route::delete('courses/{course:slug}/units/{unit:slug}/lessons/{lesson:slug}/blocks/{block:slug}', [LessonBlockController::class, 'destroy'])
             ->name('courses.units.lessons.blocks.destroy');
+    });
+
+    // Tag routes
+    Route::get('tags', [TagController::class, 'index'])->name('tags.index');
+    Route::get('tags/{tag:slug}', [TagController::class, 'show'])->name('tags.show');
+    
+    Route::middleware(['auth:api', 'role:Superadmin|Admin'])->group(function () {
+        Route::post('tags', [TagController::class, 'store'])->name('tags.store');
+        Route::put('tags/{tag:slug}', [TagController::class, 'update'])->name('tags.update');
+        Route::delete('tags/{tag:slug}', [TagController::class, 'destroy'])->name('tags.destroy');
     });
 });

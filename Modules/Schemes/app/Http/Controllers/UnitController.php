@@ -22,7 +22,11 @@ class UnitController extends Controller
     public function index(Request $request, Course $course)
     {
         $this->authorize('view', $course);
-        $paginator = $this->service->paginate($course->id, (int) $request->query('per_page', 15));
+        $paginator = $this->service->paginate(
+            $course->id,
+            $request->query('filter', []),
+            (int) $request->query('per_page', 15)
+        );
 
         return $this->paginateResponse($paginator, UnitResource::class);
     }
