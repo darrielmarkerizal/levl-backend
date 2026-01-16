@@ -1,225 +1,146 @@
-# Schemes Module API Documentation
+# API Documentation - Modules/Schemes
 
-This module handles course management, units, lessons, blocks, tags, and user progression.
-
-## Base URL
-`/api/v1`
+Dokumentasi lengkap endpoint API untuk modul **Schemes** (Course, Unit, Lesson, Lesson Block, Progress, dan Tag).
+Semua endpoint berada di bawah prefix `/api/v1`.
 
 ---
 
-## 1. Courses
+## 1. Courses (Skema Pelatihan)
 
 ### List Courses
-`GET /courses`
+Mendapatkan daftar skema pelatihan dengan dukungan filter, pencarian, dan sorting.
+- **Method**: `GET`
+- **URL**: `/api/v1/courses`
+- **Roles**: Public (Guest/Authenticated)
+- **Query Params**:
+  - `search`: String (Cari di judul/konten via Meilisearch)
+  - `filter[status]`: `draft`, `published`, `archived`
+  - `filter[level_tag]`: `dasar`, `menengah`, `mahir`
+  - `filter[type]`: `okupasi`, `kluster`
+  - `filter[category_id]`: Integer (ID Kategori)
+  - `filter[tag]`: String/Array (Slug atau Nama Tag)
+  - `sort`: `id`, `code`, `title`, `created_at`, `updated_at`, `published_at` (Gunakan prefix `-` untuk DESC)
+  - `include`: `tags`, `category`, `instructor`, `units`
 
-List all courses with filtering, sorting, and pagination.
+### Create Course
+Membuat skema pelatihan baru. Gunakan `multipart/form-data`.
+- **Method**: `POST`
+- **URL**: `/api/v1/courses`
+- **Roles**: `Superadmin`, `Admin`
+- **Form Data**:
+  - `code`: String (Wajib, Unik, maks 50)
+  - `title`: String (Wajib, maks 255)
+  - `short_desc`: String (Opsional)
+  - `level_tag`: `dasar`, `menengah`, `mahir` (Wajib)
+  - `type`: `okupasi`, `kluster` (Wajib)
+  - `enrollment_type`: `auto_accept`, `key_based`, `approval` (Wajib)
+  - `enrollment_key`: String (Wajib jika `key_based`, maks 100)
+  - `progression_mode`: `sequential`, `free` (Wajib)
+  - `category_id`: Integer (Wajib, ID Kategori)
+  - `tags[]`: Array (Nama tag, contoh: `['Web', 'Laravel']`)
+  - `outcomes[]`: Array of strings
+  - `prereq`: String (Prasyarat)
+  - `thumbnail`: File Image (Maks 4MB)
+  - `banner`: File Image (Maks 6MB)
+  - `instructor_id`: User ID (Opsional)
+  - `course_admins[]`: Array of User IDs (Opsional)
 
-**Query Parameters:**
-- `per_page` (int, default: 15): Number of items per page.
-- `filter[status]` (string): Filter by status (`draft`, `published`, `archived`).
-- `filter[level_tag]` (string): Filter by level (`Beginner`, `Intermediate`, `Advanced`).
-- `filter[type]` (string): Filter by type (`scheme`, `non_scheme`).
-- `filter[category_id]` (int): Filter by category ID.
-- `filter[search]` or `search` (string): Search in title and description (via Meilisearch).
-- `filter[tag]` (string/array): Filter by tag name or slug.
-- `include` (string, comma-separated): Include relations (`tags`, `category`, `instructor`, `units`).
-- `sort` (string, comma-separated): Sort fields (`id`, `code`, `title`, `created_at`, `updated_at`, `published_at`).
+### Update Course
+Memperbarui skema. Gunakan `_method=PUT` jika mengirim file lewat `multipart/form-data`.
+- **Method**: `PUT/PATCH`
+- **URL**: `/api/v1/courses/{course_slug}`
+- **Roles**: `Superadmin`, `Admin` (Owner/Instructor)
 
-### Show Course
-`GET /courses/{slug}`
+### Delete Course
+- **Method**: `DELETE`
+- **URL**: `/api/v1/courses/{course_slug}`
 
-Get detailed information about a specific course.
+### Publish/Unpublish Skema
+- **Publish**: `PUT /api/v1/courses/{course_slug}/publish` (Syarat: Min 1 unit & 1 lesson per unit)
+- **Unpublish**: `PUT /api/v1/courses/{course_slug}/unpublish`
 
----
-
-### Create Course (Admin)
-`POST /courses`
-
-**Role:** `Superadmin`, `Admin`
-
-**Body (Multipart Form Data):**
-- `code` (string, required): Unique course code.
-- `title` (string, required): Course title.
-- `short_desc` (string, optional): Short description.
-- `level_tag` (string, required): `Beginner`, `Intermediate`, `Advanced`.
-- `type` (string, required): `scheme`, `non_scheme`.
-- `enrollment_type` (string, required): `auto_accept`, `key_based`, `manual_approval`.
-- `enrollment_key` (string, required if `key_based` and new): Key for enrollment.
-- `progression_mode` (string, required): `free`, `sequential`.
-- `category_id` (int, required): Category ID.
-- `tags` (array, optional): Array of tag names/IDs.
-- `outcomes` (array, optional): Array of learning outcomes.
-- `prereq` (string, optional): Prerequisite text.
-- `thumbnail` (file, optional): Image file (jpg, jpeg, png, webp, max 4MB).
-- `banner` (file, optional): Image file (jpg, jpeg, png, webp, max 6MB).
-- `course_admins` (array, optional): Array of User IDs.
-
-### Update Course (Admin)
-`PUT /courses/{slug}`
-
-**Role:** `Superadmin`, `Admin`
-**Body (JSON or Form Data):** Same as Create Course, but all fields are optional.
-
-### Delete Course (Admin)
-`DELETE /courses/{slug}`
-
----
-
-### Publish/Unpublish Course (Admin)
-`PUT /courses/{slug}/publish`
-`PUT /courses/{slug}/unpublish`
-
-### Enrollment Key Management (Admin)
-- `POST /courses/{slug}/enrollment-key/generate`: Generate a new key.
-- `PUT /courses/{slug}/enrollment-key`: Update key manually (body: `enrollment_key`).
-- `DELETE /courses/{slug}/enrollment-key`: Remove key (reverts to `auto_accept`).
+### Enrollment Key
+- **Generate**: `POST /api/v1/courses/{course_slug}/enrollment-key/generate` (Kembalikan key acak 12 digit)
+- **Update**: `PUT /api/v1/courses/{course_slug}/enrollment-key` (Body: `{ enrollment_key: "NEWKEY" }`)
+- **Remove**: `DELETE /api/v1/courses/{course_slug}/enrollment-key` (Set ke `auto_accept`)
 
 ---
 
-## 2. Units (Within a Course)
+## 2. Units (Unit Kompetensi)
 
 ### List Units
-`GET /courses/{slug}/units`
+- **Method**: `GET`
+- **URL**: `/api/v1/courses/{course_slug}/units`
+- **Include**: `course`, `lessons`
 
-**Query Parameters:**
-- `filter[status]` (string): `draft`, `published`.
-- `include` (string): `course`, `lessons`.
-- `sort` (string): `order`, `title`, `created_at`.
-
-### Show Unit
-`GET /courses/{slug}/units/{unit_slug}`
-
----
-
-### Create Unit (Admin)
-`POST /courses/{slug}/units`
-
-**Body:**
-- `code` (string, required): Unique code.
-- `title` (string, required).
-- `description` (string, optional).
-- `order` (int, optional).
-
-### Update Unit (Admin)
-`PUT /courses/{slug}/units/{unit_slug}`
-
-### Delete Unit (Admin)
-`DELETE /courses/{slug}/units/{unit_slug}`
-
-### Reorder Units (Admin)
-`PUT /courses/{slug}/units/reorder`
-**Body:** `{"units": [{"id": 1, "order": 1}, {"id": 2, "order": 2}]}`
-
-### Publish/Unpublish Unit (Admin)
-`PUT /courses/{slug}/units/{unit_slug}/publish`
-`PUT /courses/{slug}/units/{unit_slug}/unpublish`
+### Manage Unit (Admin Only)
+- **Store**: `POST /api/v1/courses/{course_slug}/units`
+  - Body: `code` (Req), `title` (Req), `description`, `order`, `status`
+- **Show**: `GET /api/v1/courses/{course_slug}/units/{unit_slug}`
+- **Update**: `PUT /api/v1/courses/{course_slug}/units/{unit_slug}`
+- **Destroy**: `DELETE /api/v1/courses/{course_slug}/units/{unit_slug}`
+- **Publish/Unpublish**: `PUT .../units/{unit_slug}/publish` atau `.../unpublish`
+- **Reorder**: `PUT /api/v1/courses/{course_slug}/units/reorder`
+  - Body: `{ "units": [ { "id": 1, "order": 1 }, { "id": 2, "order": 2 } ] }`
 
 ---
 
-## 3. Lessons (Within a Unit)
+## 3. Lessons (Materi / Elemen)
 
-### List Lessons
-`GET /courses/{slug}/units/{unit_slug}/lessons`
+### List & Show
+- **Index**: `GET /api/v1/courses/{course_slug}/units/{unit_slug}/lessons`
+- **Show**: `GET /api/v1/courses/{course_slug}/units/{unit_slug}/lessons/{lesson_slug}` (Akan mengecek aksesibilitas berdasarkan progresi jika user adalah Student)
 
-**Query Parameters:**
-- `filter[type]` (string).
-- `filter[status]` (string).
-- `include` (string): `unit`, `blocks`, `assignments`.
-
-### Show Lesson
-`GET /courses/{slug}/units/{unit_slug}/lessons/{lesson_slug}`
-
----
-
-### Create Lesson (Admin)
-`POST /courses/{slug}/units/{unit_slug}/lessons`
-
-**Body:**
-- `slug` (string, optional).
-- `title` (string, required).
-- `description` (string, optional).
-- `markdown_content` (string, optional).
-- `duration_minutes` (int, optional).
-- `order` (int, optional).
-
-### Update Lesson (Admin)
-`PUT /courses/{slug}/units/{unit_slug}/lessons/{lesson_slug}`
-
-### Delete Lesson (Admin)
-`DELETE /courses/{slug}/units/{unit_slug}/lessons/{lesson_slug}`
-
-### Publish/Unpublish Lesson (Admin)
-`PUT /courses/{slug}/units/{unit_slug}/lessons/{lesson_slug}/publish`
-`PUT /courses/{slug}/units/{unit_slug}/lessons/{lesson_slug}/unpublish`
+### Manage Lesson (Admin Only)
+- **Store**: `POST /api/v1/courses/{course_slug}/units/{unit_slug}/lessons`
+  - Body: `title` (Req), `slug`, `description`, `markdown_content`, `order`, `duration_minutes`, `status`
+- **Update**: `PUT /api/v1/courses/{course_slug}/units/{unit_slug}/lessons/{lesson_slug}`
+- **Destroy**: `DELETE /api/v1/courses/{course_slug}/units/{unit_slug}/lessons/{lesson_slug}`
+- **Publish/Unpublish**: `PUT .../lessons/{lesson_slug}/publish` atau `.../unpublish`
 
 ---
 
-## 4. Lesson Blocks (Content)
+## 4. Lesson Blocks (Konten Materi)
 
-### List Blocks
-`GET /courses/{slug}/units/{unit_slug}/lessons/{lesson_slug}/blocks`
+### List & Show
+- **Index**: `GET /api/v1/courses/{course_slug}/units/{unit_slug}/lessons/{lesson_slug}/blocks`
+- **Show**: `GET .../blocks/{block_slug}`
 
-### Show Block
-`GET /courses/{slug}/units/{unit_slug}/lessons/{lesson_slug}/blocks/{block_id}`
-
----
-
-### Create Block (Admin)
-`POST /courses/{slug}/units/{unit_slug}/lessons/{lesson_slug}/blocks`
-
-**Body (Multipart Form Data):**
-- `type` (string, required): `text`, `video`, `image`, `file`.
-- `content` (string, optional): Text content or description.
-- `media` (file, required for non-text): The media file.
-- `order` (int, optional).
-
-### Update Block (Admin)
-`PUT /courses/{slug}/units/{unit_slug}/lessons/{lesson_slug}/blocks/{block_id}`
-
-**Body (Multipart or JSON):** Same as Create, but optional.
-
-### Delete Block (Admin)
-`DELETE /courses/{slug}/units/{unit_slug}/lessons/{lesson_slug}/blocks/{block_id}`
+### Manage Block (Admin Only)
+- **Store**: `POST /api/v1/courses/{course_slug}/units/{unit_slug}/lessons/{lesson_slug}/blocks`
+  - **Form Data**:
+    - `type`: `text`, `video`, `image`, `file` (Wajib)
+    - `content`: String (Wajib jika `text`)
+    - `media`: File (Wajib jika `video/image/file`, maks 50MB)
+    - `order`: Integer
+- **Update**: `PUT .../blocks/{block_slug}` (Mendukung ganti tipe dan ganti media)
+- **Destroy**: `DELETE .../blocks/{block_slug}`
 
 ---
 
-## 5. Progress Tracking
+## 5. Progress Tracking (Progres Belajar)
 
-### Get Course Progress
-`GET /courses/{slug}/progress`
-
-Returns hierarchical progress for the course, units, and lessons.
-**Query Params:** `user_id` (Admin only, to view others).
+### View Progress
+Melihat statistik progres user (berapa % selesai, daftar lesson yang sudah/belum).
+- **Method**: `GET`
+- **URL**: `/api/v1/courses/{course_slug}/progress`
+- **Params**: `user_id` (Opsional bagi Admin untuk cek progres orang lain).
 
 ### Complete Lesson
-`POST /courses/{slug}/units/{unit_slug}/lessons/{lesson_slug}/complete`
-
-Marks a lesson as completed for the authenticated student.
+Menandai suatu materi telah selesai dipelajari.
+- **Method**: `POST`
+- **URL**: `/api/v1/courses/{course_slug}/units/{unit_slug}/lessons/{lesson_slug}/complete`
+- **Effect**: Mengupdate status enrollment dan mencatat timestamp penyelesaian.
 
 ---
 
 ## 6. Tags
 
-### List Tags
-`GET /tags`
-
-**Query Parameters:** 
-- `filter[search]` or `search` (string).
-- `filter[name]`, `filter[slug]`, `filter[description]` (partial match).
-- `per_page` (int).
-
-### Show Tag
-`GET /tags/{slug}`
-
----
-
-### Create Tag (Admin)
-`POST /tags`
-**Body:** `{"name": "Tag Name"}`
-
-### Update Tag (Admin)
-`PUT /tags/{slug}`
-**Body:** `{"name": "Updated Name"}`
-
-### Delete Tag (Admin)
-`DELETE /tags/{slug}`
+### Manage Tags
+- **Index**: `GET /api/v1/tags` (Filter: `filter[name]`, `filter[slug]`)
+- **Show**: `GET /api/v1/tags/{tag_slug}`
+- **Store**: `POST /api/v1/tags`
+  - Body: `{ "name": "Laravel" }` atau `{ "names": ["PHP", "Backend"] }`
+- **Update**: `PUT /api/v1/tags/{tag_slug}`
+  - Body: `{ "name": "Laravel Core" }`
+- **Destroy**: `DELETE /api/v1/tags/{tag_slug}`

@@ -148,8 +148,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
             return response()->json(
                 [
-                    'status' => 'error',
+                    'success' => false,
                     'message' => __('messages.unauthenticated'),
+                    'errors' => null,
                 ],
                 401,
             );
@@ -168,8 +169,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
             return response()->json(
                 [
-                    'status' => 'error',
+                    'success' => false,
                     'message' => __('messages.session_expired'),
+                    'errors' => null,
                 ],
                 401,
             );
@@ -188,8 +190,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
             return response()->json(
                 [
-                    'status' => 'error',
+                    'success' => false,
                     'message' => __('messages.session_invalid'),
+                    'errors' => null,
                 ],
                 401,
             );
@@ -209,8 +212,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
             return response()->json(
                 [
-                    'status' => 'error',
+                    'success' => false,
                     'message' => __('messages.session_blacklisted'),
+                    'errors' => null,
                 ],
                 401,
             );
@@ -232,8 +236,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
             return response()->json(
                 [
-                    'status' => 'error',
+                    'success' => false,
                     'message' => __('messages.session_not_found'),
+                    'errors' => null,
                 ],
                 401,
             );
@@ -253,8 +258,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
             return response()->json(
                 [
-                    'status' => 'error',
+                    'success' => false,
                     'message' => __('messages.user_data_not_found'),
+                    'errors' => null,
                 ],
                 401,
             );
@@ -263,8 +269,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (AuthorizationException $e, \Illuminate\Http\Request $request) {
             return response()->json(
                 [
-                    'status' => 'error',
+                    'success' => false,
                     'message' => __('messages.forbidden'),
+                    'errors' => null,
                 ],
                 403,
             );
@@ -292,7 +299,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 if ($isCredentialError) {
                     return response()->json(
                         [
-                            'status' => 'error',
+                            'success' => false,
                             'message' => __('messages.invalid_credentials'),
                             'errors' => $errors,
                         ],
@@ -303,7 +310,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
             return response()->json(
                 [
-                    'status' => 'error',
+                    'success' => false,
                     'message' => __('messages.validation_failed'),
                     'errors' => $errors,
                 ],
@@ -316,10 +323,30 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Http\Request $request,
         ) {
             if ($request->is('api/*') || $request->is('v1/*')) {
+                $model = $e->getModel();
+                $message = __('messages.not_found');
+                
+                // Provide specific messages based on model type
+                if ($model) {
+                    $modelName = class_basename($model);
+                    $message = match ($modelName) {
+                        'Course' => __('messages.courses.not_found'),
+                        'Unit' => __('messages.units.not_found'),
+                        'Lesson' => __('messages.lessons.not_found'),
+                        'LessonBlock' => __('messages.lesson_blocks.not_found'),
+                        'Tag' => __('messages.tags.not_found'),
+                        'User' => __('messages.user.not_found'),
+                        'Category' => __('messages.categories.not_found'),
+                        'Enrollment' => __('messages.enrollments.not_found'),
+                        default => __('messages.not_found'),
+                    };
+                }
+                
                 return response()->json(
                     [
-                        'status' => 'error',
-                        'message' => __('messages.not_found'),
+                        'success' => false,
+                        'message' => $message,
+                        'errors' => null,
                     ],
                     404,
                 );
@@ -332,20 +359,31 @@ return Application::configure(basePath: dirname(__DIR__))
         ) {
             if ($request->is('api/*') || $request->is('v1/*')) {
                 $prev = $e->getPrevious();
+                $message = __('messages.not_found');
+                
                 if ($prev instanceof \Illuminate\Database\Eloquent\ModelNotFoundException) {
-                    return response()->json(
-                        [
-                            'status' => 'error',
-                            'message' => __('messages.not_found'),
-                        ],
-                        404,
-                    );
+                    $model = $prev->getModel();
+                    if ($model) {
+                        $modelName = class_basename($model);
+                        $message = match ($modelName) {
+                            'Course' => __('messages.courses.not_found'),
+                            'Unit' => __('messages.units.not_found'),
+                            'Lesson' => __('messages.lessons.not_found'),
+                            'LessonBlock' => __('messages.lesson_blocks.not_found'),
+                            'Tag' => __('messages.tags.not_found'),
+                            'User' => __('messages.user.not_found'),
+                            'Category' => __('messages.categories.not_found'),
+                            'Enrollment' => __('messages.enrollments.not_found'),
+                            default => __('messages.not_found'),
+                        };
+                    }
                 }
 
                 return response()->json(
                     [
-                        'status' => 'error',
-                        'message' => __('messages.not_found'),
+                        'success' => false,
+                        'message' => $message,
+                        'errors' => null,
                     ],
                     404,
                 );

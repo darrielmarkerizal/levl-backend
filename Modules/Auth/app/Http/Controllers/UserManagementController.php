@@ -31,7 +31,7 @@ class UserManagementController extends Controller
 
         $users->getCollection()->transform(fn($user) => new UserResource($user));
 
-        return $this->paginateResponse($users, 'messages.data_retrieved');
+        return $this->paginateResponse($users);
     }
 
     public function show(int $id): JsonResponse

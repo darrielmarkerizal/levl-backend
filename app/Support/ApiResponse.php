@@ -71,7 +71,7 @@ trait ApiResponse
 
     protected function paginateResponse(
         LengthAwarePaginator $paginator,
-        string $message = 'messages.success',
+        string $message = 'messages.data_retrieved',
         int $status = 200,
         ?array $additionalMeta = null,
         array $params = []
@@ -116,12 +116,17 @@ trait ApiResponse
             $meta = array_replace_recursive($meta, $additionalMeta);
         }
 
-        return $this->success(
-            data: $collection,
-            message: $message,
-            params: $params,
-            status: $status,
-            meta: $meta
+        $finalMessage = $paginator->total() === 0 ? '' : self::translate($message, $params);
+
+        return response()->json(
+            [
+                'success' => true,
+                'message' => $finalMessage,
+                'data' => $collection,
+                'meta' => $meta,
+                'errors' => null,
+            ],
+            $status
         );
     }
 

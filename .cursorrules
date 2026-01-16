@@ -206,10 +206,9 @@ public function methodName(FormRequest $request, ?Model $model = null)
     $result = $this->service->methodName($data, $actor);
     
     // Step 4: Transform & respond
-    return $this->success(
-        new ResourceClass($result),
-        __('messages.key')
-    );
+    // ✅ REQUIRED: transform collection manually to avoid type mismatch in setCollection()
+    $paginator->getCollection()->transform(fn($item) => new Resource($item));
+    return $this->paginateResponse($paginator, 'messages.key');
 }
 ```
 
@@ -523,6 +522,7 @@ private function parseDuplicateConstraint(QueryException $e): array
 - FORBIDDEN to return Model directly
 - Resource handles formatting, type casting, and exposure control
 - Response structure: `{success, message, data, meta, errors}`
+- **Error Response Cleanup**: If `success` is `false`, the `data` and `meta` fields MUST be omitted if they are `null`.
 
 ## Resource Serialization
 - All data responses MUST use JsonResource
@@ -659,7 +659,8 @@ private function parseDuplicateConstraint(QueryException $e): array
 - MUST define `allowedFilters` explicitly
 - MUST define `allowedSorts` explicitly
 - MUST define `defaultSort` explicitly
-- Use `paginateResponse()` helper from `ApiResponse` trait for consistent pagination format (`meta.pagination`)
+- Use `paginateResponse()` (for JsonResource) or `paginateQueryBuilder()` (for Fractal) helper from `ApiResponse` trait for consistent pagination format (`meta.pagination`).
+- **Strict Filtering Enforcement**: To trigger strict filtering validation (triggering `InvalidFilterQuery` exception for unknown filters), Service MUST wrap filter array in a mock Request object: `QueryBuilder::for(Model::class, new Request(['filter' => $filters]))`.
 
 ---
 
@@ -686,6 +687,7 @@ private function parseDuplicateConstraint(QueryException $e): array
 - Validation errors → `ValidationException`
 - FORBIDDEN to return error arrays manually
 - Global handler maps errors to standard response format
+- **Laravel 11 Exception Registration**: For projects using Laravel 11 structure, API exception rendering MUST be registered in `bootstrap/app.php` using `$exceptions->render()`. Ensure `api/*` and `v1/*` routes always return JSON.
 
 ## Exception Design
 - Custom exceptions MUST extend appropriate base exception

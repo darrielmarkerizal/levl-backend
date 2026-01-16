@@ -23,7 +23,7 @@ class UserActivityService implements UserActivityServiceInterface
         ]);
     }
 
-    public function getActivities(User $user, array $filters = []): Collection
+    public function getActivities(User $user, array $filters = []): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
         $query = UserActivity::where('user_id', $user->id)
             ->orderBy('created_at', 'desc');
