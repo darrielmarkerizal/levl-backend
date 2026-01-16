@@ -158,6 +158,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd ${{ secrets.DEPLOY_PATH }}
+            git reset --hard HEAD
             git pull origin main
             composer install --no-dev --optimize-autoloader
             php artisan migrate --force
