@@ -52,16 +52,21 @@ trait ApiResponse
         mixed $data = null,
         ?array $meta = null
     ): JsonResponse {
-        return response()->json(
-            [
-                'success' => false,
-                'message' => self::translate($message, $params),
-                'data' => $data,
-                'meta' => $meta,
-                'errors' => $errors,
-            ],
-            $status
-        );
+        $response = [
+            'success' => false,
+            'message' => self::translate($message, $params),
+            'errors' => $errors,
+        ];
+
+        if ($data !== null) {
+            $response['data'] = $data;
+        }
+
+        if ($meta !== null) {
+            $response['meta'] = $meta;
+        }
+
+        return response()->json($response, $status);
     }
 
     protected function paginateResponse(
@@ -186,15 +191,20 @@ trait ApiResponse
         mixed $data = null,
         ?array $meta = null
     ): JsonResponse {
-        return response()->json(
-            [
-                'success' => false,
-                'message' => self::translate($message, $params),
-                'data' => $data,
-                'meta' => $meta,
-                'errors' => $errors,
-            ],
-            $status
-        );
+        $response = [
+            'success' => false,
+            'message' => self::translate($message, $params),
+            'errors' => $errors,
+        ];
+
+        if ($data !== null) {
+            $response['data'] = $data;
+        }
+
+        if ($meta !== null) {
+            $response['meta'] = $meta;
+        }
+
+        return response()->json($response, $status);
     }
 }

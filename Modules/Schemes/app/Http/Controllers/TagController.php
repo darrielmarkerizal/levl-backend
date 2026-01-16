@@ -25,7 +25,7 @@ class TagController extends Controller
             (int) $request->query('per_page', 15)
         );
 
-        $paginator->setCollection(TagResource::collection($paginator->getCollection()));
+        $paginator->getCollection()->transform(fn($tag) => new TagResource($tag));
         return $this->paginateResponse($paginator);
     }
 

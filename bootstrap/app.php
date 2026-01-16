@@ -57,8 +57,6 @@ return Application::configure(basePath: dirname(__DIR__))
                 [
                     'success' => false,
                     'message' => $message,
-                    'data' => null,
-                    'meta' => null,
                     'errors' => [],
                 ],
                 404,
@@ -72,8 +70,6 @@ return Application::configure(basePath: dirname(__DIR__))
                 [
                     'success' => false,
                     'message' => $message,
-                    'data' => null,
-                    'meta' => null,
                     'errors' => [],
                 ],
                 401,
@@ -87,8 +83,6 @@ return Application::configure(basePath: dirname(__DIR__))
                 [
                     'success' => false,
                     'message' => $message,
-                    'data' => null,
-                    'meta' => null,
                     'errors' => [],
                 ],
                 403,
@@ -102,8 +96,6 @@ return Application::configure(basePath: dirname(__DIR__))
                 [
                     'success' => false,
                     'message' => $message,
-                    'data' => null,
-                    'meta' => null,
                     'errors' => $e->getErrors(),
                 ],
                 409,
@@ -114,8 +106,6 @@ return Application::configure(basePath: dirname(__DIR__))
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
-                'data' => null,
-                'meta' => null,
                 'errors' => null,
             ], 400);
         });
@@ -124,8 +114,6 @@ return Application::configure(basePath: dirname(__DIR__))
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
-                'data' => null,
-                'meta' => null,
                 'errors' => null,
             ], 400);
         });
@@ -138,8 +126,6 @@ return Application::configure(basePath: dirname(__DIR__))
                 [
                     'success' => false,
                     'message' => $message,
-                    'data' => null,
-                    'meta' => null,
                     'errors' => $e->getErrors(),
                 ],
                 $e->getCode(),

@@ -28,7 +28,7 @@ class UnitController extends Controller
             (int) $request->query('per_page', 15)
         );
 
-        $paginator->setCollection(UnitResource::collection($paginator->getCollection()));
+        $paginator->getCollection()->transform(fn($unit) => new UnitResource($unit));
         return $this->paginateResponse($paginator);
     }
 
