@@ -23,4 +23,28 @@ class DevController extends Controller
 
         return view('dev.octane-check', $data);
     }
+
+    public function benchmarkView()
+    {
+        return view('dev.benchmark');
+    }
+
+    public function benchmarkApi(Request $request)
+    {
+        $start = microtime(true);
+        
+        if ($request->get('mode') === 'db') {
+            // Test DB connection and query execution
+            \Illuminate\Support\Facades\DB::select('select 1');
+        }
+
+        return response()->json([
+            'status' => 'ok',
+            'mode' => $request->get('mode', 'simple'),
+            'duration' => microtime(true) - $start,
+            'server' => $_SERVER['SERVER_SOFTWARE'] ?? 'unknown',
+            'pid' => getmypid(),
+        ]);
+    }
 }
+
