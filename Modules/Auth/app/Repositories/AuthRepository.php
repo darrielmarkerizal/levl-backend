@@ -30,6 +30,7 @@ class AuthRepository extends BaseRepository implements AuthRepositoryInterface
     {
         return $this->query()
             ->where(fn ($q) => $q->where('email', $login)->orWhere('username', $login))
+            ->with('roles:id,name')  // Eager load roles to prevent N+1
             ->first();
     }
 

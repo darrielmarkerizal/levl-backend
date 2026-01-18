@@ -25,6 +25,7 @@ class UserManagementService implements UserManagementServiceInterface
     public function __construct(
         private readonly AuthRepositoryInterface $authRepository,
         private readonly UserAccessPolicyInterface $userAccessPolicy,
+        private readonly UserCacheService $cacheService,
     ) {}
 
     public function listUsers(User $authUser, int $perPage = 15, ?string $search = null): LengthAwarePaginator
@@ -89,7 +90,12 @@ class UserManagementService implements UserManagementServiceInterface
 
     public function showUser(User $authUser, int $userId): User
     {
-        $target = User::findOrFail($userId);
+        // Try cache first
+        $target = $this->cacheService->getUser($userId);
+        
+        if (!$target) {
+            $target = User::findOrFail($userId);
+        }
         
         // Authorization check via policy
         if (!$authUser->can('view', $target)) {
@@ -118,6 +124,10 @@ class UserManagementService implements UserManagementServiceInterface
         return DB::transaction(function () use ($user, $status) {
             $user->status = UserStatus::from($status);
             $user->save();
+            
+            // Invalidate cache
+            $this->cacheService->invalidateUser($user->id);
+            
             return $user->fresh();
         });
     }
