@@ -14,8 +14,20 @@ class LessonPolicy
         return true;
     }
 
-    public function view(?User $user, Lesson $lesson): bool
+    public function view(User $user, Lesson $lesson): bool
     {
+        $course = $lesson->unit?->course;
+        if (!$course) {
+            return false;
+        }
+
+        if ($user->hasRole('Student')) {
+            return \Modules\Enrollments\Models\Enrollment::where('user_id', $user->id)
+                ->where('course_id', $course->id)
+                ->whereIn('status', ['active', 'completed'])
+                ->exists();
+        }
+
         return true;
     }
 

@@ -15,6 +15,8 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class LessonBlockService
 {
+    use \App\Support\Traits\BuildsQueryBuilderRequest;
+
     public function __construct(
         private readonly LessonBlockRepositoryInterface $repository
     ) {}
@@ -33,7 +35,7 @@ class LessonBlockService
 
     public function list(int $lessonId, array $filters = []): Collection
     {
-        $query = QueryBuilder::for(LessonBlock::class, new \Illuminate\Http\Request(['filter' => $filters]))
+        $query = QueryBuilder::for(LessonBlock::class, $this->buildQueryBuilderRequest($filters))
             ->where('lesson_id', $lessonId)
             ->allowedFilters([
                 AllowedFilter::exact('block_type'),

@@ -180,6 +180,18 @@ class Course extends Model implements HasMedia
   }
 
   /**
+   * Get the creator of the course (the first admin who was assigned).
+   */
+  public function getCreatorAttribute()
+  {
+    if ($this->relationLoaded('admins')) {
+      return $this->admins->sortBy('pivot.created_at')->first();
+    }
+
+    return $this->admins()->orderBy('course_admins.created_at', 'asc')->first();
+  }
+
+  /**
    * Get the user who deleted the course.
    */
   public function deletedBy(): BelongsTo

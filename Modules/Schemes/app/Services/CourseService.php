@@ -24,6 +24,8 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class CourseService implements CourseServiceInterface
 {
+    use \App\Support\Traits\BuildsQueryBuilderRequest;
+
     public function __construct(
         private readonly CourseRepositoryInterface $repository
     ) {}
@@ -56,7 +58,10 @@ class CourseService implements CourseServiceInterface
     private function buildQuery(array $filters = []): QueryBuilder
     {
         $searchQuery = data_get($filters, 'search');
-        $builder = QueryBuilder::for(Course::class, new \Illuminate\Http\Request(['filter' => $filters]));
+        $builder = QueryBuilder::for(
+            Course::with(['instructor', 'admins']),
+            $this->buildQueryBuilderRequest($filters)
+        );
 
         if ($searchQuery && trim((string) $searchQuery) !== '') {
             $ids = Course::search($searchQuery)->keys()->toArray();
@@ -80,7 +85,7 @@ class CourseService implements CourseServiceInterface
                 AllowedFilter::exact('type'),
                 AllowedFilter::exact('category_id'),
             ])
-            ->allowedIncludes(['tags', 'category', 'instructor', 'units'])
+            ->allowedIncludes(['tags', 'category', 'instructor', 'units', 'admins'])
             ->allowedSorts(['id', 'code', 'title', 'created_at', 'updated_at', 'published_at'])
             ->defaultSort('title');
     }
@@ -115,8 +120,8 @@ class CourseService implements CourseServiceInterface
                     $attributes['code'] = $this->generateCourseCode();
                 }
 
-                if ($actor && ! isset($attributes['instructor_id'])) {
-                    $attributes['instructor_id'] = $actor->id;
+                if (! isset($attributes['instructor_id'])) {
+                    $attributes['instructor_id'] = null;
                 }
 
                 $tags = $attributes['tags'] ?? null;
@@ -126,6 +131,10 @@ class CourseService implements CourseServiceInterface
 
                 if ($tags) {
                     $course->tags()->sync($tags);
+                }
+
+                if ($actor && $actor->hasRole(['Superadmin', 'Admin'])) {
+                    $course->admins()->syncWithoutDetaching([$actor->id]);
                 }
 
                 $this->handleMedia($course, $files);
@@ -249,11 +258,20 @@ class CourseService implements CourseServiceInterface
         $message = $e->getMessage();
         $errors = [];
 
-        if (str_contains($message, 'courses_code_unique')) {
+        if (preg_match('/courses?_code_unique/i', $message)) {
             $errors['code'] = [__('messages.courses.code_exists')];
         }
-        if (str_contains($message, 'courses_slug_unique')) {
+        
+        if (preg_match('/courses?_slug_unique/i', $message)) {
             $errors['slug'] = [__('messages.courses.slug_exists')];
+        }
+
+        if (empty($errors)) {
+            // Attempt to extract column name from common DB error formats
+            if (preg_match('/Key \(([^)]+)\)=\([^)]+\) already exists/i', $message, $matches)) {
+                $column = $matches[1];
+                $errors[$column] = [__('messages.courses.duplicate_data_field', ['field' => $column])];
+            }
         }
 
         return $errors ?: ['general' => [__('messages.courses.duplicate_data')]];

@@ -1,0 +1,15 @@
+Running 10s test @ http://127.0.0.1:8000/dev/benchmark-api?mode=courses
+  2 threads and 50 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     1.33s     5.55ms   1.35s    87.50%
+    Req/Sec    11.99      9.84    50.00     84.15%
+  Latency Distribution
+     50%    1.33s 
+     75%    1.33s 
+     90%    1.34s 
+     99%    1.35s 
+  175 requests in 10.08s, 57.85MB read
+  Socket errors: connect 0, read 0, write 0, timeout 159
+  Non-2xx or 3xx responses: 175
+Requests/sec:     17.36
+Transfer/sec:      5.74MB

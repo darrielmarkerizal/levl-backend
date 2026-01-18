@@ -25,3 +25,7 @@ Thumbs.db
 /tests/reports
 rr
 .rr.yaml
+
+**/caddy
+frankenphp
+frankenphp-worker.php

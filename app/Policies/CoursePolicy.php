@@ -11,12 +11,17 @@ class CoursePolicy
 {
     use HandlesAuthorization;
 
+    public function view(?User $user, Course $course)
+    {
+        return Response::allow();
+    }
+
     public function create(User $user)
     {
         if ($user->hasRole('Superadmin') || $user->hasRole('Admin')) {
             return Response::allow();
         }
-        return $this->deny('Hanya admin atau superadmin yang dapat membuat course.');
+        return $this->deny(__('messages.admin_only'));
     }
 
     public function update(User $user, Course $course)
@@ -25,7 +30,7 @@ class CoursePolicy
             return Response::allow();
         }
         if (! $user->hasRole('Admin')) {
-            return $this->deny('Hanya admin atau superadmin yang dapat mengubah course.');
+            return $this->deny(__('messages.admin_only'));
         }
         if ((int) $course->instructor_id === (int) $user->id) {
             return Response::allow();
@@ -34,7 +39,7 @@ class CoursePolicy
             return Response::allow();
         }
 
-        return $this->deny('Anda hanya dapat mengubah course yang Anda buat atau ketika Anda terdaftar sebagai admin course.');
+        return $this->deny(__('messages.course_owner_only'));
     }
 
     public function delete(User $user, Course $course)
@@ -43,7 +48,7 @@ class CoursePolicy
             return Response::allow();
         }
         if (! $user->hasRole('Admin')) {
-            return $this->deny('Hanya admin atau superadmin yang dapat menghapus course.');
+            return $this->deny(__('messages.admin_only'));
         }
         if ((int) $course->instructor_id === (int) $user->id) {
             return Response::allow();
@@ -52,6 +57,6 @@ class CoursePolicy
             return Response::allow();
         }
 
-        return $this->deny('Anda hanya dapat menghapus course yang Anda buat atau ketika Anda terdaftar sebagai admin course.');
+        return $this->deny(__('messages.course_owner_only'));
     }
 }

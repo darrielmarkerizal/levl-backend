@@ -12,13 +12,13 @@ class LessonBlockPolicy
     public function view(User $user, LessonBlock $block): bool
     {
         $lesson = $block->lesson;
-        if (!$lesson) return false;
-        
-        $course = $lesson->unit?->course;
-        if (!$course) return false;
+        if (!$lesson) {
+            return false;
+        }
 
-        if ($user->hasRole('Superadmin') || $user->hasRole('Admin')) {
-            return true;
+        $course = $lesson->unit?->course;
+        if (!$course) {
+            return false;
         }
 
         if ($user->hasRole('Student')) {
@@ -28,7 +28,7 @@ class LessonBlockPolicy
                 ->exists();
         }
 
-        return false;
+        return true;
     }
 
     public function create(User $user): bool

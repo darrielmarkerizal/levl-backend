@@ -14,8 +14,20 @@ class UnitPolicy
         return true;
     }
 
-    public function view(?User $user, Unit $unit): bool
+    public function view(User $user, Unit $unit): bool
     {
+        $course = $unit->course;
+        if (!$course) {
+            return false;
+        }
+
+        if ($user->hasRole('Student')) {
+            return \Modules\Enrollments\Models\Enrollment::where('user_id', $user->id)
+                ->where('course_id', $course->id)
+                ->whereIn('status', ['active', 'completed'])
+                ->exists();
+        }
+
         return true;
     }
 

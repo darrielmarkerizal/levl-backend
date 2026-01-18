@@ -11,20 +11,46 @@ class LessonPolicy
 {
     use HandlesAuthorization;
 
+    public function view(User $user, Lesson $lesson)
+    {
+        $unit = $lesson->unit;
+        if (!$unit) {
+            return $this->deny(__('messages.unit_not_found'));
+        }
+
+        $course = $unit->course;
+        if (!$course) {
+            return $this->deny(__('messages.course_not_found'));
+        }
+
+        if ($user->hasRole('Student')) {
+            $isEnrolled = \Modules\Enrollments\Models\Enrollment::where('user_id', $user->id)
+                ->where('course_id', $course->id)
+                ->whereIn('status', ['active', 'completed'])
+                ->exists();
+
+            if (!$isEnrolled) {
+                return $this->deny(__('messages.enrollment_required'));
+            }
+        }
+
+        return Response::allow();
+    }
+
     public function update(User $user, Lesson $lesson)
     {
         if (! $user->hasRole('Admin')) {
-            return $this->deny('Hanya admin atau superadmin yang dapat mengubah lesson.');
+            return $this->deny(__('messages.admin_only'));
         }
 
         $unit = $lesson->unit;
         if (! $unit) {
-            return $this->deny('Unit tidak ditemukan.');
+            return $this->deny(__('messages.unit_not_found'));
         }
 
         $course = $unit->course;
         if (! $course) {
-            return $this->deny('Course tidak ditemukan.');
+            return $this->deny(__('messages.course_not_found'));
         }
 
         // Check if user is instructor or course admin
@@ -36,23 +62,23 @@ class LessonPolicy
             return Response::allow();
         }
 
-        return $this->deny('Anda hanya dapat mengubah lesson dari course yang Anda buat atau course yang Anda kelola sebagai admin.');
+        return $this->deny(__('messages.course_owner_only'));
     }
 
     public function delete(User $user, Lesson $lesson)
     {
         if (! $user->hasRole('Admin')) {
-            return $this->deny('Hanya admin atau superadmin yang dapat menghapus lesson.');
+            return $this->deny(__('messages.admin_only'));
         }
 
         $unit = $lesson->unit;
         if (! $unit) {
-            return $this->deny('Unit tidak ditemukan.');
+            return $this->deny(__('messages.unit_not_found'));
         }
 
         $course = $unit->course;
         if (! $course) {
-            return $this->deny('Course tidak ditemukan.');
+            return $this->deny(__('messages.course_not_found'));
         }
 
         // Check if user is instructor or course admin
@@ -64,6 +90,6 @@ class LessonPolicy
             return Response::allow();
         }
 
-        return $this->deny('Anda hanya dapat menghapus lesson dari course yang Anda buat atau course yang Anda kelola sebagai admin.');
+        return $this->deny(__('messages.course_owner_only'));
     }
 }

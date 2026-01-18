@@ -14,6 +14,7 @@ class AuthServiceProvider extends ServiceProvider
         \Modules\Schemes\Models\Lesson::class => \App\Policies\LessonPolicy::class,
         \Modules\Learning\Models\Assignment::class => \App\Policies\AssignmentPolicy::class,
         \Modules\Grading\Models\Grade::class => \App\Policies\GradePolicy::class,
+        \Modules\Auth\Models\User::class => \Modules\Auth\Policies\UserPolicy::class,
     ];
 
     public function boot(): void

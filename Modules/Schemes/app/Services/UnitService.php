@@ -16,6 +16,8 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class UnitService
 {
+    use \App\Support\Traits\BuildsQueryBuilderRequest;
+
     public function __construct(
         private readonly UnitRepositoryInterface $repository
     ) {}
@@ -33,7 +35,7 @@ class UnitService
     {
         $perPage = max(1, $perPage);
 
-        $query = QueryBuilder::for(Unit::class, new \Illuminate\Http\Request(['filter' => $filters]))
+        $query = QueryBuilder::for(Unit::class, $this->buildQueryBuilderRequest($filters))
             ->where('course_id', $courseId)
             ->allowedFilters([
                 AllowedFilter::exact('status'),

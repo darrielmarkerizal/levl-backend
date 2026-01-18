@@ -58,6 +58,7 @@ return [
     "unpublished" => "Unit berhasil diunpublish.",
     "reordered" => "Urutan unit berhasil diperbarui.",
     "order_updated" => "Urutan unit berhasil diperbarui.",
+    "list_retrieved" => "Daftar unit berhasil diambil.",
     "not_found" => "Unit tidak ditemukan.",
     "not_in_course" => "Unit tidak ditemukan di course ini.",
     "no_create_access" => "Anda tidak memiliki akses untuk membuat unit di course ini.",
@@ -119,6 +120,8 @@ return [
 
   "master_data" => [
     "types_retrieved" => "Daftar tipe master data berhasil diambil.",
+    "categories" => "Daftar kategori",
+    "roles" => "Daftar peran",
     "roles_retrieved" => "Daftar peran berhasil diambil.",
     "user_statuses" => "Daftar status pengguna",
     "course_statuses" => "Daftar status kursus",
@@ -157,6 +160,7 @@ return [
     "published" => "Course berhasil dipublish.",
     "unpublished" => "Course berhasil diunpublish.",
     "enrollment_settings_updated" => "Pengaturan enrollment berhasil diperbarui.",
+    "list_retrieved" => "Daftar course berhasil diambil.",
     "not_found" => "Course tidak ditemukan.",
     "no_unpublish_access" => "Anda tidak memiliki akses untuk unpublish course ini.",
     "no_update_key_access" => "Anda tidak memiliki akses untuk mengubah enrollment key course ini.",
@@ -167,6 +171,7 @@ return [
     "code_exists" => "Kode sudah digunakan.",
     "slug_exists" => "Slug sudah digunakan.",
     "duplicate_data" => "Data duplikat. Silakan periksa input Anda.",
+    "duplicate_data_field" => "Data :field sudah digunakan.",
     "cannot_publish_without_units" => "Kursus tidak dapat dipublikasikan karena belum memiliki unit.",
     "must_have_one_unit" => "Kursus harus memiliki minimal satu unit.",
     "cannot_publish_without_lessons" => "Kursus tidak dapat dipublikasikan karena belum memiliki lesson.",

@@ -116,7 +116,7 @@ trait ApiResponse
             $meta = array_replace_recursive($meta, $additionalMeta);
         }
 
-        $finalMessage = $paginator->total() === 0 ? '' : self::translate($message, $params);
+        $finalMessage = self::translate($message, $params);
 
         return response()->json(
             [

@@ -56,6 +56,55 @@ class MasterDataController extends Controller
     );
   }
 
+  /**
+   * Daftar Tipe Master Data
+   *
+   * Mengambil daftar semua tipe master data yang tersedia di sistem.
+   *
+   * @summary Daftar Tipe Master Data
+   *
+   * @response 200 scenario="Success" {"success":true,"message":"Daftar tipe master data","data":[{"type":"user-status","label":"Status Pengguna"},{"type":"roles","label":"Peran"}]}
+   *
+   * @unauthenticated
+   */
+  public function types(): JsonResponse
+  {
+    $types = [
+      ["type" => "categories", "label" => __("messages.master_data.categories")],
+      ["type" => "user-status", "label" => __("messages.master_data.user_statuses")],
+      ["type" => "roles", "label" => __("messages.master_data.roles")],
+      ["type" => "course-status", "label" => __("messages.master_data.course_statuses")],
+      ["type" => "course-types", "label" => __("messages.master_data.course_types")],
+      ["type" => "enrollment-types", "label" => __("messages.master_data.enrollment_types")],
+      ["type" => "level-tags", "label" => __("messages.master_data.level_tags")],
+      ["type" => "progression-modes", "label" => __("messages.master_data.progression_modes")],
+      ["type" => "content-types", "label" => __("messages.master_data.content_types")],
+      ["type" => "enrollment-status", "label" => __("messages.master_data.enrollment_statuses")],
+      ["type" => "progress-status", "label" => __("messages.master_data.progress_statuses")],
+      ["type" => "assignment-status", "label" => __("messages.master_data.assignment_statuses")],
+      ["type" => "submission-status", "label" => __("messages.master_data.submission_statuses")],
+      ["type" => "submission-types", "label" => __("messages.master_data.submission_types")],
+      ["type" => "content-status", "label" => __("messages.master_data.content_statuses")],
+      ["type" => "priorities", "label" => __("messages.master_data.priorities")],
+      ["type" => "target-types", "label" => __("messages.master_data.target_types")],
+      ["type" => "challenge-types", "label" => __("messages.master_data.challenge_types")],
+      ["type" => "challenge-assignment-status", "label" => __("messages.master_data.challenge_assignment_statuses")],
+      ["type" => "challenge-criteria-types", "label" => __("messages.master_data.challenge_criteria_types")],
+      ["type" => "badge-types", "label" => __("messages.master_data.badge_types")],
+      ["type" => "point-source-types", "label" => __("messages.master_data.point_source_types")],
+      ["type" => "point-reasons", "label" => __("messages.master_data.point_reasons")],
+      ["type" => "notification-types", "label" => __("messages.master_data.notification_types")],
+      ["type" => "notification-channels", "label" => __("messages.master_data.notification_channels")],
+      ["type" => "notification-frequencies", "label" => __("messages.master_data.notification_frequencies")],
+      ["type" => "grade-status", "label" => __("messages.master_data.grade_statuses")],
+      ["type" => "grade-source-types", "label" => __("messages.master_data.grade_source_types")],
+      ["type" => "category-status", "label" => __("messages.master_data.category_statuses")],
+      ["type" => "setting-types", "label" => __("messages.master_data.setting_types")],
+    ];
+
+    return $this->success($types, __("messages.master_data.types_retrieved"));
+  }
+
 
   // ==================== AUTH ====================
 

@@ -31,15 +31,46 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+
+        $this->renderable(function (AccessDeniedHttpException $e, Request $request) {
+            if ($this->isApiRequest($request)) {
+                return $this->forbidden(__('messages.forbidden'));
+            }
+        });
+
+        $this->renderable(function (AuthorizationException $e, Request $request) {
+            if ($this->isApiRequest($request)) {
+                return $this->forbidden(__('messages.forbidden'));
+            }
+        });
+    }
+
+    protected function isApiRequest(Request $request): bool
+    {
+        return $request->is('api/*') || $request->is('v1/*') || $request->expectsJson();
     }
 
     public function render($request, Throwable $e): Response
     {
-        if ($request->expectsJson() || $request->is('api/*') || $request->is('v1/*')) {
+        if ($this->isApiRequest($request)) {
             return $this->handleApiException($request, $e);
         }
 
         return parent::render($request, $e);
+    }
+
+    /**
+     * Determine if the exception handler should return JSON.
+     * Override parent to prioritize URL path over Accept header.
+     */
+    protected function shouldReturnJson($request, Throwable $e): bool
+    {
+        // Always return JSON for API routes
+        if ($request->is('api/*') || $request->is('v1/*')) {
+            return true;
+        }
+
+        return parent::shouldReturnJson($request, $e);
     }
 
     protected function handleApiException(Request $request, Throwable $e): JsonResponse

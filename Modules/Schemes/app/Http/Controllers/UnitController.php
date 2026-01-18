@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Schemes\Http\Controllers;
 
 use App\Support\ApiResponse;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\Schemes\Http\Requests\UnitRequest;
@@ -15,13 +16,17 @@ use Modules\Schemes\Services\UnitService;
 
 class UnitController extends Controller
 {
-    use ApiResponse;
+    use ApiResponse, AuthorizesRequests;
 
     public function __construct(private readonly UnitService $service) {}
 
     public function index(Request $request, Course $course)
     {
-        $this->authorize('view', $course);
+        $dummyUnit = new Unit();
+        $dummyUnit->course_id = $course->id;
+        $dummyUnit->setRelation('course', $course);
+        $this->authorize('view', $dummyUnit);
+
         $paginator = $this->service->paginate(
             $course->id,
             $request->query('filter', []),
@@ -29,7 +34,7 @@ class UnitController extends Controller
         );
 
         $paginator->getCollection()->transform(fn($unit) => new UnitResource($unit));
-        return $this->paginateResponse($paginator);
+        return $this->paginateResponse($paginator, 'messages.units.list_retrieved');
     }
 
     public function store(UnitRequest $request, Course $course)

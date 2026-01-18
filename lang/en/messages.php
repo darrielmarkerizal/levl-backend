@@ -69,6 +69,7 @@ return [
     "unpublished" => "Unit unpublished successfully.",
     "reordered" => "Unit order updated successfully.",
     "order_updated" => "Unit order updated successfully.",
+    "list_retrieved" => "Unit list retrieved successfully.",
     "not_found" => "Unit not found.",
     "not_in_course" => "Unit not found in this course.",
     "no_create_access" => "You do not have access to create units for this course.",
@@ -130,6 +131,8 @@ return [
 
   "master_data" => [
     "types_retrieved" => "Master data types retrieved successfully.",
+    "categories" => "Category list",
+    "roles" => "Role list",
     "roles_retrieved" => "Roles retrieved successfully.",
     "user_statuses" => "User status list",
     "course_statuses" => "Course status list",
@@ -169,6 +172,7 @@ return [
     "published" => "Course published successfully.",
     "unpublished" => "Course unpublished successfully.",
     "enrollment_settings_updated" => "Enrollment settings updated successfully.",
+    "list_retrieved" => "Course list retrieved successfully.",
     "not_found" => "Course not found.",
     "no_unpublish_access" => "You do not have access to unpublish this course.",
     "no_update_key_access" => "You do not have access to update enrollment key for this course.",
@@ -179,6 +183,7 @@ return [
     "code_exists" => "Code already in use.",
     "slug_exists" => "Slug already in use.",
     "duplicate_data" => "Duplicate data. Please check your input.",
+    "duplicate_data_field" => "The :field already exists.",
     "cannot_publish_without_units" => "Course cannot be published without units.",
     "must_have_one_unit" => "Course must have at least one unit.",
     "cannot_publish_without_lessons" => "Course cannot be published without lessons.",

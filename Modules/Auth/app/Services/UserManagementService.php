@@ -29,10 +29,8 @@ class UserManagementService implements UserManagementServiceInterface
 
     public function listUsers(User $authUser, int $perPage = 15, ?string $search = null): LengthAwarePaginator
     {
-        $isSuperadmin = $authUser->hasRole('Superadmin');
-        $isAdmin = $authUser->hasRole('Admin');
-
-        if (!$isSuperadmin && !$isAdmin) {
+        // Authorization check via policy
+        if (!$authUser->can('viewAny', User::class)) {
             throw new AuthorizationException(__('messages.unauthorized'));
         }
 
@@ -45,14 +43,15 @@ class UserManagementService implements UserManagementServiceInterface
             $query->whereIn('id', $ids);
         }
 
-        if ($isAdmin && !$isSuperadmin) {
+        // Filter based on user role - Admin can only see users they manage
+        if ($authUser->hasRole('Admin') && !$authUser->hasRole('Superadmin')) {
             $managedCourseIds = CourseAdmin::query()
                 ->where('user_id', $authUser->id)
                 ->pluck('course_id')
                 ->unique();
 
             $query->where(function (Builder $q) use ($managedCourseIds) {
-                // See all Admins (except Superadmin, though Superadmin is usually separate)
+                // See all Admins (except Superadmin)
                 $q->whereHas('roles', function ($roleQuery) {
                     $roleQuery->where('name', 'Admin');
                 })
@@ -91,33 +90,10 @@ class UserManagementService implements UserManagementServiceInterface
     public function showUser(User $authUser, int $userId): User
     {
         $target = User::findOrFail($userId);
-        $isSuperadmin = $authUser->hasRole('Superadmin');
-        $isAdmin = $authUser->hasRole('Admin');
-
-        if (!$isSuperadmin && !$isAdmin) {
-             throw new AuthorizationException(__('messages.unauthorized'));
-        }
-
-        if ($isAdmin && !$isSuperadmin) {
-            $managedCourseIds = CourseAdmin::query()
-                ->where('user_id', $authUser->id)
-                ->pluck('course_id')
-                ->unique();
-
-            $isAccessible = false;
-
-            if ($target->hasRole('Admin') && !$target->hasRole('Superadmin')) {
-                $isAccessible = true;
-            } elseif ($target->hasRole(['Instructor', 'Student'])) {
-                $isAccessible = Enrollment::query()
-                    ->where('user_id', $target->id)
-                    ->whereIn('course_id', $managedCourseIds)
-                    ->exists();
-            }
-
-            if (!$isAccessible) {
-                throw new AuthorizationException(__('messages.auth.no_access_to_user'));
-            }
+        
+        // Authorization check via policy
+        if (!$authUser->can('view', $target)) {
+            throw new AuthorizationException(__('messages.auth.no_access_to_user'));
         }
 
         return $target;

@@ -118,6 +118,14 @@ return Application::configure(basePath: dirname(__DIR__))
             ], 400);
         });
 
+        $exceptions->render(function (\Spatie\QueryBuilder\Exceptions\InvalidIncludeQuery $e, \Illuminate\Http\Request $request) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'errors' => null,
+            ], 400);
+        });
+
         // Handle generic BusinessException for business rule violations
         $exceptions->render(function (BusinessException $e, \Illuminate\Http\Request $request) {
             $message = $e->getMessage() ?: __('messages.error');
@@ -264,6 +272,19 @@ return Application::configure(basePath: dirname(__DIR__))
                 ],
                 401,
             );
+        });
+
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException $e, \Illuminate\Http\Request $request) {
+            if ($request->is('api/*') || $request->is('v1/*')) {
+                return response()->json(
+                    [
+                        'success' => false,
+                        'message' => __('messages.forbidden'),
+                        'errors' => null,
+                    ],
+                    403,
+                );
+            }
         });
 
         $exceptions->render(function (AuthorizationException $e, \Illuminate\Http\Request $request) {

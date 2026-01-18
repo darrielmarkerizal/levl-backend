@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Schemes\Http\Controllers;
 
 use App\Support\ApiResponse;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\Enrollments\Contracts\Services\EnrollmentServiceInterface;
@@ -18,7 +19,7 @@ use Modules\Schemes\Services\ProgressionService;
 
 class LessonController extends Controller
 {
-    use ApiResponse;
+    use ApiResponse, AuthorizesRequests;
 
     public function __construct(
         private readonly LessonService $service,

@@ -11,18 +11,39 @@ class UnitPolicy
 {
     use HandlesAuthorization;
 
+    public function view(User $user, Unit $unit)
+    {
+        $course = $unit->course;
+        if (!$course) {
+            return $this->deny(__('messages.course_not_found'));
+        }
+
+        if ($user->hasRole('Student')) {
+            $isEnrolled = \Modules\Enrollments\Models\Enrollment::where('user_id', $user->id)
+                ->where('course_id', $course->id)
+                ->whereIn('status', ['active', 'completed'])
+                ->exists();
+
+            if (!$isEnrolled) {
+                return $this->deny(__('messages.enrollment_required'));
+            }
+        }
+
+        return Response::allow();
+    }
+
     public function create(User $user, int $courseId)
     {
         if ($user->hasRole('Superadmin')) {
             return Response::allow();
         }
         if (! $user->hasRole('Admin')) {
-            return $this->deny('Hanya admin atau superadmin yang dapat membuat unit.');
+            return $this->deny(__('messages.admin_only'));
         }
 
         $course = \Modules\Schemes\Models\Course::find($courseId);
         if (! $course) {
-            return $this->deny('Course tidak ditemukan.');
+            return $this->deny(__('messages.course_not_found'));
         }
 
         if ((int) $course->instructor_id === (int) $user->id) {
@@ -33,7 +54,7 @@ class UnitPolicy
             return Response::allow();
         }
 
-        return $this->deny('Anda hanya dapat membuat unit untuk course yang Anda buat atau course yang Anda kelola sebagai admin.');
+        return $this->deny(__('messages.course_owner_only'));
     }
 
     public function update(User $user, Unit $unit)
@@ -42,12 +63,12 @@ class UnitPolicy
             return Response::allow();
         }
         if (! $user->hasRole('Admin')) {
-            return $this->deny('Hanya admin atau superadmin yang dapat mengubah unit.');
+            return $this->deny(__('messages.admin_only'));
         }
 
         $course = $unit->course;
         if (! $course) {
-            return $this->deny('Course tidak ditemukan.');
+            return $this->deny(__('messages.course_not_found'));
         }
 
         if ((int) $course->instructor_id === (int) $user->id) {
@@ -58,7 +79,7 @@ class UnitPolicy
             return Response::allow();
         }
 
-        return $this->deny('Anda hanya dapat mengubah unit dari course yang Anda buat atau course yang Anda kelola sebagai admin.');
+        return $this->deny(__('messages.course_owner_only'));
     }
 
     public function delete(User $user, Unit $unit)
@@ -67,12 +88,12 @@ class UnitPolicy
             return Response::allow();
         }
         if (! $user->hasRole('Admin')) {
-            return $this->deny('Hanya admin atau superadmin yang dapat menghapus unit.');
+            return $this->deny(__('messages.admin_only'));
         }
 
         $course = $unit->course;
         if (! $course) {
-            return $this->deny('Course tidak ditemukan.');
+            return $this->deny(__('messages.course_not_found'));
         }
 
         if ((int) $course->instructor_id === (int) $user->id) {
@@ -83,6 +104,6 @@ class UnitPolicy
             return Response::allow();
         }
 
-        return $this->deny('Anda hanya dapat menghapus unit dari course yang Anda buat atau course yang Anda kelola sebagai admin.');
+        return $this->deny(__('messages.course_owner_only'));
     }
 }

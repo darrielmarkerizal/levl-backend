@@ -17,6 +17,8 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class TagService
 {
+    use \App\Support\Traits\BuildsQueryBuilderRequest;
+
     public function __construct(
         private TagRepositoryInterface $repository
     ) {}
@@ -35,7 +37,7 @@ class TagService
     private function buildQuery(array $filters = []): QueryBuilder
     {
         $searchQuery = data_get($filters, 'search');
-        $builder = QueryBuilder::for(Tag::class, new \Illuminate\Http\Request(['filter' => $filters]));
+        $builder = QueryBuilder::for(Tag::class, $this->buildQueryBuilderRequest($filters));
 
         if ($searchQuery && trim((string) $searchQuery) !== '') {
             $ids = Tag::search($searchQuery)->keys()->toArray();

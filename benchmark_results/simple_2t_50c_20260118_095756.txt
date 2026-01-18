@@ -1,0 +1,13 @@
+Running 10s test @ http://127.0.0.1:8000/dev/benchmark-api?mode=simple
+  2 threads and 50 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency   128.59ms   68.22ms 621.70ms   95.49%
+    Req/Sec   214.29     47.99   310.00     74.21%
+  Latency Distribution
+     50%  109.46ms
+     75%  135.35ms
+     90%  162.12ms
+     99%  521.96ms
+  4104 requests in 10.04s, 4.44MB read
+Requests/sec:    408.78
+Transfer/sec:    453.09KB

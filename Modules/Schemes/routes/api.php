@@ -39,9 +39,11 @@ Route::prefix('v1')->scopeBindings()->group(function () {
             ->name('courses.enrollment-key.destroy');
     });
 
-    // Public unit routes
-    Route::get('courses/{course:slug}/units', [UnitController::class, 'index'])->name('courses.units.index');
-    Route::get('courses/{course:slug}/units/{unit:slug}', [UnitController::class, 'show'])->name('courses.units.show');
+    // Authenticated unit routes
+    Route::middleware(['auth:api'])->group(function () {
+        Route::get('courses/{course:slug}/units', [UnitController::class, 'index'])->name('courses.units.index');
+        Route::get('courses/{course:slug}/units/{unit:slug}', [UnitController::class, 'show'])->name('courses.units.show');
+    });
 
     // Admin unit management routes
     Route::middleware(['auth:api', 'role:Superadmin|Admin'])->group(function () {

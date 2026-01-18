@@ -15,6 +15,8 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class LessonService
 {
+    use \App\Support\Traits\BuildsQueryBuilderRequest;
+
     public function __construct(
         private readonly LessonRepositoryInterface $repository
     ) {}
@@ -38,7 +40,7 @@ class LessonService
     {
         $perPage = max(1, $perPage);
 
-        $query = QueryBuilder::for(Lesson::class, new \Illuminate\Http\Request(['filter' => $filters]))
+        $query = QueryBuilder::for(Lesson::class, $this->buildQueryBuilderRequest($filters))
             ->where('unit_id', $unitId)
             ->allowedFilters([
                 AllowedFilter::exact('type'),

@@ -472,11 +472,209 @@ private function parseDuplicateConstraint(QueryException $e): array
 # Security Rules
 
 ## Authentication & Authorization
-- Use Laravel Sanctum or Passport for API authentication
-- Token security: Tokens MUST be stored securely, expired with proper TTL
-- Policy enforcement: All actions requiring authorization MUST use Policy
-- Permission check: Cross-module actions MUST check permission via Spatie Permission
-- Authorization checks MUST be in Controller (via Policy) or Service (via Permission)
+
+### RBAC Architecture (CRITICAL)
+Laravel provides two authorization mechanisms that MUST be used correctly:
+
+**1. Route Middleware (`role:` / `permission:`)** - For role-based access control
+- Use for **role checking** at route level
+- Syntax: `middleware(['role:Admin,Superadmin'])` or `middleware(['permission:users.view'])`
+- Example: Only Admin/Superadmin can access user management routes
+
+**2. Policy Classes** - For resource-level authorization
+- Use for **resource access control** (ownership, enrollment, membership)
+- MUST be registered in `app/Providers/AuthServiceProvider.php` `$policies` array
+- Called via `$this->authorize('action', $model)` in Controller
+- Example: Student can only view courses they are enrolled in
+
+### RBAC Implementation Rules (ENFORCED)
+
+#### ✅ CORRECT: Policy-Based Authorization
+```php
+// Route: Middleware for authentication only
+Route::middleware(['auth:api'])->group(function () {
+    Route::get('courses/{course}/units', [UnitController::class, 'index']);
+});
+
+// Controller: Authorize via Policy
+public function index(Course $course) {
+    $this->authorize('view', $course); // ← Policy called
+    // ...
+}
+
+// Policy: Resource-level authorization
+public function view(User $user, Course $course): bool {
+    if ($user->hasRole('Student')) {
+        return Enrollment::where('user_id', $user->id)
+            ->where('course_id', $course->id)
+            ->whereIn('status', ['active', 'completed'])
+            ->exists();
+    }
+    return true; // Admin/Instructor allowed
+}
+```
+
+#### ❌ FORBIDDEN: Service-Based Authorization
+```php
+// ❌ FORBIDDEN - Authorization logic in Service
+public function listUsers(User $authUser) {
+    if ($authUser->hasRole('Admin') && !$authUser->hasRole('Superadmin')) {
+        // Complex authorization logic here...
+    }
+}
+```
+
+**Why forbidden?**
+- Violates Single Responsibility Principle
+- Authorization logic mixed with business logic
+- Cannot be reused from other contexts (Blade, API, etc.)
+- Difficult to test in isolation
+
+### Policy Best Practices
+
+#### Policy Method Naming
+- `viewAny()` - Can user view list of resources?
+- `view($model)` - Can user view this specific resource?
+- `create()` - Can user create new resource?
+- `update($model)` - Can user update this resource?
+- `delete($model)` - Can user delete this resource?
+
+#### Policy Structure
+```php
+class CoursePolicy
+{
+    public function view(User $user, Course $course): bool
+    {
+        // Check enrollment for Students
+        if ($user->hasRole('Student')) {
+            return Enrollment::where('user_id', $user->id)
+                ->where('course_id', $course->id)
+                ->whereIn('status', ['active', 'completed'])
+                ->exists();
+        }
+        
+        // Admin/Instructor allowed (role check done by Gate::before)
+        return true;
+    }
+}
+```
+
+#### Gate::before() for Superadmin Bypass
+```php
+// app/Providers/AuthServiceProvider.php
+Gate::before(function (User $user) {
+    if ($user->hasRole('Superadmin')) {
+        return true; // Bypass all policy checks
+    }
+    return null; // Continue to policy
+});
+```
+
+### Service Layer Rules
+- Service MUST NOT contain authorization logic
+- Service receives authenticated user as parameter
+- Service assumes user is already authorized (checked by Controller/Policy)
+- Service focuses on business logic only
+
+```php
+// ✅ CORRECT
+public function listUsers(User $authUser, int $perPage): LengthAwarePaginator
+{
+    // Authorization already done by Controller via Policy
+    // Service only handles query filtering based on user role
+    
+    $query = User::query();
+    
+    if ($authUser->hasRole('Admin') && !$authUser->hasRole('Superadmin')) {
+        // Filter to managed users (business logic, not authorization)
+        $query->whereHas('enrollments', function($q) use ($authUser) {
+            $q->whereIn('course_id', $this->getManagedCourseIds($authUser));
+        });
+    }
+    
+    return $query->paginate($perPage);
+}
+```
+
+### When to Use Middleware vs Policy
+
+| Scenario | Use Middleware | Use Policy |
+|----------|---------------|------------|
+| Role-based access (any Admin) | ✅ `role:Admin` | ❌ |
+| Resource ownership (my course) | ❌ | ✅ Policy |
+| Enrollment status | ❌ | ✅ Policy |
+| Permission-based | ✅ `permission:users.view` | ❌ |
+| Complex resource rules | ❌ | ✅ Policy |
+
+### Authorization Flow
+1. **Route Middleware** → Check authentication (`auth:api`)
+2. **Route Middleware** → Check role if needed (`role:Admin`)
+3. **Controller** → Call `$this->authorize('action', $model)`
+4. **Gate::before()** → Superadmin bypass
+5. **Policy** → Resource-level authorization
+6. **Service** → Business logic (no authorization)
+
+### Common Patterns
+
+#### Pattern 1: Public View, Restricted Modify
+```php
+// Route
+Route::get('courses/{course}', [CourseController::class, 'show']); // Public
+Route::middleware(['auth:api', 'role:Admin'])->group(function () {
+    Route::put('courses/{course}', [CourseController::class, 'update']);
+});
+
+// Policy
+public function view(?User $user, Course $course): bool {
+    return true; // Public
+}
+
+public function update(User $user, Course $course): bool {
+    return $course->instructor_id === $user->id; // Only instructor
+}
+```
+
+#### Pattern 2: Enrollment-Based Access
+```php
+// Policy
+public function view(User $user, Unit $unit): bool {
+    if ($user->hasRole('Student')) {
+        return Enrollment::where('user_id', $user->id)
+            ->where('course_id', $unit->course_id)
+            ->whereIn('status', ['active', 'completed'])
+            ->exists();
+    }
+    return true;
+}
+```
+
+#### Pattern 3: Hierarchical Access
+```php
+// Policy
+public function view(User $user, User $targetUser): bool {
+    // Superadmin handled by Gate::before()
+    
+    if ($user->hasRole('Admin')) {
+        // Admin can view other Admins and managed Instructors/Students
+        if ($targetUser->hasRole('Admin')) {
+            return true;
+        }
+        
+        return $this->isInManagedCourses($user, $targetUser);
+    }
+    
+    return false;
+}
+```
+
+### Security Checklist
+- ✅ All routes requiring auth use `auth:api` middleware
+- ✅ Role-based routes use `role:` middleware
+- ✅ Resource access uses Policy (`$this->authorize()`)
+- ✅ Policies registered in `AuthServiceProvider::$policies`
+- ✅ `Gate::before()` handles Superadmin bypass
+- ✅ Services do NOT contain authorization logic
+- ✅ Controllers are thin (only authorize + delegate)
 
 ## Input Security
 - CSRF protection: Web routes MUST use CSRF protection
@@ -615,7 +813,352 @@ private function parseDuplicateConstraint(QueryException $e): array
 
 ---
 
+# Laravel Octane Stateful Safety Rules
+
+## Critical Understanding: Stateful vs Stateless
+
+Laravel Octane (FrankenPHP/RoadRunner/Swoole) keeps your application **in memory** between requests. This is fundamentally different from traditional PHP-FPM where each request starts fresh.
+
+**Key Implications:**
+- Application boots ONCE and stays alive for thousands of requests
+- Global variables, static properties, and singletons persist across requests
+- Memory leaks accumulate over time if not properly managed
+- State from one request can leak into another request if not cleaned up
+
+## FORBIDDEN Patterns (State Leakage)
+
+### ❌ FORBIDDEN: Mutable Static Properties
+
+```php
+// ❌ FORBIDDEN - State persists across requests
+class UserService {
+    private static array $cache = [];
+    
+    public function getUser(int $id): User {
+        if (!isset(self::$cache[$id])) {
+            self::$cache[$id] = User::find($id);
+        }
+        return self::$cache[$id]; // ← User A might see User B's data!
+    }
+}
+```
+
+**Why forbidden?** Static properties are shared across ALL requests. User A's data will be visible to User B.
+
+### ❌ FORBIDDEN: Global State Accumulation
+
+```php
+// ❌ FORBIDDEN - Global state persists
+class LogService {
+    private array $logs = [];
+    
+    public function log(string $message): void {
+        $this->logs[] = $message; // ← Grows unbounded!
+    }
+}
+```
+
+**Why forbidden?** If this service is a singleton, `$logs` will grow infinitely and cause memory exhaustion.
+
+### ❌ FORBIDDEN: Request-Specific Data in Singleton
+
+```php
+// ❌ FORBIDDEN - Request data in singleton
+class AuthService {
+    private ?User $currentUser = null;
+    
+    public function setCurrentUser(User $user): void {
+        $this->currentUser = $user; // ← Leaks to next request!
+    }
+}
+```
+
+**Why forbidden?** If `AuthService` is a singleton, User A's session will leak to User B.
+
+### ❌ FORBIDDEN: Unguarded Static Counters
+
+```php
+// ❌ FORBIDDEN - Counter persists across requests
+class RateLimiter {
+    private static int $requestCount = 0;
+    
+    public function increment(): void {
+        self::$requestCount++; // ← Never resets!
+    }
+}
+```
+
+**Why forbidden?** Counter will keep growing across all requests, giving incorrect rate limit data.
+
+## ✅ CORRECT Patterns (Stateless/Safe)
+
+### ✅ CORRECT: Use Request-Scoped Services
+
+```php
+// ✅ CORRECT - No mutable state
+class UserService {
+    public function __construct(
+        private readonly UserRepository $repository,
+        private readonly CacheInterface $cache,
+    ) {}
+    
+    public function getUser(int $id): User {
+        return $this->cache->remember("user:{$id}", 3600, function() use ($id) {
+            return $this->repository->find($id);
+        });
+    }
+}
+```
+
+**Why correct?** Uses Laravel's cache (which is properly managed by Octane) instead of static properties.
+
+### ✅ CORRECT: Stateless Singletons
+
+```php
+// ✅ CORRECT - Singleton with NO mutable state
+class HashService {
+    public function hash(string $value): string {
+        return bcrypt($value); // Pure function, no state
+    }
+}
+```
+
+**Why correct?** No mutable properties. Each method call is independent.
+
+### ✅ CORRECT: Use Container for Request-Scoped Data
+
+```php
+// ✅ CORRECT - Request-scoped binding
+// In AppServiceProvider
+app()->bind(CurrentUser::class, function () {
+    return new CurrentUser(auth()->user());
+});
+
+// In Service
+public function __construct(
+    private readonly CurrentUser $currentUser,
+) {}
+```
+
+**Why correct?** Laravel's container is properly flushed by Octane between requests.
+
+### ✅ CORRECT: Cleanup via Octane Listeners
+
+```php
+// ✅ CORRECT - Custom cleanup listener
+class FlushCustomCache {
+    public function handle(RequestTerminated $event): void {
+        CustomCache::flush(); // Cleanup after each request
+    }
+}
+
+// Register in config/octane.php
+'listeners' => [
+    RequestTerminated::class => [
+        FlushCustomCache::class,
+    ],
+],
+```
+
+**Why correct?** Explicitly cleans up state after each request.
+
+## Service Layer Rules (Octane-Safe)
+
+### Service MUST Be Stateless
+- ✅ Services MUST NOT store request-specific data in properties
+- ✅ Services MUST receive all data via method parameters
+- ✅ Services MUST NOT use static properties for caching
+- ✅ Services MUST use Laravel's cache or database for persistence
+
+```php
+// ✅ CORRECT - Stateless service
+class CourseService {
+    public function __construct(
+        private readonly CourseRepository $repository,
+    ) {}
+    
+    public function create(array $data, User $actor): Course {
+        // All data comes from parameters, no instance state
+        return DB::transaction(function () use ($data, $actor) {
+            return $this->repository->create($data);
+        });
+    }
+}
+```
+
+### Repository MUST Be Stateless
+- ✅ Repositories MUST NOT cache query results in properties
+- ✅ Repositories MUST NOT store filters/parameters in properties
+- ✅ All query parameters MUST be method arguments
+
+```php
+// ❌ FORBIDDEN
+class CourseRepository {
+    private array $filters = []; // ← State persists!
+    
+    public function setFilters(array $filters): self {
+        $this->filters = $filters;
+        return $this;
+    }
+}
+
+// ✅ CORRECT
+class CourseRepository {
+    public function list(array $filters, int $perPage): LengthAwarePaginator {
+        // Filters passed as parameter, not stored
+        return Course::query()
+            ->when($filters['status'] ?? null, fn($q, $status) => $q->where('status', $status))
+            ->paginate($perPage);
+    }
+}
+```
+
+## Memory Leak Prevention
+
+### Cleanup Requirements
+- ✅ Database connections MUST be disconnected after each request (via `DisconnectFromDatabases` listener)
+- ✅ Uploaded files MUST be flushed (via `FlushUploadedFiles` listener)
+- ✅ Temporary container instances MUST be flushed (via `FlushTemporaryContainerInstances` listener)
+- ✅ Garbage collection MUST run periodically (via `CollectGarbage` listener)
+
+### Monitoring Memory Usage
+```bash
+# Check Octane worker memory usage
+php artisan octane:status
+
+# Reload workers if memory grows too high
+php artisan octane:reload
+```
+
+## Testing for State Leakage
+
+### Test Pattern: Concurrent Request Isolation
+```php
+// Test that User A's data doesn't leak to User B
+test('user data does not leak between requests', function () {
+    $userA = User::factory()->create(['name' => 'Alice']);
+    $userB = User::factory()->create(['name' => 'Bob']);
+    
+    // Simulate Request 1 (User A)
+    actingAs($userA)->get('/api/profile');
+    
+    // Simulate Request 2 (User B)
+    $response = actingAs($userB)->get('/api/profile');
+    
+    // User B should see their own data, not User A's
+    expect($response->json('data.name'))->toBe('Bob');
+});
+```
+
+### Test Pattern: Memory Leak Detection
+```php
+// Test that service doesn't accumulate state
+test('service does not accumulate state', function () {
+    $service = app(CourseService::class);
+    
+    $memoryBefore = memory_get_usage();
+    
+    // Simulate 100 requests
+    for ($i = 0; $i < 100; $i++) {
+        $service->create(['title' => "Course {$i}"], auth()->user());
+    }
+    
+    $memoryAfter = memory_get_usage();
+    $memoryGrowth = $memoryAfter - $memoryBefore;
+    
+    // Memory growth should be minimal (< 1MB for 100 operations)
+    expect($memoryGrowth)->toBeLessThan(1024 * 1024);
+});
+```
+
+## Octane Configuration Checklist
+
+Verify `config/octane.php` has these listeners enabled:
+
+```php
+'listeners' => [
+    RequestTerminated::class => [
+        FlushUploadedFiles::class, // ← REQUIRED
+    ],
+    
+    OperationTerminated::class => [
+        FlushOnce::class, // ← REQUIRED
+        FlushTemporaryContainerInstances::class, // ← REQUIRED
+        DisconnectFromDatabases::class, // ← REQUIRED (prevent connection leaks)
+        CollectGarbage::class, // ← REQUIRED (prevent memory leaks)
+    ],
+],
+```
+
+## Common Pitfalls
+
+### Pitfall 1: Eloquent Model Caching
+```php
+// ❌ FORBIDDEN
+class CourseService {
+    private ?Course $currentCourse = null;
+    
+    public function getCourse(int $id): Course {
+        if (!$this->currentCourse || $this->currentCourse->id !== $id) {
+            $this->currentCourse = Course::find($id);
+        }
+        return $this->currentCourse; // ← Stale data!
+    }
+}
+```
+
+**Problem:** Model data becomes stale. If another request updates the course, this service will return old data.
+
+### Pitfall 2: Event Listener State
+```php
+// ❌ FORBIDDEN
+class CourseCreatedListener {
+    private array $processedCourses = [];
+    
+    public function handle(CourseCreated $event): void {
+        if (in_array($event->course->id, $this->processedCourses)) {
+            return; // Skip duplicate
+        }
+        $this->processedCourses[] = $event->course->id; // ← Grows unbounded!
+    }
+}
+```
+
+**Problem:** `$processedCourses` will grow infinitely across all requests.
+
+### Pitfall 3: Middleware State
+```php
+// ❌ FORBIDDEN
+class TrackRequestMiddleware {
+    private int $requestCount = 0;
+    
+    public function handle(Request $request, Closure $next) {
+        $this->requestCount++; // ← Persists across requests!
+        Log::info("Request #{$this->requestCount}");
+        return $next($request);
+    }
+}
+```
+
+**Problem:** Counter will be incorrect across multiple requests.
+
+## Safe Patterns Summary
+
+| Pattern | Safe? | Reason |
+|---------|-------|--------|
+| Static properties (immutable) | ✅ | Read-only, no state change |
+| Static properties (mutable) | ❌ | State persists across requests |
+| Instance properties (in singleton) | ❌ | Singleton persists across requests |
+| Instance properties (in scoped service) | ✅ | Service is recreated per request |
+| Laravel Cache | ✅ | Properly managed by Octane |
+| Database queries | ✅ | Stateless, connections cleaned up |
+| Global variables | ❌ | Persists across requests |
+| `$GLOBALS` usage | ❌ | Persists across requests |
+
+---
+
 # Caching Rules
+
 
 ## Cache Layer
 - Caching ONLY in Service/Repository layer (NOT Controller)
