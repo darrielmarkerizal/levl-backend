@@ -1,4 +1,0 @@
-Test|RPS|Avg Latency|P99 Latency|Transfer
-Light Load|135.10|400.84ms|1.50s|167.56KB
-Medium Load|136.95|1.32s|1.95s|170.00KB
-Heavy Load|172.18|1.25s|1.92s|213.51KB
