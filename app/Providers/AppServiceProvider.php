@@ -38,7 +38,20 @@ class AppServiceProvider extends ServiceProvider
     // Register observers
     \App\Models\ActivityLog::observe(\App\Observers\ActivityLogObserver::class);
 
-
+    // Slow query monitoring for Auth module
+    if ($this->app->environment('local', 'staging')) {
+      \Illuminate\Support\Facades\DB::listen(function ($query) {
+        // Log queries >50ms
+        if ($query->time > 50) {
+          \Illuminate\Support\Facades\Log::warning('Slow query detected in Auth module', [
+            'sql' => $query->sql,
+            'bindings' => $query->bindings,
+            'time' => $query->time . 'ms',
+            'url' => request()->fullUrl(),
+          ]);
+        }
+      });
+    }
 
     if ($this->app->environment("local")) {
       Mail::alwaysTo(config("mail.development_to", "dev@local.test"));
