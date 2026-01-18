@@ -57,8 +57,20 @@
                         <span id="res-time" class="font-mono font-bold text-lg">-</span>
                     </div>
                     <div class="flex justify-between items-center">
-                        <span class="text-gray-600">Avg Latency</span>
+                        <span class="text-gray-600">Avg Latency (Browser)</span>
                         <span id="res-latency" class="font-mono font-bold text-lg">-</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Min Response Time</span>
+                        <span id="res-min" class="font-mono font-bold text-green-600">-</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Max Response Time</span>
+                        <span id="res-max" class="font-mono font-bold text-red-600">-</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Avg Response Time (Server)</span>
+                        <span id="res-avg" class="font-mono font-bold text-blue-600">-</span>
                     </div>
                     <div class="flex justify-between items-center bg-indigo-100 p-2 rounded">
                         <span class="text-indigo-800 font-medium">Requests / Sec</span>
@@ -112,12 +124,13 @@
             status.classList.remove('hidden');
             status.textContent = 'Running...';
             
-            ['res-time', 'res-latency', 'res-rps', 'res-mem', 'res-mem-peak', 'res-cpu', 'res-pid', 'res-cost'].forEach(id => document.getElementById(id).textContent = '-');
+            ['res-time', 'res-latency', 'res-rps', 'res-mem', 'res-mem-peak', 'res-cpu', 'res-pid', 'res-cost', 'res-min', 'res-max', 'res-avg'].forEach(id => document.getElementById(id).textContent = '-');
 
             const start = performance.now();
             let completed = 0;
             let lastServerInfo = '-';
             let lastMetrics = {};
+            let responseTimes = [];
 
             async function makeRequest() {
                 try {
@@ -130,6 +143,9 @@
                         cpu: data.cpu_load ? data.cpu_load[0] : 'N/A',
                         pid: data.pid
                     };
+                    if (data.response_time_ms) {
+                        responseTimes.push(data.response_time_ms);
+                    }
                 } catch (e) {
                     console.error(e);
                 } finally {
@@ -162,9 +178,17 @@
             const hoursFor1M = 1000000 / (rps * 3600);
             const costFor1M = hoursFor1M * hourlyCost;
 
+            // Calculate response time stats
+            const minResponseTime = responseTimes.length > 0 ? Math.min(...responseTimes) : 0;
+            const maxResponseTime = responseTimes.length > 0 ? Math.max(...responseTimes) : 0;
+            const avgResponseTime = responseTimes.length > 0 ? responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length : 0;
+
             // Update UI
             document.getElementById('res-time').textContent = durationMs.toFixed(2) + ' ms';
             document.getElementById('res-latency').textContent = avgLatency.toFixed(2) + ' ms';
+            document.getElementById('res-min').textContent = minResponseTime.toFixed(2) + ' ms';
+            document.getElementById('res-max').textContent = maxResponseTime.toFixed(2) + ' ms';
+            document.getElementById('res-avg').textContent = avgResponseTime.toFixed(2) + ' ms';
             document.getElementById('res-rps').textContent = rps.toFixed(2);
             document.getElementById('res-cost').textContent = '$' + costFor1M.toFixed(6);
             document.getElementById('server-software').textContent = lastServerInfo;

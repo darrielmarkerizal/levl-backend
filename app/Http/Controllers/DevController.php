@@ -31,6 +31,8 @@ class DevController extends Controller
 
     public function benchmarkApi(Request $request)
     {
+        $startTime = microtime(true);
+        
         $mode = $request->query('mode', 'simple');
         
         $result = match($mode) {
@@ -50,10 +52,18 @@ class DevController extends Controller
             default => ['simple' => true],
         };
 
+        $responseTime = (microtime(true) - $startTime) * 1000; // Convert to milliseconds
+
         return response()->json([
             'status' => 'ok',
             'mode' => $mode,
             'result' => 1,
+            'response_time_ms' => round($responseTime, 2),
+            'server' => $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown',
+            'memory_human' => round(memory_get_usage(true) / 1024 / 1024, 2) . ' MB',
+            'memory_peak' => memory_get_peak_usage(true),
+            'cpu_load' => function_exists('sys_getloadavg') ? sys_getloadavg() : null,
+            'pid' => getmypid(),
         ], 200, [], JSON_UNESCAPED_SLASHES);
     }
 
