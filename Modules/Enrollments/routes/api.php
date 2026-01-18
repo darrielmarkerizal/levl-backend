@@ -15,14 +15,16 @@ Route::middleware(['auth:api'])->prefix('v1')->group(function () {
         Route::post('enrollments/{enrollment}/remove', [EnrollmentsController::class, 'remove'])->name('enrollments.remove');
     });
 
-    // Read-only enrollment endpoints (default API rate limiting applies globally)
-    Route::get('courses/enrollments', [EnrollmentsController::class, 'indexManaged'])->name('courses.enrollments.managed');
-    Route::get('courses/{course:slug}/enrollment-status', [EnrollmentsController::class, 'status'])->name('courses.enrollments.status');
-    Route::get('courses/{course:slug}/enrollments', [EnrollmentsController::class, 'indexByCourse'])->name('courses.enrollments.index');
-    Route::get('enrollments', [EnrollmentsController::class, 'index'])->name('enrollments.index');
+    // Read-only enrollment endpoints with default API rate limiting
+    Route::middleware(['throttle:api'])->group(function () {
+        Route::get('courses/enrollments', [EnrollmentsController::class, 'indexManaged'])->name('courses.enrollments.managed');
+        Route::get('courses/{course:slug}/enrollment-status', [EnrollmentsController::class, 'status'])->name('courses.enrollments.status');
+        Route::get('courses/{course:slug}/enrollments', [EnrollmentsController::class, 'indexByCourse'])->name('courses.enrollments.index');
+        Route::get('enrollments', [EnrollmentsController::class, 'index'])->name('enrollments.index');
+    });
 
-    // Admin Reporting & Analytics
-    Route::middleware(['role:Superadmin|Admin|Instructor'])->group(function () {
+    // Admin Reporting & Analytics with default API rate limiting
+    Route::middleware(['role:Superadmin|Admin|Instructor', 'throttle:api'])->group(function () {
         Route::get('courses/{course:slug}/reports/completion-rate', [\Modules\Enrollments\Http\Controllers\ReportController::class, 'courseCompletionRate'])->name('courses.reports.completion-rate');
         Route::get('reports/enrollment-funnel', [\Modules\Enrollments\Http\Controllers\ReportController::class, 'enrollmentFunnel'])->name('reports.enrollment-funnel');
         Route::get('courses/{course:slug}/exports/enrollments-csv', [\Modules\Enrollments\Http\Controllers\ReportController::class, 'exportEnrollmentsCsv'])->name('courses.exports.enrollments-csv');

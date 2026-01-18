@@ -32,12 +32,12 @@ class Course extends Model implements HasMedia
   {
     $this->addMediaCollection("thumbnail")
       ->singleFile()
-      ->useDisk("do")
+
       ->acceptsMimeTypes(["image/jpeg", "image/png", "image/webp"]);
 
     $this->addMediaCollection("banner")
       ->singleFile()
-      ->useDisk("do")
+
       ->acceptsMimeTypes(["image/jpeg", "image/png", "image/webp"]);
   }
 

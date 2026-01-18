@@ -39,7 +39,7 @@ Route::prefix("v1")
       ->middleware([\Modules\Auth\Http\Middleware\AllowExpiredToken::class, "throttle:auth"])
       ->name("refresh");
 
-    Route::middleware(["auth:api"])->group(function () {
+    Route::middleware(["auth:api", "throttle:api"])->group(function () {
       Route::post("/auth/logout", [AuthApiController::class, "logout"])->name("logout");
       Route::post("/auth/set-username", [AuthApiController::class, "setUsername"])->name(
         "set.username",
@@ -136,7 +136,7 @@ Route::prefix("v1")
         "confirmForgot",
       ])->name("password.forgot.confirm");
     });
-    Route::middleware(["auth:api"])
+    Route::middleware(["auth:api", "throttle:api"])
       ->post("/auth/password/reset", [PasswordResetController::class, "changePassword"])
       ->name("password.reset");
 
@@ -144,3 +144,4 @@ Route::prefix("v1")
     Route::get('/dev/tokens', [AuthApiController::class, 'generateDevTokens'])
       ->name('dev.tokens');
   });
+

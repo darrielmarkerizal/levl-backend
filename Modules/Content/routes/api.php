@@ -46,10 +46,9 @@ Route::middleware(['auth:api'])->prefix('v1')->group(function () {
     // Course Announcements
     Route::prefix('courses/{course}/announcements')->as('courses.announcements.')->group(function () {
         Route::get('/', [CourseAnnouncementController::class, 'index'])->name('index');
-
-        Route::middleware('role:Superadmin|Admin|Instructor')->group(function () {
-            Route::post('/', [CourseAnnouncementController::class, 'store'])->name('store');
-        });
+        Route::post('/', [CourseAnnouncementController::class, 'store'])
+            ->middleware('role:Superadmin|Admin|Instructor')
+            ->name('store');
     });
 
     // Statistics
