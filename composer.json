@@ -40,7 +40,7 @@
     "barryvdh/laravel-ide-helper": "^3.6",
     "codedungeon/phpunit-result-printer": "^0.1.0",
     "fakerphp/faker": "^1.23",
-    "itsgoingd/clockwork": "*",
+    "itsgoingd/clockwork": "^5.3",
     "larastan/larastan": "^3.8",
     "laravel/pail": "^1.2.2",
     "laravel/pint": "^1.24",

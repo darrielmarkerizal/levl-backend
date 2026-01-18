@@ -47,6 +47,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // Enable CORS for API routes
         $middleware->api(prepend: [\Illuminate\Http\Middleware\HandleCors::class]);
 
+        // Inject Query Detector status in all API responses
+        $middleware->api(append: [\App\Http\Middleware\InjectQueryDetectorStatus::class]);
+
         $middleware->append(\App\Http\Middleware\LogApiAction::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
