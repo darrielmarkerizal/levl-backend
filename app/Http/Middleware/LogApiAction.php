@@ -75,7 +75,7 @@ class LogApiAction
                 $meta['route_parameters'] = $request->route()->parameters();
             }
 
-            Audit::create([
+            dispatch(new \App\Jobs\CreateAuditJob([
                 'action' => $action,
                 'actor_id' => $user?->id,
                 'actor_type' => $user ? get_class($user) : null,
@@ -88,7 +88,7 @@ class LogApiAction
                 'user_agent' => $request->userAgent(),
                 'meta' => $meta,
                 'logged_at' => now(),
-            ]);
+            ]));
         } catch (\Exception $e) {
             Log::error('Failed to log API action: '.$e->getMessage(), [
                 'request_path' => $request->path(),

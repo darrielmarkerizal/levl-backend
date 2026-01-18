@@ -201,7 +201,7 @@ class UserManagementService implements UserManagementServiceInterface
             $user->save();
             
             if (!empty($changes)) {
-                 Audit::create([
+                 dispatch(new \App\Jobs\CreateAuditJob([
                     'action' => 'update',
                     'user_id' => $user->id,
                     'module' => 'Auth',
@@ -211,7 +211,7 @@ class UserManagementService implements UserManagementServiceInterface
                     'logged_at' => now(),
                     'ip_address' => $ip,
                     'user_agent' => $userAgent
-                ]);
+                ]));
             }
             
             return $user->fresh();

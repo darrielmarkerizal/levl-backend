@@ -308,7 +308,7 @@ class AuthService implements AuthServiceInterface
         ?string $ip,
         ?string $userAgent,
     ): void {
-        Audit::create([
+        dispatch(new \App\Jobs\CreateAuditJob([
             'action' => 'update',
             'user_id' => $user->id,
             'module' => 'Auth',
@@ -318,7 +318,7 @@ class AuthService implements AuthServiceInterface
             'user_agent' => $userAgent,
             'meta' => ['action' => 'profile.update', 'changes' => $changes],
             'logged_at' => now(),
-        ]);
+        ]));
     }
 
     public function logEmailChangeRequest(
@@ -328,7 +328,7 @@ class AuthService implements AuthServiceInterface
         ?string $ip,
         ?string $userAgent,
     ): void {
-        Audit::create([
+        dispatch(new \App\Jobs\CreateAuditJob([
             'action' => 'update',
             'user_id' => $user->id,
             'module' => 'Auth',
@@ -342,7 +342,7 @@ class AuthService implements AuthServiceInterface
                 'uuid' => $uuid,
             ],
             'logged_at' => now(),
-        ]);
+        ]));
     }
 
     public function createUserFromGoogle($googleUser): User
