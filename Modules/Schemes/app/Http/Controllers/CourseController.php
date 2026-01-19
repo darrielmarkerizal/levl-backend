@@ -40,7 +40,7 @@ class CourseController extends Controller
 
         try {
             $course = $this->service->create($data, $actor, $request->allFiles());
-            $course->load(['tags', 'instructor', 'category', 'admins']);
+            $course->load(['tags', 'instructor.media', 'category', 'admins.media', 'media']);
             return $this->created(new CourseResource($course), __('messages.courses.created'));
         } catch (DuplicateResourceException $e) {
             return $this->validationError($e->getErrors());
@@ -49,7 +49,7 @@ class CourseController extends Controller
 
     public function show(Course $course)
     {
-        return $this->success(new CourseResource($course->load(['tags', 'category', 'instructor', 'admins', 'units'])));
+        return $this->success(new CourseResource($course->load(['tags', 'category', 'instructor.media', 'admins.media', 'units', 'media'])));
     }
 
     public function update(CourseRequest $request, Course $course)

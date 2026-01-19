@@ -22,6 +22,9 @@ class ProfileController extends Controller
     public function index(Request $request): JsonResponse
     {
         $user = $request->user();
+        if (!$user->relationLoaded('media')) {
+            $user->load('media');
+        }
         $profileData = $this->profileService->getProfileData($user);
 
         return $this->success(new \Modules\Auth\Http\Resources\ProfileResource($profileData));
@@ -41,6 +44,9 @@ class ProfileController extends Controller
     public function uploadAvatar(\Modules\Auth\Http\Requests\UploadAvatarRequest $request): JsonResponse
     {
         $user = $request->user();
+        if (!$user->relationLoaded('media')) {
+            $user->load('media');
+        }
         $avatarUrl = $this->profileService->uploadAvatar($user, $request->file('avatar'));
 
         return $this->success(['avatar_url' => $avatarUrl], 'Avatar uploaded successfully.');

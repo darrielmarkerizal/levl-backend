@@ -107,7 +107,7 @@ class User extends Authenticatable implements HasMedia, JWTSubject
     "is_password_set" => "boolean",
   ];
 
-  protected $appends = ["avatar_url", "last_active_relative"];
+  protected $appends = ["last_active_relative"];
 
   public function getAvatarUrlAttribute(): ?string
   {

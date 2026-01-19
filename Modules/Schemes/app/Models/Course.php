@@ -119,7 +119,7 @@ class Course extends Model implements HasMedia
     "progression_mode" => ProgressionMode::class,
   ];
 
-  protected $appends = ["thumbnail_url", "banner_url", "tag_list"];
+    protected $appends = ["tag_list"];
 
   protected $hidden = ["enrollment_key_hash", "deleted_at"];
 

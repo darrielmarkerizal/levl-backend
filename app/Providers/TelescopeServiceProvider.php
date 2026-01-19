@@ -22,9 +22,6 @@ if (class_exists(\Laravel\Telescope\TelescopeApplicationServiceProvider::class))
             $telescopeEnabled = config('telescope.enabled', false);
 
             Telescope::filter(function (IncomingEntry $entry) use ($isLocal, $telescopeEnabled) {
-                if ($telescopeEnabled) {
-                    return true;
-                }
                 
                 return $isLocal ||
                        $entry->isReportableException() ||
@@ -32,6 +29,24 @@ if (class_exists(\Laravel\Telescope\TelescopeApplicationServiceProvider::class))
                        $entry->isFailedJob() ||
                        $entry->isScheduledTask() ||
                        $entry->hasMonitoredTag();
+            });
+
+            Telescope::tag(function (IncomingEntry $entry) {
+                if ($entry->type === 'request') {
+                    $tags = ['status:'.$entry->content['response_status']];
+                    
+                    if (isset($entry->content['duration'])) {
+                        $tags[] = 'time:'.$entry->content['duration'].'ms';
+                    }
+                    
+                    if (isset($entry->content['memory'])) {
+                        $tags[] = 'mem:'.$entry->content['memory'].'MB';
+                    }
+
+                    return $tags;
+                }
+                
+                return [];
             });
         }
 

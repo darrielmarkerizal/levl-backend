@@ -68,7 +68,7 @@ class CourseService implements CourseServiceInterface
     {
         $searchQuery = data_get($filters, 'search');
         $builder = QueryBuilder::for(
-            Course::with(['instructor', 'admins']),
+            Course::with(['instructor.media', 'admins.media', 'media']),
             $this->buildQueryBuilderRequest($filters)
         );
 

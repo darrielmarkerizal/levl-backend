@@ -62,6 +62,7 @@ class AuthService implements AuthServiceInterface
 
             $userArray = $user->toArray();
             $userArray['roles'] = $user->getRoleNames()->values();
+            $userArray['avatar_url'] = $user->avatar_url;
 
             $response = ['user' => $userArray] + $pair->toArray();
 
@@ -144,18 +145,22 @@ class AuthService implements AuthServiceInterface
         $this->throttle->clearAttempts($login, $ip);
 
         // Log successful login (NO sensitive data like password or tokens)
-        activity('auth')
-            ->causedBy($user)
-            ->withProperties([
+        // Log successful login (NO sensitive data like password or tokens)
+        dispatch(new \App\Jobs\LogActivityJob([
+            'log_name' => 'auth',
+            'causer_id' => $user->id,
+            'properties' => [
                 'action' => 'login',
                 'login_type' => filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username',
                 'auto_verified' => $wasAutoVerified,
                 'status' => $user->status instanceof UserStatus ? $user->status->value : (string) $user->status,
-            ])
-            ->log(__('messages.auth.log_user_login'));
+            ],
+            'description' => __('messages.auth.log_user_login'),
+        ]));
 
         $userArray = $user->toArray();
         $userArray['roles'] = $user->getRoleNames()->values();
+        $userArray['avatar_url'] = $user->avatar_url;
         $userArray['status'] =
           $user->status instanceof UserStatus ? $user->status->value : (string) $user->status;
 
@@ -248,13 +253,16 @@ class AuthService implements AuthServiceInterface
     public function logout(User $user, string $currentJwt, ?string $refreshToken = null): void
     {
         // Log logout (NO sensitive data like tokens)
-        activity('auth')
-            ->causedBy($user)
-            ->withProperties([
+        // Log logout (NO sensitive data like tokens)
+        dispatch(new \App\Jobs\LogActivityJob([
+            'log_name' => 'auth',
+            'causer_id' => $user->id,
+            'properties' => [
                 'action' => 'logout',
                 'refresh_token_revoked' => $refreshToken !== null,
-            ])
-            ->log(__('messages.auth.log_user_logout'));
+            ],
+            'description' => __('messages.auth.log_user_logout'),
+        ]));
 
         $this->jwt->setToken($currentJwt)->invalidate();
         if ($refreshToken) {
@@ -284,6 +292,7 @@ class AuthService implements AuthServiceInterface
 
         $userArray = $user->toArray();
         $userArray['roles'] = $user->getRoleNames()->values();
+        $userArray['avatar_url'] = $user->avatar_url;
 
         return ['user' => $userArray];
     }
@@ -298,6 +307,7 @@ class AuthService implements AuthServiceInterface
 
         $userArray = $user->toArray();
         $userArray['roles'] = $user->getRoleNames()->values();
+        $userArray['avatar_url'] = $user->avatar_url;
 
         return ['user' => $userArray];
     }
@@ -402,6 +412,7 @@ class AuthService implements AuthServiceInterface
                     'name' => $user->name,
                     'email' => $user->email,
                     'username' => $user->username,
+                    'avatar_url' => $user->avatar_url,
                     'role' => $role,
                 ],
                 'access_token' => $token,
