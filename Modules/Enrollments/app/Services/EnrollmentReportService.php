@@ -50,7 +50,7 @@ class EnrollmentReportService implements EnrollmentReportServiceInterface
         if ($courseId) {
             $query->where('course_id', $courseId);
         } elseif (! $user->hasRole('Superadmin')) {
-            // Filter to managed courses only
+            
             $courseIds = Course::query()
                 ->where(function ($q) use ($user) {
                     $q->where('instructor_id', $user->id)

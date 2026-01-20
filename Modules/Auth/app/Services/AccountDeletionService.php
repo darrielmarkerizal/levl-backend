@@ -30,7 +30,7 @@ class AccountDeletionService
             ]);
         }
 
-        // Invalidate old requests
+        
         OtpCode::query()
             ->forUser($user)
             ->forPurpose(self::PURPOSE)
@@ -89,8 +89,8 @@ class AccountDeletionService
         $user->account_status = 'deleted';
         $user->save();
 
-        // Perform soft delete or force delete as per business rule.
-        // Usually soft delete is better.
+        
+        
         $user->delete();
 
         return true;

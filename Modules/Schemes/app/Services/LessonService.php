@@ -85,7 +85,7 @@ class LessonService
             $attributes['unit_id'] = $unitId;
 
             if (isset($attributes['order'])) {
-                // Increment existing items at this position and above to make room
+                
                 Lesson::where('unit_id', $unitId)
                     ->where('order', '>=', $attributes['order'])
                     ->increment('order');
@@ -106,20 +106,20 @@ class LessonService
             $lesson = $this->repository->findByIdOrFail($id);
             $attributes = $data instanceof UpdateLessonDTO ? $data->toArrayWithoutNull() : $data;
 
-            // Handle order change
+            
             if (isset($attributes['order']) && $attributes['order'] != $lesson->order) {
                 $newOrder = $attributes['order'];
                 $currentOrder = $lesson->order;
                 $unitId = $lesson->unit_id;
 
                 if ($newOrder < $currentOrder) {
-                    // Moving up: increment items in between
+                    
                     Lesson::where('unit_id', $unitId)
                         ->where('order', '>=', $newOrder)
                         ->where('order', '<', $currentOrder)
                         ->increment('order');
                 } elseif ($newOrder > $currentOrder) {
-                    // Moving down: decrement items in between
+                    
                     Lesson::where('unit_id', $unitId)
                         ->where('order', '>', $currentOrder)
                         ->where('order', '<=', $newOrder)
@@ -143,7 +143,7 @@ class LessonService
             $deleted = $this->repository->delete($lesson);
 
             if ($deleted) {
-                // Reorder remaining lessons: decrement order for all lessons with order > deleted order
+                
                 Lesson::where('unit_id', $unitId)
                     ->where('order', '>', $deletedOrder)
                     ->decrement('order');
@@ -158,7 +158,7 @@ class LessonService
         $lesson = $this->repository->findByIdOrFail($id);
         $lesson->update(['status' => 'published']);
 
-        // Invalidate course cache
+        
         $courseId = $lesson->unit->course_id;
         app(\Modules\Schemes\Services\SchemesCacheService::class)->invalidateCourse($courseId);
 
@@ -170,7 +170,7 @@ class LessonService
         $lesson = $this->repository->findByIdOrFail($id);
         $lesson->update(['status' => 'draft']);
 
-        // Invalidate course cache
+        
         $courseId = $lesson->unit->course_id;
         app(\Modules\Schemes\Services\SchemesCacheService::class)->invalidateCourse($courseId);
 

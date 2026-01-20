@@ -7,14 +7,12 @@ use Modules\Auth\Models\User;
 
 class UserCacheService
 {
-    private const TTL_USER = 3600;        // 1 hour
-    private const TTL_ROLES = 3600;       // 1 hour
-    private const TTL_PERMISSIONS = 3600; // 1 hour
-    private const TTL_STATS = 1800;       // 30 minutes
+    private const TTL_USER = 3600;        
+    private const TTL_ROLES = 3600;       
+    private const TTL_PERMISSIONS = 3600; 
+    private const TTL_STATS = 1800;       
     
-    /**
-     * Get user with relationships cached
-     */
+    
     public function getUser(int $id): ?User
     {
         return Cache::tags(['users'])
@@ -29,9 +27,7 @@ class UserCacheService
             });
     }
     
-    /**
-     * Get user by email (for login)
-     */
+    
     public function getUserByEmail(string $email): ?User
     {
         return Cache::tags(['users'])
@@ -42,9 +38,7 @@ class UserCacheService
             });
     }
     
-    /**
-     * Get user by username (for login)
-     */
+    
     public function getUserByUsername(string $username): ?User
     {
         return Cache::tags(['users'])
@@ -55,9 +49,7 @@ class UserCacheService
             });
     }
     
-    /**
-     * Get user roles
-     */
+    
     public function getUserRoles(int $userId): array
     {
         return Cache::tags(['users', 'roles'])
@@ -66,9 +58,7 @@ class UserCacheService
             });
     }
     
-    /**
-     * Get user permissions
-     */
+    
     public function getUserPermissions(int $userId): array
     {
         return Cache::tags(['users', 'permissions'])
@@ -77,9 +67,7 @@ class UserCacheService
             });
     }
     
-    /**
-     * Invalidate user cache
-     */
+    
     public function invalidateUser(int $userId): void
     {
         Cache::tags(['users'])->forget("user.{$userId}");
@@ -88,25 +76,19 @@ class UserCacheService
         Cache::tags(['users'])->forget("user.{$userId}.stats");
     }
     
-    /**
-     * Invalidate user by email
-     */
+    
     public function invalidateUserByEmail(string $email): void
     {
         Cache::tags(['users'])->forget("user.email.{$email}");
     }
     
-    /**
-     * Invalidate user by username
-     */
+    
     public function invalidateUserByUsername(string $username): void
     {
         Cache::tags(['users'])->forget("user.username.{$username}");
     }
     
-    /**
-     * Invalidate all users cache
-     */
+    
     public function invalidateAllUsers(): void
     {
         Cache::tags(['users'])->flush();

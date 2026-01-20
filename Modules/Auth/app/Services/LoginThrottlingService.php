@@ -106,9 +106,7 @@ class LoginThrottlingService implements LoginThrottlingServiceInterface
         return $this->rateLimiter->availableIn($key);
     }
 
-    /**
-     * @return array{max:int,decay:int}
-     */
+    
     public function getRateLimitConfig(): array
     {
         return [
@@ -123,9 +121,7 @@ class LoginThrottlingService implements LoginThrottlingServiceInterface
         return $unlockAtTs ? max(0, $unlockAtTs - time()) : 0;
     }
 
-    /**
-     * @return array{threshold:int,window:int,duration:int}
-     */
+    
     public function getLockConfig(): array
     {
         return [
@@ -135,5 +131,4 @@ class LoginThrottlingService implements LoginThrottlingServiceInterface
         ];
     }
 }
-
 

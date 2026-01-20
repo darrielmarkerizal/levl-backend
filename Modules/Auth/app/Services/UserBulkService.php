@@ -39,7 +39,7 @@ class UserBulkService implements UserBulkServiceInterface
         $isSuperadmin = $authUser->hasRole('Superadmin');
         $isAdmin = $authUser->hasRole('Admin');
 
-        // Reuse the scope logic from listUsers but only select IDs
+        
         $query = QueryBuilder::for(User::class, new Request(['filter' => $filters]))
             ->select('id');
 

@@ -130,7 +130,7 @@ class ProfileService implements ProfileServiceInterface
     {
         $uuid = $this->emailVerification->sendChangeEmailLink($user, $newEmail);
         
-        // Audit log
+        
         $this->authService->logEmailChangeRequest($user, $newEmail, $uuid, $ip, $userAgent);
 
         return $uuid;

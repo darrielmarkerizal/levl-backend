@@ -50,7 +50,7 @@ class LessonBlockService
     {
         return DB::transaction(function () use ($lessonId, $data, $mediaFile) {
             if (isset($data['order'])) {
-                // Increment existing items at this position and above to make room
+                
                 LessonBlock::where('lesson_id', $lessonId)
                     ->where('order', '>=', $data['order'])
                     ->increment('order');
@@ -96,19 +96,19 @@ class LessonBlockService
                 'content' => data_get($data, 'content', $block->content),
             ];
 
-            // Handle order change
+            
             if (isset($data['order']) && $data['order'] != $block->order) {
                 $newOrder = $data['order'];
                 $currentOrder = $block->order;
 
                 if ($newOrder < $currentOrder) {
-                    // Moving up: increment items in between
+                    
                     LessonBlock::where('lesson_id', $lessonId)
                         ->where('order', '>=', $newOrder)
                         ->where('order', '<', $currentOrder)
                         ->increment('order');
                 } elseif ($newOrder > $currentOrder) {
-                    // Moving down: decrement items in between
+                    
                     LessonBlock::where('lesson_id', $lessonId)
                         ->where('order', '>', $currentOrder)
                         ->where('order', '<=', $newOrder)
@@ -150,7 +150,7 @@ class LessonBlockService
             $deleted = (bool) $block->delete();
 
             if ($deleted) {
-                // Reorder remaining blocks: decrement order for all blocks with order > deleted order
+                
                 LessonBlock::where('lesson_id', $lessonId)
                     ->where('order', '>', $deletedOrder)
                     ->decrement('order');

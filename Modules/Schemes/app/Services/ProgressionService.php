@@ -29,12 +29,12 @@ class ProgressionService
 
         $user = \Modules\Auth\Models\User::find($userId);
         
-        // Admin, Instructor, and Superadmin can access any lesson without prerequisite checks
+        
         if ($user && ($user->hasRole('Superadmin') || $user->hasRole('Admin') || $user->hasRole('Instructor'))) {
-            // Still need enrollment for progress tracking, create if doesn't exist
+            
             $enrollment = $this->getEnrollmentForCourse($course->id, $userId);
             if (!$enrollment) {
-                // Create enrollment for admin/instructor
+                
                 $enrollment = \Modules\Enrollments\Models\Enrollment::create([
                     'user_id' => $userId,
                     'course_id' => $course->id,
@@ -45,7 +45,7 @@ class ProgressionService
             return $enrollment;
         }
 
-        // For students, check enrollment and prerequisites
+        
         $enrollment = $this->getEnrollmentForCourse($course->id, $userId);
         
         if (!$enrollment || !$this->canAccessLesson($lesson, $enrollment)) {
@@ -79,17 +79,17 @@ class ProgressionService
     public function markLessonCompleted(Lesson $lesson, Enrollment $enrollment): void
     {
         DB::transaction(function () use ($lesson, $enrollment) {
-            // Lock enrollment to prevent race conditions
+            
             $lockedEnrollment = Enrollment::lockForUpdate()->findOrFail($enrollment->id);
 
-            // Idempotency check: Skip if already completed
+            
             $existingProgress = LessonProgress::where('enrollment_id', $lockedEnrollment->id)
                 ->where('lesson_id', $lesson->id)
                 ->where('status', ProgressStatus::Completed)
                 ->first();
 
             if ($existingProgress) {
-                return; // Already completed, skip to prevent duplicate processing
+                return; 
             }
 
             $lessonModel = $lesson->fresh([
@@ -113,7 +113,7 @@ class ProgressionService
 
             $this->updateCourseProgress($lessonModel->unit->course, $lockedEnrollment);
 
-            // Dispatch events AFTER transaction commits
+            
             DB::afterCommit(function () use ($lessonModel, $lockedEnrollment, $unitResult) {
                 \Modules\Schemes\Events\LessonCompleted::dispatch($lessonModel, $lockedEnrollment->user_id, $lockedEnrollment->id);
 
@@ -143,7 +143,7 @@ class ProgressionService
                 return;
             }
 
-            // Reset lesson progress
+            
             $progress = LessonProgress::query()
                 ->where('enrollment_id', $enrollment->id)
                 ->where('lesson_id', $lessonModel->id)
@@ -156,7 +156,7 @@ class ProgressionService
                 $progress->save();
             }
 
-            // Update unit and course progress
+            
             $this->updateUnitProgress(
                 $lessonModel->unit,
                 $enrollment,

@@ -144,8 +144,8 @@ class AuthService implements AuthServiceInterface
 
         $this->throttle->clearAttempts($login, $ip);
 
-        // Log successful login (NO sensitive data like password or tokens)
-        // Log successful login (NO sensitive data like password or tokens)
+        
+        
         dispatch(new \App\Jobs\LogActivityJob([
             'log_name' => 'auth',
             'causer_id' => $user->id,
@@ -252,8 +252,8 @@ class AuthService implements AuthServiceInterface
 
     public function logout(User $user, string $currentJwt, ?string $refreshToken = null): void
     {
-        // Log logout (NO sensitive data like tokens)
-        // Log logout (NO sensitive data like tokens)
+        
+        
         dispatch(new \App\Jobs\LogActivityJob([
             'log_name' => 'auth',
             'causer_id' => $user->id,

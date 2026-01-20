@@ -9,13 +9,11 @@ use Modules\Schemes\Models\Unit;
 
 class SchemesCacheService
 {
-    private const TTL_COURSE = 3600;      // 1 hour
-    private const TTL_LISTING = 300;      // 5 minutes
-    private const TTL_UNITS = 3600;       // 1 hour
+    private const TTL_COURSE = 3600;      
+    private const TTL_LISTING = 300;      
+    private const TTL_UNITS = 3600;       
     
-    /**
-     * Get course by ID with caching
-     */
+    
     public function getCourse(int $id): ?Course
     {
         return Cache::tags(['schemes', 'courses'])
@@ -25,9 +23,7 @@ class SchemesCacheService
             });
     }
     
-    /**
-     * Get course by Slug with caching
-     */
+    
     public function getCourseBySlug(string $slug): ?Course
     {
         return Cache::tags(['schemes', 'courses'])
@@ -38,21 +34,17 @@ class SchemesCacheService
             });
     }
     
-    /**
-     * Get public course listing (cached by page & filters)
-     */
+    
     public function getPublicCourses(int $page, int $perPage, array $filters, callable $callback): LengthAwarePaginator
     {
-        // Create a unique cache key based on filters
+        
         $filterKey = md5(json_encode($filters));
         
         return Cache::tags(['schemes', 'courses', 'listing'])
             ->remember("courses.public.{$page}.{$perPage}.{$filterKey}", self::TTL_LISTING, $callback);
     }
     
-    /**
-     * Invalidate specific course cache
-     */
+    
     public function invalidateCourse(int $courseId, ?string $slug = null): void
     {
         Cache::tags(['schemes', 'courses'])->forget("course.{$courseId}");
@@ -61,13 +53,11 @@ class SchemesCacheService
             Cache::tags(['schemes', 'courses'])->forget("course.slug.{$slug}");
         }
         
-        // Also invalidate listings as course data changed
+        
         Cache::tags(['schemes', 'listing'])->flush();
     }
     
-    /**
-     * Invalidate all course listings (e.g. new course published)
-     */
+    
     public function invalidateListings(): void
     {
         Cache::tags(['schemes', 'listing'])->flush();

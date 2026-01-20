@@ -40,8 +40,6 @@ class ProfileStatisticsService implements ProfileStatisticsServiceInterface
         ];
     }
 
-
-
     public function getPerformanceStats(User $user): array
     {
         $completionRate = $this->calculateCompletionRate($user);
@@ -85,6 +83,5 @@ class ProfileStatisticsService implements ProfileStatisticsServiceInterface
 
         return (float) round($averageScore ?? 0, 2);
     }
-
 
 }

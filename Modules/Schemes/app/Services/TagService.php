@@ -61,10 +61,7 @@ class TagService
         return $this->firstOrCreateByName($name);
     }
 
-    /**
-     * @param  array<int, string>  $names
-     * @return \Illuminate\Support\Collection<int, Tag>
-     */
+    
     public function createMany(array $names): BaseCollection
     {
         return BaseCollection::make($names)
@@ -154,10 +151,7 @@ class TagService
         return $this->findUniqueSlug($base, "{$base}-{$counter}", $counter + 1, $ignoreId);
     }
 
-    /**
-     * @param  array<string|int>  $tags
-     * @return array<int>
-     */
+    
     private function resolveTagIds(array $tags): array
     {
         return BaseCollection::make($tags)

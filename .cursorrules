@@ -11,6 +11,11 @@
 - Spatie Media Library (Media Management)
 - Meilisearch (via Laravel Scout)
 
+## Comment Policy
+- No new comments (PHPDoc, inline `//`, or block `/* */`) may be added.
+- If existing comments are encountered during edits, remove them as part of the change.
+- Favor clear naming and small functions over explanatory comments.
+
 ---
 
 # Architectural Guidelines

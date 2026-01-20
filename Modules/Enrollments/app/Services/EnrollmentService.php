@@ -195,9 +195,7 @@ class EnrollmentService implements EnrollmentServiceInterface
             ->paginate($perPage);
     }
 
-    /**
-     * Get managed enrollments for a user (courses they manage)
-     */
+    
     public function getManagedEnrollments(User $user, int $perPage = 15, ?string $courseSlug = null, array $filters = []): array
     {
         $courses = Course::query()
@@ -242,9 +240,7 @@ class EnrollmentService implements EnrollmentServiceInterface
         return $this->repository->findByCourseAndUser($courseId, $userId);
     }
 
-    /**
-     * @throws BusinessException
-     */
+    
     public function cancel(Enrollment $enrollment): Enrollment
     {
         return DB::transaction(function () use ($enrollment) {
@@ -264,9 +260,7 @@ class EnrollmentService implements EnrollmentServiceInterface
         });
     }
 
-    /**
-     * @throws BusinessException
-     */
+    
     public function withdraw(Enrollment $enrollment): Enrollment
     {
         return DB::transaction(function () use ($enrollment) {
@@ -286,9 +280,7 @@ class EnrollmentService implements EnrollmentServiceInterface
         });
     }
 
-    /**
-     * @throws BusinessException
-     */
+    
     public function approve(Enrollment $enrollment): Enrollment
     {
         return DB::transaction(function () use ($enrollment) {
@@ -318,9 +310,7 @@ class EnrollmentService implements EnrollmentServiceInterface
         });
     }
 
-    /**
-     * @throws BusinessException
-     */
+    
     public function decline(Enrollment $enrollment): Enrollment
     {
         return DB::transaction(function () use ($enrollment) {
@@ -348,9 +338,7 @@ class EnrollmentService implements EnrollmentServiceInterface
         });
     }
 
-    /**
-     * @throws BusinessException
-     */
+    
     public function remove(Enrollment $enrollment): Enrollment
     {
         return DB::transaction(function () use ($enrollment) {
@@ -396,9 +384,7 @@ class EnrollmentService implements EnrollmentServiceInterface
         }
     }
 
-    /**
-     * @return array<int, User>
-     */
+    
     private function getCourseManagers(Course $course): array
     {
         $managers = [];
@@ -442,9 +428,7 @@ class EnrollmentService implements EnrollmentServiceInterface
         return $this->repository->getActiveEnrollment($userId, $courseId);
     }
 
-    /**
-     * List enrollments based on user role (context-aware)
-     */
+    
     public function listEnrollments(User $user, int $perPage, array $filters = []): LengthAwarePaginator
     {
         $courseSlug = $filters['filter']['course_slug'] ?? $filters['course_slug'] ?? null;
@@ -469,9 +453,7 @@ class EnrollmentService implements EnrollmentServiceInterface
         return $this->paginateByUser($user->id, $perPage, $filters);
     }
 
-    /**
-     * Find enrollment for cancel/withdraw actions (with role-based logic)
-     */
+    
     public function findEnrollmentForAction(Course $course, User $user, array $data): Enrollment
     {
         $targetUserId = $user->hasRole('Superadmin') && isset($data['user_id']) 
@@ -490,9 +472,7 @@ class EnrollmentService implements EnrollmentServiceInterface
         return $enrollment;
     }
 
-    /**
-     * Get enrollment status with find logic
-     */
+    
     public function getEnrollmentStatus(Course $course, User $user, array $data): array
     {
         $targetUserId = $user->hasRole('Superadmin') && isset($data['user_id'])
@@ -511,14 +491,12 @@ class EnrollmentService implements EnrollmentServiceInterface
         ];
     }
 
-    /**
-     * @throws BusinessException
-     */
+    
     public function enroll(User $user, Course $course, array $data): array
     {
         $enrollmentKey = $data['enrollment_key'] ?? null;
         
-        // 1. Check Course Status
+        
         if ($course->status !== \Modules\Schemes\Enums\CourseStatus::Published) {
             throw new BusinessException(
                 __('messages.enrollments.course_not_published'),
@@ -526,7 +504,7 @@ class EnrollmentService implements EnrollmentServiceInterface
             );
         }
 
-        // 2. Check Enrollment Type & Key
+        
         if ($course->enrollment_type === \Modules\Schemes\Enums\EnrollmentType::KeyBased) {
             if (empty($enrollmentKey)) {
                 throw new BusinessException(
@@ -543,8 +521,8 @@ class EnrollmentService implements EnrollmentServiceInterface
             }
         }
 
-        // 3. Check Duplicate Enrollment
-        // Optimized: Check efficient index query first
+        
+        
         $existingEnrollment = $this->repository->findByCourseAndUser($course->id, $user->id);
         
         if ($existingEnrollment) {
@@ -560,25 +538,25 @@ class EnrollmentService implements EnrollmentServiceInterface
                     []
                 );
             }
-            // If Cancelled/Rejected/Expelled, we might allow re-enrollment logic here?
-            // For now, let's assume if they were expelled/rejected, they can re-apply if logic allows.
-            // But per 'Enrollment Flow' in plan, we just check Active/Pending.
-            // If they have a Cancelled one, we should probably CREATE A NEW ONE or UPDATE THE EXISTING?
-            // "Create record" implies new or update. 
-            // Better to update status of existing record if it exists but cancelled?
-            // Or create new? 
-            // Plan said "Insert into enrollments". 
-            // Let's stick to simple "Create new" logic but since unique constraint usually exists on (user_id, course_id)...
-            // Wait, does `enrollments` table have unique(user_id, course_id)?
-            // If strict unique constraint, we MUST update.
-            // Let's assume we update existing if found, or create new.
-            // Actually, best practice for historial data is keeping old one?
-            // But if unique index exists, we can't.
-            // Let's assume we reuse the record if it exists.
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
         }
 
         return DB::transaction(function () use ($user, $course, $existingEnrollment) {
-            // Determine initial status
+            
             $initialStatus = match ($course->enrollment_type) {
                 \Modules\Schemes\Enums\EnrollmentType::AutoAccept, 
                 \Modules\Schemes\Enums\EnrollmentType::KeyBased => EnrollmentStatus::Active,
@@ -591,7 +569,7 @@ class EnrollmentService implements EnrollmentServiceInterface
             if ($existingEnrollment) {
                  $existingEnrollment->status = $initialStatus;
                  $existingEnrollment->enrolled_at = $enrolledAt;
-                 $existingEnrollment->completed_at = null; // Reset if re-taking?
+                 $existingEnrollment->completed_at = null; 
                  
                  Enrollment::withoutSyncingToSearch(fn () => $existingEnrollment->save());
                  $enrollment = $existingEnrollment;
@@ -605,12 +583,12 @@ class EnrollmentService implements EnrollmentServiceInterface
                 Enrollment::withoutSyncingToSearch(fn () => $enrollment->save());
             }
 
-            // Dispatch Event
+            
             event(new EnrollmentCreated($enrollment));
 
             $freshEnrollment = $enrollment->fresh(['course:id,title,slug', 'user:id,name,email']);
             
-            // Generate message based on status
+            
             $message = $initialStatus === EnrollmentStatus::Pending
                 ? __('messages.enrollments.approval_sent')
                 : __('messages.enrollments.auto_accept_success');

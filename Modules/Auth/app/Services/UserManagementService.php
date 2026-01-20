@@ -30,7 +30,7 @@ class UserManagementService implements UserManagementServiceInterface
 
     public function listUsers(User $authUser, int $perPage = 15, ?string $search = null): LengthAwarePaginator
     {
-        // Authorization check via policy
+        
         if (!$authUser->can('viewAny', User::class)) {
             throw new AuthorizationException(__('messages.unauthorized'));
         }
@@ -44,7 +44,7 @@ class UserManagementService implements UserManagementServiceInterface
             $query->whereIn('id', $ids);
         }
 
-        // Filter based on user role - Admin can only see users they manage
+        
         if ($authUser->hasRole('Admin') && !$authUser->hasRole('Superadmin')) {
             $managedCourseIds = CourseAdmin::query()
                 ->where('user_id', $authUser->id)
@@ -52,11 +52,11 @@ class UserManagementService implements UserManagementServiceInterface
                 ->unique();
 
             $query->where(function (Builder $q) use ($managedCourseIds) {
-                // See all Admins (except Superadmin)
+                
                 $q->whereHas('roles', function ($roleQuery) {
                     $roleQuery->where('name', 'Admin');
                 })
-                // OR see Instructors/Students in managed courses
+                
                 ->orWhere(function ($subQuery) use ($managedCourseIds) {
                     $subQuery->whereHas('roles', function ($roleQuery) {
                         $roleQuery->whereIn('name', ['Instructor', 'Student']);
@@ -90,14 +90,14 @@ class UserManagementService implements UserManagementServiceInterface
 
     public function showUser(User $authUser, int $userId): User
     {
-        // Try cache first
+        
         $target = $this->cacheService->getUser($userId);
         
         if (!$target) {
             $target = User::findOrFail($userId);
         }
         
-        // Authorization check via policy
+        
         if (!$authUser->can('view', $target)) {
             throw new AuthorizationException(__('messages.auth.no_access_to_user'));
         }
@@ -125,7 +125,7 @@ class UserManagementService implements UserManagementServiceInterface
             $user->status = UserStatus::from($status);
             $user->save();
             
-            // Invalidate cache
+            
             $this->cacheService->invalidateUser($user->id);
             
             return $user->fresh();
@@ -143,8 +143,8 @@ class UserManagementService implements UserManagementServiceInterface
         }
 
         if (!$authUser->hasRole('Superadmin')) {
-            // Admin can only delete fellow Admins or managed Instructors/Students
-            // (showUser already handles the scope check)
+            
+            
             if ($user->hasRole('Superadmin')) {
                 throw new AuthorizationException(__('messages.forbidden'));
             }
@@ -157,21 +157,21 @@ class UserManagementService implements UserManagementServiceInterface
     {
         $role = $validated['role'];
 
-        // 1. Student can ONLY be created via registration, NOT via Admin API
+        
         if ($role === config('auth.default_role', 'Student')) {
             throw \Illuminate\Validation\ValidationException::withMessages([
                 'role' => [__('messages.auth.student_creation_forbidden')],
             ]);
         }
 
-        // 2. Role-based restrictions
+        
         if ($authUser->hasRole('Admin') && !$authUser->hasRole('Superadmin')) {
-            // Admin can ONLY create Admin or Instructor
+            
             if (!in_array($role, ['Admin', 'Instructor'])) {
                 throw new AuthorizationException(__('messages.forbidden'));
             }
         } elseif ($authUser->hasRole('Superadmin')) {
-            // Superadmin can create Superadmin, Admin, Instructor
+            
             if (!in_array($role, ['Superadmin', 'Admin', 'Instructor'])) {
                 throw new AuthorizationException(__('messages.forbidden'));
             }
@@ -186,7 +186,7 @@ class UserManagementService implements UserManagementServiceInterface
         $user = $this->authRepository->createUser($validated + ['is_password_set' => false]);
         $user->assignRole($role);
 
-        // TODO: Send credentials email...
+        
         
         return $user;
     }
@@ -202,11 +202,11 @@ class UserManagementService implements UserManagementServiceInterface
                 }
             }
 
-            // Avatar handling should ideally be in a separate MediaService or handled here via Spatie Media Library
-            // Keeping it here is fine as it's part of Profile Update use case.
-            // But Controller logic had file handling. Service should receive `UploadedFile` or strict path?
-            // Usually Controller handles upload, passes file.
-            // Here assuming Controller handled it or we pass the array.
+            
+            
+            
+            
+            
             
             $user->save();
             

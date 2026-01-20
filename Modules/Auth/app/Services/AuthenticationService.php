@@ -56,14 +56,14 @@ class AuthenticationService implements AuthenticationServiceInterface
             );
         }
 
-        // Auto-verify if Privileged User
+        
         $wasAutoVerified = $this->autoVerifyPrivilegedUser($user);
 
-        // Generate Tokens & Log Activity inside Transaction
+        
         return DB::transaction(function () use ($user, $ip, $userAgent, $login, $wasAutoVerified) {
             $this->throttle->clearAttempts($login, $ip);
 
-            // Trigger Event for Logging
+            
             $loginType = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
             event(new UserLoggedIn($user, $ip, $userAgent, $loginType));
 
@@ -108,10 +108,10 @@ class AuthenticationService implements AuthenticationServiceInterface
             if ($refreshToken) {
                 $this->authRepository->revokeRefreshToken($refreshToken, $user->id);
             } else {
-                // Return to revoke all tokens if no specific token provided,
-                // or just accept that we only invalidate the access token.
-                // For better security/UX matching "logout", let's revoke all for this user
-                // to ensure they can't refresh.
+                
+                
+                
+                
                 $this->authRepository->revokeAllUserRefreshTokens($user->id);
             }
             
@@ -136,7 +136,7 @@ class AuthenticationService implements AuthenticationServiceInterface
             }
 
             if ($record->isReplaced()) {
-                // Reuse Detection Logic
+                
                 $chain = $this->authRepository->findReplacedTokenChain($record->id);
                 $deviceIds = collect($chain)->pluck('device_id')->unique()->filter()->toArray();
                 foreach ($deviceIds as $deviceId) {

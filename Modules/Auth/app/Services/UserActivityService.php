@@ -73,5 +73,4 @@ class UserActivityService implements UserActivityServiceInterface
         ], $assignment);
     }
 
-
 }

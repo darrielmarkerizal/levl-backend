@@ -53,13 +53,12 @@ class CourseService implements CourseServiceInterface
         $perPage = max(1, $perPage);
         $page = request()->get('page', 1);
 
-        // Try to get from cache first (with closure)
+        
         return $this->cacheService->getPublicCourses($page, $perPage, $filters, function () use ($filters, $perPage) {
             return $this->buildQuery($filters)
                 ->where('status', 'published')
                 ->paginate($perPage);
         });
-
 
     }
 
@@ -147,12 +146,12 @@ class CourseService implements CourseServiceInterface
 
                 $this->handleMedia($course, $files);
 
-                // Invalidate listing cache
+                
                 $this->cacheService->invalidateListings();
 
                 $course = $course->fresh(['tags']);
 
-                // Audit Log
+                
                 if ($actor) {
                     dispatch(new \App\Jobs\LogActivityJob([
                         'log_name' => 'schemes',
@@ -187,13 +186,13 @@ class CourseService implements CourseServiceInterface
 
                 $this->handleMedia($course, $files);
 
-                // Invalidate specific course cache + listings
+                
                 $this->cacheService->invalidateCourse($course->id, $course->slug);
 
                 $updatedCourse = $course->fresh(['tags']);
 
-                // Audit Log
-                $actor = auth()->user(); // Assuming auth context
+                
+                $actor = auth()->user(); 
                 if ($actor) {
                      dispatch(new \App\Jobs\LogActivityJob([
                         'log_name' => 'schemes',
@@ -221,7 +220,7 @@ class CourseService implements CourseServiceInterface
              if ($actor) {
                  dispatch(new \App\Jobs\LogActivityJob([
                     'log_name' => 'schemes',
-                    'causer_id' => $actor->id, // If admin deletes
+                    'causer_id' => $actor->id, 
                     'description' => "Deleted course: {$course->title}",
                     'properties' => ['course_id' => $course->id, 'action' => 'delete'],
                  ]));
@@ -231,9 +230,7 @@ class CourseService implements CourseServiceInterface
         return $deleted;
     }
 
-    /**
-     * @throws BusinessException
-     */
+    
     public function publish(int $id): Course
     {
         $course = $this->findOrFail($id);
@@ -371,7 +368,7 @@ class CourseService implements CourseServiceInterface
         }
 
         if (empty($errors)) {
-            // Attempt to extract column name from common DB error formats
+            
             if (preg_match('/Key \(([^)]+)\)=\([^)]+\) already exists/i', $message, $matches)) {
                 $column = $matches[1];
                 $errors[$column] = [__('messages.courses.duplicate_data_field', ['field' => $column])];
@@ -414,9 +411,7 @@ class CourseService implements CourseServiceInterface
         return $course->fresh();
     }
 
-    /**
-     * Delete the course banner.
-     */
+    
     public function deleteBanner(int $id): Course
     {
         $course = $this->findOrFail($id);
@@ -425,24 +420,20 @@ class CourseService implements CourseServiceInterface
         return $course->fresh();
     }
 
-    /**
-     * Verify an enrollment key against a course's stored hash.
-     */
+    
     public function verifyEnrollmentKey(Course $course, string $plainKey): bool
     {
         if (empty($course->enrollment_key_hash)) {
             return false;
         }
 
-        // Get the hasher from container
+        
         $hasher = app(\App\Contracts\EnrollmentKeyHasherInterface::class);
 
         return $hasher->verify($plainKey, $course->enrollment_key_hash);
     }
 
-    /**
-     * Generate a new enrollment key.
-     */
+    
     public function generateEnrollmentKey(int $length = 12): string
     {
         $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -455,9 +446,7 @@ class CourseService implements CourseServiceInterface
         return $key;
     }
 
-    /**
-     * Check if a course has an enrollment key set.
-     */
+    
     public function hasEnrollmentKey(Course $course): bool
     {
         return ! empty($course->enrollment_key_hash);

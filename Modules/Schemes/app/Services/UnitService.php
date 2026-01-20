@@ -69,7 +69,7 @@ class UnitService
             }
 
             if (isset($attributes['order'])) {
-                // Increment existing items at this position and above to make room
+                
                 Unit::where('course_id', $courseId)
                     ->where('order', '>=', $attributes['order'])
                     ->increment('order');
@@ -90,20 +90,20 @@ class UnitService
             $unit = $this->repository->findByIdOrFail($id);
             $attributes = $data instanceof UpdateUnitDTO ? $data->toArrayWithoutNull() : $data;
 
-            // Handle order change
+            
             if (isset($attributes['order']) && $attributes['order'] != $unit->order) {
                 $newOrder = $attributes['order'];
                 $currentOrder = $unit->order;
                 $courseId = $unit->course_id;
 
                 if ($newOrder < $currentOrder) {
-                    // Moving up: increment items in between
+                    
                     Unit::where('course_id', $courseId)
                         ->where('order', '>=', $newOrder)
                         ->where('order', '<', $currentOrder)
                         ->increment('order');
                 } elseif ($newOrder > $currentOrder) {
-                    // Moving down: decrement items in between
+                    
                     Unit::where('course_id', $courseId)
                         ->where('order', '>', $currentOrder)
                         ->where('order', '<=', $newOrder)
@@ -127,7 +127,7 @@ class UnitService
             $deleted = $this->repository->delete($unit);
 
             if ($deleted) {
-                // Reorder remaining units: decrement order for all units with order > deleted order
+                
                 Unit::where('course_id', $courseId)
                     ->where('order', '>', $deletedOrder)
                     ->decrement('order');
@@ -142,20 +142,20 @@ class UnitService
         return \Illuminate\Support\Facades\DB::transaction(function () use ($courseId, $data) {
             $unitIds = array_map('intval', $data['units']);
 
-            // Check for duplicate IDs
+            
             if (count($unitIds) !== count(array_unique($unitIds))) {
                 throw new \InvalidArgumentException(__('messages.units.duplicate_ids'));
             }
 
-            // Get all units for this course
+            
             $allUnits = Unit::where('course_id', $courseId)->pluck('id')->toArray();
 
-            // Ensure all units are included in reorder
+            
             if (count($unitIds) !== count($allUnits) || array_diff($allUnits, $unitIds)) {
                 throw new \InvalidArgumentException(__('messages.units.must_include_all'));
             }
 
-            // Strict Validation: Ensure all IDs belong to this course
+            
             $count = Unit::whereIn('id', $unitIds)
                 ->where('course_id', $courseId)
                 ->count();
@@ -168,7 +168,7 @@ class UnitService
                 $this->repository->updateOrder($unitId, $index + 1);
             }
 
-            // Invalidate course cache after reorder
+            
             $this->cacheService->invalidateCourse($courseId);
 
             return true;
@@ -180,7 +180,7 @@ class UnitService
         $unit = $this->repository->findByIdOrFail($id);
         $unit->update(['status' => 'published']);
         
-        // Invalidate course cache
+        
         $this->cacheService->invalidateCourse($unit->course_id);
 
         return $unit->fresh();
@@ -191,7 +191,7 @@ class UnitService
         $unit = $this->repository->findByIdOrFail($id);
         $unit->update(['status' => 'draft']);
         
-        // Invalidate course cache
+        
         $this->cacheService->invalidateCourse($unit->course_id);
 
         return $unit->fresh();

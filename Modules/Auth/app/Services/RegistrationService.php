@@ -11,13 +11,13 @@ use Modules\Auth\Contracts\Repositories\AuthRepositoryInterface;
 use Modules\Auth\DTOs\RegisterDTO;
 use Modules\Auth\Events\UserRegistered;
 use Modules\Auth\Models\User;
-use Modules\Auth\Services\AuthenticationService; // Need to create tokens after register
+use Modules\Auth\Services\AuthenticationService; 
 
 class RegistrationService
 {
     public function __construct(
         private readonly AuthRepositoryInterface $authRepository,
-        private readonly AuthenticationService $authService, // Dependency for token generation
+        private readonly AuthenticationService $authService, 
     ) {}
 
     public function registerStudent(RegisterDTO $dto, string $ip, ?string $userAgent): array
@@ -31,7 +31,7 @@ class RegistrationService
 
             event(new UserRegistered($user));
 
-            // Generate tokens immediately
+            
             return $this->authService->generateTokens($user, $ip, $userAgent);
         });
     }
@@ -45,7 +45,7 @@ class RegistrationService
             $user = $this->authRepository->createUser($validated);
             $user->assignRole('Instructor');
 
-            event(new UserRegistered($user, $passwordPlain)); // Listener handles email with password
+            event(new UserRegistered($user, $passwordPlain)); 
 
             return $user;
         });
