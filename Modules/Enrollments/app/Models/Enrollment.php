@@ -1,16 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Enrollments\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 use Modules\Enrollments\Enums\EnrollmentStatus;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class Enrollment extends Model
 {
-    use HasFactory, LogsActivity;
+    use HasFactory, LogsActivity, Searchable;
 
     /**
      * Get activity log options for this model.
@@ -21,12 +24,27 @@ class Enrollment extends Model
             ->logAll()
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
+            // CRITICAL: Disable log for created event to prevent overhead
+            ->dontLogIfAttributesChangedOnly(['created_at', 'updated_at'])
             ->setDescriptionForEvent(fn (string $eventName) => match ($eventName) {
                 'created' => 'Enrollment baru telah dibuat',
                 'updated' => 'Enrollment telah diperbarui',
                 'deleted' => 'Enrollment telah dihapus',
                 default => "Enrollment {$eventName}",
             });
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+        
+        // Dispatch async job to initialize progress without blocking request
+        static::created(function ($enrollment) {
+            \Modules\Enrollments\Jobs\InitializeEnrollmentProgressJob::dispatch(
+                $enrollment->id,
+                $enrollment->course_id
+            );
+        });
     }
 
     protected $fillable = [
@@ -68,6 +86,24 @@ class Enrollment extends Model
     public function courseProgress()
     {
         return $this->hasOne(CourseProgress::class);
+    }
+
+    public function toSearchableArray(): array
+    {
+        // PENTING: Jangan load relasi di sini untuk menghindari N+1 yang berat
+        return [
+            'id' => $this->id,
+            'status' => $this->status,
+            'enrolled_at' => $this->enrolled_at?->timestamp,
+            'created_at' => $this->created_at->timestamp,
+        ];
+    }
+
+    public function shouldBeSearchable(): bool
+    {
+        // CRITICAL: Disable sync secara default untuk mencegah memory exhaustion
+        // Data akan di-sync via scheduled job atau manual command jika perlu
+        return false; 
     }
 
     /**

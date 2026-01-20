@@ -131,7 +131,8 @@ return [
     */
 
     'warm' => [
-        ...Octane::defaultServicesToWarm(),
+        // Remove defaultServicesToWarm to avoid memory exhaustion
+        // Services akan di-load on-demand per request
     ],
 
     'flush' => [

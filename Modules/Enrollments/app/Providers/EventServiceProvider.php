@@ -12,9 +12,11 @@ class EventServiceProvider extends ServiceProvider
      * @var array<string, array<int, string>>
      */
     protected $listen = [
-        \Modules\Enrollments\Events\EnrollmentCreated::class => [
-            \Modules\Enrollments\Listeners\InitializeProgressForEnrollment::class,
-        ],
+        // Progress initialization is now handled via Model::created() boot method
+        // which dispatches InitializeEnrollmentProgressJob asynchronously
+        // \Modules\Enrollments\Events\EnrollmentCreated::class => [
+        //     \Modules\Enrollments\Listeners\InitializeProgressForEnrollment::class,
+        // ],
     ];
 
     /**
@@ -22,7 +24,7 @@ class EventServiceProvider extends ServiceProvider
      *
      * @var bool
      */
-    protected static $shouldDiscoverEvents = true;
+    protected static $shouldDiscoverEvents = false;
 
     /**
      * Configure the proper event listeners for email verification.

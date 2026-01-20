@@ -137,6 +137,7 @@ class EnrollmentRepository extends BaseRepository implements EnrollmentRepositor
     public function findByCourseAndUser(int $courseId, int $userId): ?Enrollment
     {
         return $this->query()
+            ->withoutEagerLoads() // PENTING: Jangan load relasi
             ->where('course_id', $courseId)
             ->where('user_id', $userId)
             ->first();

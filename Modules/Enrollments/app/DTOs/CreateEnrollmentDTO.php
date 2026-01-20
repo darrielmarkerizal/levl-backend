@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Enrollments\DTOs;
 
 use Spatie\LaravelData\Attributes\MapInputName;

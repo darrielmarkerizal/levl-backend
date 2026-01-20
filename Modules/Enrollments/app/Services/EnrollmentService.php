@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Enrollments\Services;
 
 use App\Contracts\EnrollmentKeyHasherInterface;
@@ -36,20 +38,22 @@ class EnrollmentService implements EnrollmentServiceInterface
     public function paginateByCourse(int $courseId, int $perPage = 15): LengthAwarePaginator
     {
         $perPage = max(1, $perPage);
+        $searchQuery = request()->input('search');
 
-        $query = QueryBuilder::for(Enrollment::class)
-            ->where('course_id', $courseId)
+        $builder = QueryBuilder::for(Enrollment::class)
+            ->where('course_id', $courseId);
+
+        if ($searchQuery && trim((string) $searchQuery) !== '') {
+            $ids = Enrollment::search($searchQuery)->take(1000)->keys()->toArray();
+            $builder->whereIn('id', $ids ?: [0]);
+        }
+
+        return $builder
             ->allowedFilters([
                 AllowedFilter::exact('status'),
                 AllowedFilter::exact('user_id'),
                 AllowedFilter::callback('enrolled_from', fn ($q, $value) => $q->whereDate('enrolled_at', '>=', $value)),
                 AllowedFilter::callback('enrolled_to', fn ($q, $value) => $q->whereDate('enrolled_at', '<=', $value)),
-                AllowedFilter::callback('search', function ($query, $value) {
-                    $query->whereHas('user', function ($q) use ($value) {
-                        $q->where('name', 'ilike', "%{$value}%")
-                            ->orWhere('email', 'ilike', "%{$value}%");
-                    });
-                }),
             ])
             ->allowedIncludes(['user', 'course'])
             ->allowedSorts([
@@ -61,29 +65,37 @@ class EnrollmentService implements EnrollmentServiceInterface
                           ->orderBy('created_at', 'desc');
                 }),
             ])
-            ->defaultSort('priority');
-
-        return $query->paginate($perPage);
+            ->defaultSort('priority')
+            ->paginate($perPage);
     }
 
     public function paginateByCourseIds(array $courseIds, int $perPage = 15): LengthAwarePaginator
     {
         $perPage = max(1, $perPage);
+        $searchQuery = request()->input('search');
 
-        $query = QueryBuilder::for(Enrollment::class)
-            ->whereIn('course_id', $courseIds)
+        $builder = QueryBuilder::for(Enrollment::class)
+            ->whereIn('course_id', $courseIds);
+
+        if ($searchQuery && trim((string) $searchQuery) !== '') {
+            $ids = Enrollment::search($searchQuery)->take(1000)->keys()->toArray();
+            $builder->whereIn('id', $ids ?: [0]);
+        }
+
+        return $builder
             ->allowedFilters([
                 AllowedFilter::exact('status'),
                 AllowedFilter::exact('user_id'),
-                AllowedFilter::exact('course_id'),
+                AllowedFilter::callback('course_slug', function ($query, $value) {
+                    $course = \Modules\Schemes\Models\Course::where('slug', $value)->first();
+                    if ($course) {
+                        $query->where('course_id', $course->id);
+                    } else {
+                        $query->whereRaw('1 = 0');
+                    }
+                }),
                 AllowedFilter::callback('enrolled_from', fn ($q, $value) => $q->whereDate('enrolled_at', '>=', $value)),
                 AllowedFilter::callback('enrolled_to', fn ($q, $value) => $q->whereDate('enrolled_at', '<=', $value)),
-                AllowedFilter::callback('search', function ($query, $value) {
-                    $query->whereHas('user', function ($q) use ($value) {
-                        $q->where('name', 'ilike', "%{$value}%")
-                            ->orWhere('email', 'ilike', "%{$value}%");
-                    });
-                }),
             ])
             ->allowedIncludes(['user', 'course'])
             ->allowedSorts([
@@ -95,34 +107,82 @@ class EnrollmentService implements EnrollmentServiceInterface
                           ->orderBy('created_at', 'desc');
                 }),
             ])
-            ->defaultSort('priority');
-
-        return $query->paginate($perPage);
+            ->defaultSort('priority')
+            ->paginate($perPage);
     }
 
     public function paginateByUser(int $userId, int $perPage = 15): LengthAwarePaginator
     {
         $perPage = max(1, $perPage);
+        $searchQuery = request()->input('search');
 
-        $query = QueryBuilder::for(Enrollment::class)
-            ->where('user_id', $userId)
+        $builder = QueryBuilder::for(Enrollment::class)
+            ->where('user_id', $userId);
+
+        if ($searchQuery && trim((string) $searchQuery) !== '') {
+            $ids = Enrollment::search($searchQuery)->take(1000)->keys()->toArray();
+            $builder->whereIn('id', $ids ?: [0]);
+        }
+
+        return $builder
             ->allowedFilters([
                 AllowedFilter::exact('status'),
-                AllowedFilter::exact('course_id'),
+                AllowedFilter::callback('course_slug', function ($query, $value) {
+                    $course = \Modules\Schemes\Models\Course::where('slug', $value)->first();
+                    if ($course) {
+                        $query->where('course_id', $course->id);
+                    } else {
+                        $query->whereRaw('1 = 0');
+                    }
+                }),
                 AllowedFilter::callback('enrolled_from', fn ($q, $value) => $q->whereDate('enrolled_at', '>=', $value)),
                 AllowedFilter::callback('enrolled_to', fn ($q, $value) => $q->whereDate('enrolled_at', '<=', $value)),
-                AllowedFilter::callback('search', function ($query, $value) {
-                    $query->whereHas('course', function ($q) use ($value) {
-                        $q->where('title', 'ilike', "%{$value}%")
-                            ->orWhere('slug', 'ilike', "%{$value}%");
-                    });
-                }),
             ])
             ->allowedIncludes(['user', 'course'])
             ->allowedSorts(['enrolled_at', 'completed_at', 'created_at'])
-            ->defaultSort('-enrolled_at');
+            ->defaultSort('-enrolled_at')
+            ->paginate($perPage);
+    }
 
-        return $query->paginate($perPage);
+    public function paginateAll(int $perPage = 15): LengthAwarePaginator
+    {
+        $perPage = max(1, $perPage);
+        $searchQuery = request()->input('search');
+
+        $builder = QueryBuilder::for(Enrollment::class);
+
+        if ($searchQuery && trim((string) $searchQuery) !== '') {
+            $ids = Enrollment::search($searchQuery)->take(1000)->keys()->toArray();
+            $builder->whereIn('id', $ids ?: [0]);
+        }
+
+        return $builder
+            ->allowedFilters([
+                AllowedFilter::exact('status'),
+                AllowedFilter::exact('user_id'),
+                AllowedFilter::callback('course_slug', function ($query, $value) {
+                    $course = \Modules\Schemes\Models\Course::where('slug', $value)->first();
+                    if ($course) {
+                        $query->where('course_id', $course->id);
+                    } else {
+                        $query->whereRaw('1 = 0');
+                    }
+                }),
+                AllowedFilter::callback('enrolled_from', fn ($q, $value) => $q->whereDate('enrolled_at', '>=', $value)),
+                AllowedFilter::callback('enrolled_to', fn ($q, $value) => $q->whereDate('enrolled_at', '<=', $value)),
+            ])
+            ->allowedIncludes(['user', 'course'])
+            ->allowedSorts([
+                'enrolled_at',
+                'completed_at',
+                'created_at',
+                AllowedSort::callback('priority', function ($query, $descending) {
+                    $query->orderByRaw("CASE WHEN status = 'pending' THEN 1 ELSE 2 END")
+                          ->orderBy('created_at', 'desc');
+                }),
+            ])
+            ->defaultSort('priority')
+            ->paginate($perPage);
     }
 
     /**
@@ -130,7 +190,6 @@ class EnrollmentService implements EnrollmentServiceInterface
      */
     public function getManagedEnrollments(User $user, int $perPage = 15, ?string $courseSlug = null): array
     {
-        // Get courses managed by user
         $courses = Course::query()
             ->select(['id', 'slug', 'title'])
             ->where(function ($query) use ($user) {
@@ -144,7 +203,6 @@ class EnrollmentService implements EnrollmentServiceInterface
 
         $courseIds = $courses->pluck('id')->all();
 
-        // Handle course_slug filter
         if ($courseSlug) {
             $course = $courses->firstWhere('slug', $courseSlug);
             if (! $course) {
@@ -184,14 +242,14 @@ class EnrollmentService implements EnrollmentServiceInterface
         return DB::transaction(function () use ($course, $user, $dto) {
             $existing = $this->repository->findByCourseAndUser($course->id, $user->id);
 
-            if ($existing && collect([EnrollmentStatus::Active, EnrollmentStatus::Pending])->contains($existing->status)) {
+            if ($existing) {
                 throw new BusinessException(
-                    __('messages.enrollments.already_enrolled'),
-                    ['course' => __('messages.enrollments.already_enrolled')]
+                    __('messages.enrollments.already_enrolled_or_cancelled'),
+                    ['course' => __('messages.enrollments.already_enrolled_or_cancelled')]
                 );
             }
 
-            $enrollment = $existing ?? new Enrollment([
+            $enrollment = new Enrollment([
                 'user_id' => $user->id,
                 'course_id' => $course->id,
             ]);
@@ -199,21 +257,34 @@ class EnrollmentService implements EnrollmentServiceInterface
             [$status, $message] = $this->determineStatusAndMessage($course, $dto);
 
             $enrollment->status = EnrollmentStatus::from($status);
-            $enrollment->enrolled_at = $enrollment->enrolled_at ?? Carbon::now();
+            $enrollment->enrolled_at = Carbon::now();
 
             if ($status !== EnrollmentStatus::Completed->value) {
                 $enrollment->completed_at = null;
             }
 
-            $enrollment->save();
+            // Save without syncing to Meilisearch
+            Enrollment::withoutSyncingToSearch(fn () => $enrollment->save());
+            
+            // Load relations instead of fresh() to avoid extra queries
+            $enrollment->load(['course:id,title,slug,code', 'user:id,name,email']);
 
-            $freshEnrollment = $enrollment->fresh(['course:id,title,slug,code', 'user:id,name,email']);
-
-            EnrollmentCreated::dispatch($freshEnrollment);
-            $this->sendEnrollmentEmails($freshEnrollment, $course, $user, $status);
+            // Dispatch event and send emails asynchronously after response
+            $enrollmentId = $enrollment->id;
+            $courseId = $course->id;
+            $userId = $user->id;
+            $enrollStatus = $status;
+            
+            dispatch(function () use ($enrollmentId, $courseId, $userId, $enrollStatus) {
+                $enrollment = Enrollment::with(['course:id,title,slug,code', 'user:id,name,email'])->find($enrollmentId);
+                if ($enrollment) {
+                    EnrollmentCreated::dispatch($enrollment);
+                    $this->sendEnrollmentEmails($enrollment, $enrollment->course, $enrollment->user, $enrollStatus);
+                }
+            })->afterResponse();
 
             return [
-                'enrollment' => $freshEnrollment,
+                'enrollment' => $enrollment,
                 'status' => $status,
                 'message' => $message,
             ];
@@ -228,14 +299,15 @@ class EnrollmentService implements EnrollmentServiceInterface
         return DB::transaction(function () use ($enrollment) {
             if ($enrollment->status !== EnrollmentStatus::Pending) {
                 throw new BusinessException(
-                    'Hanya enrollment dengan status pending yang dapat dibatalkan.',
-                    ['enrollment' => 'Hanya enrollment dengan status pending yang dapat dibatalkan.']
+                    __('messages.enrollments.cannot_cancel_pending'),
+                    ['enrollment' => __('messages.enrollments.cannot_cancel_pending')]
                 );
             }
 
             $enrollment->status = EnrollmentStatus::Cancelled;
             $enrollment->completed_at = null;
-            $enrollment->save();
+            
+            Enrollment::withoutSyncingToSearch(fn () => $enrollment->save());
 
             return $enrollment->fresh(['course:id,title,slug', 'user:id,name,email']);
         });
@@ -249,14 +321,15 @@ class EnrollmentService implements EnrollmentServiceInterface
         return DB::transaction(function () use ($enrollment) {
             if ($enrollment->status !== EnrollmentStatus::Active) {
                 throw new BusinessException(
-                    'Hanya enrollment aktif yang dapat mengundurkan diri.',
-                    ['enrollment' => 'Hanya enrollment aktif yang dapat mengundurkan diri.']
+                    __('messages.enrollments.cannot_withdraw_active'),
+                    ['enrollment' => __('messages.enrollments.cannot_withdraw_active')]
                 );
             }
 
             $enrollment->status = EnrollmentStatus::Cancelled;
             $enrollment->completed_at = null;
-            $enrollment->save();
+            
+            Enrollment::withoutSyncingToSearch(fn () => $enrollment->save());
 
             return $enrollment->fresh(['course:id,title,slug', 'user:id,name,email']);
         });
@@ -270,15 +343,16 @@ class EnrollmentService implements EnrollmentServiceInterface
         return DB::transaction(function () use ($enrollment) {
             if ($enrollment->status !== EnrollmentStatus::Pending) {
                 throw new BusinessException(
-                    'Hanya permintaan enrollment pending yang dapat disetujui.',
-                    ['enrollment' => 'Hanya permintaan enrollment pending yang dapat disetujui.']
+                    __('messages.enrollments.cannot_approve_pending'),
+                    ['enrollment' => __('messages.enrollments.cannot_approve_pending')]
                 );
             }
 
             $enrollment->status = EnrollmentStatus::Active;
             $enrollment->enrolled_at = Carbon::now();
             $enrollment->completed_at = null;
-            $enrollment->save();
+            
+            Enrollment::withoutSyncingToSearch(fn () => $enrollment->save());
 
             $freshEnrollment = $enrollment->fresh(['course:id,title,slug,code', 'user:id,name,email']);
             $course = $freshEnrollment->course;
@@ -301,14 +375,15 @@ class EnrollmentService implements EnrollmentServiceInterface
         return DB::transaction(function () use ($enrollment) {
             if ($enrollment->status !== EnrollmentStatus::Pending) {
                 throw new BusinessException(
-                    'Hanya permintaan enrollment pending yang dapat ditolak.',
-                    ['enrollment' => 'Hanya permintaan enrollment pending yang dapat ditolak.']
+                    __('messages.enrollments.cannot_decline_pending'),
+                    ['enrollment' => __('messages.enrollments.cannot_decline_pending')]
                 );
             }
 
             $enrollment->status = EnrollmentStatus::Cancelled;
             $enrollment->completed_at = null;
-            $enrollment->save();
+            
+            Enrollment::withoutSyncingToSearch(fn () => $enrollment->save());
 
             $freshEnrollment = $enrollment->fresh(['course:id,title,slug,code', 'user:id,name,email']);
             $course = $freshEnrollment->course;
@@ -330,14 +405,15 @@ class EnrollmentService implements EnrollmentServiceInterface
         return DB::transaction(function () use ($enrollment) {
             if (! collect([EnrollmentStatus::Active, EnrollmentStatus::Pending])->contains($enrollment->status)) {
                 throw new BusinessException(
-                    'Hanya enrollment aktif atau pending yang dapat dikeluarkan.',
-                    ['enrollment' => 'Hanya enrollment aktif atau pending yang dapat dikeluarkan.']
+                    __('messages.enrollments.cannot_remove_active_pending'),
+                    ['enrollment' => __('messages.enrollments.cannot_remove_active_pending')]
                 );
             }
 
             $enrollment->status = EnrollmentStatus::Cancelled;
             $enrollment->completed_at = null;
-            $enrollment->save();
+            
+            Enrollment::withoutSyncingToSearch(fn () => $enrollment->save());
 
             return $enrollment->fresh(['course:id,title,slug', 'user:id,name,email']);
         });
@@ -353,10 +429,10 @@ class EnrollmentService implements EnrollmentServiceInterface
         $typeValue = $type instanceof \Modules\Schemes\Enums\EnrollmentType ? $type->value : ($type ?? 'auto_accept');
 
         return match ($typeValue) {
-            'auto_accept' => ['active', 'Enrol berhasil. Anda sekarang terdaftar pada course ini.'],
+            'auto_accept' => ['active', __('messages.enrollments.auto_accept_success')],
             'key_based' => $this->handleKeyBasedEnrollment($course, $dto),
-            'approval' => ['pending', 'Permintaan enrollment berhasil dikirim. Menunggu persetujuan.'],
-            default => ['active', 'Enrol berhasil.'],
+            'approval' => ['pending', __('messages.enrollments.approval_sent')],
+            default => ['active', __('messages.enrollments.enrolled_success')],
         };
     }
 
@@ -383,7 +459,7 @@ class EnrollmentService implements EnrollmentServiceInterface
             );
         }
 
-        return ['active', 'Enrol berhasil menggunakan kode kunci.'];
+        return ['active', __('messages.enrollments.key_based_success')];
     }
 
     private function sendEnrollmentEmails(Enrollment $enrollment, Course $course, User $student, string $status): void
@@ -456,5 +532,80 @@ class EnrollmentService implements EnrollmentServiceInterface
     public function getActiveEnrollment(int $userId, int $courseId): ?Enrollment
     {
         return $this->repository->getActiveEnrollment($userId, $courseId);
+    }
+
+    /**
+     * List enrollments based on user role (context-aware)
+     */
+    public function listEnrollments(User $user, int $perPage, ?string $courseSlug): LengthAwarePaginator
+    {
+        if ($user->hasRole('Superadmin')) {
+            return $this->paginateAll($perPage);
+        }
+
+        if ($user->hasRole('Admin') || $user->hasRole('Instructor')) {
+            $result = $this->getManagedEnrollments($user, $perPage, $courseSlug);
+            
+            if (! $result['found']) {
+                throw new BusinessException(
+                    __('messages.enrollments.course_not_managed'),
+                    []
+                );
+            }
+
+            return $result['paginator'];
+        }
+
+        return $this->paginateByUser($user->id, $perPage);
+    }
+
+    /**
+     * Cancel enrollment with find logic
+     */
+    public function cancelEnrollment(Course $course, User $user, ?int $targetUserId): Enrollment
+    {
+        $userId = $targetUserId ?? $user->id;
+        $enrollment = $this->findByCourseAndUser($course->id, $userId);
+
+        if (!$enrollment) {
+            throw new BusinessException(
+                __('messages.enrollments.request_not_found'),
+                []
+            );
+        }
+
+        return $enrollment;
+    }
+
+    /**
+     * Withdraw from enrollment with find logic
+     */
+    public function withdrawEnrollment(Course $course, User $user, ?int $targetUserId): Enrollment
+    {
+        $userId = $targetUserId ?? $user->id;
+        $enrollment = $this->findByCourseAndUser($course->id, $userId);
+
+        if (!$enrollment) {
+            throw new BusinessException(
+                __('messages.enrollments.not_found'),
+                []
+            );
+        }
+
+        return $enrollment;
+    }
+
+    /**
+     * Get enrollment status with find logic
+     */
+    public function getEnrollmentStatus(Course $course, User $user, ?int $targetUserId): array
+    {
+        $userId = $targetUserId ?? $user->id;
+        $enrollment = $this->findByCourseAndUser($course->id, $userId);
+
+        return [
+            'found' => (bool) $enrollment,
+            'enrollment' => $enrollment,
+        ];
     }
 }

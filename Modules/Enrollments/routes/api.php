@@ -18,8 +18,9 @@ Route::middleware(['auth:api'])->prefix('v1')->group(function () {
 
     // Read-only enrollment endpoints with default API rate limiting
     Route::middleware(['throttle:api'])->group(function () {
-        Route::get('courses/enrollments', [EnrollmentsController::class, 'indexManaged'])->name('courses.enrollments.managed');
-        Route::get('courses/{course:slug}/enrollment-status', [EnrollmentsController::class, 'status'])->name('courses.enrollments.status');
+        Route::get('courses/{course:slug}/enrollment-status', [EnrollmentsController::class, 'status'])
+            ->name('courses.enrollments.status')
+            ->middleware('role:Student');
         Route::get('courses/{course:slug}/enrollments', [EnrollmentsController::class, 'indexByCourse'])->name('courses.enrollments.index');
         Route::get('enrollments', [EnrollmentsController::class, 'index'])->name('enrollments.index');
     });

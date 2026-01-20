@@ -338,6 +338,7 @@ return [
     "unenrolled" => "Berhasil membatalkan pendaftaran dari course.",
     "completed" => "Course berhasil diselesaikan.",
     "already_enrolled" => "Sudah terdaftar di course ini.",
+    "already_enrolled_or_cancelled" => "Anda sudah pernah mendaftar atau membatalkan pendaftaran di course ini. Tidak dapat mendaftar kembali.",
     "not_enrolled" => "Belum terdaftar di course ini.",
     "cancelled" => "Permintaan enrollment berhasil dibatalkan.",
     "withdrawn" => "Anda berhasil mengundurkan diri dari course.",
@@ -363,6 +364,15 @@ return [
     "rejected" => "Permintaan enrollment ditolak.",
     "key_required" => "Kode enrollment wajib diisi.",
     "key_invalid" => "Kode enrollment tidak valid.",
+    "cannot_cancel_pending" => "Hanya enrollment dengan status pending yang dapat dibatalkan.",
+    "cannot_withdraw_active" => "Hanya enrollment aktif yang dapat mengundurkan diri.",
+    "cannot_approve_pending" => "Hanya permintaan enrollment pending yang dapat disetujui.",
+    "cannot_decline_pending" => "Hanya permintaan enrollment pending yang dapat ditolak.",
+    "cannot_remove_active_pending" => "Hanya enrollment aktif atau pending yang dapat dikeluarkan.",
+    "auto_accept_success" => "Enrol berhasil. Anda sekarang terdaftar pada course ini.",
+    "approval_sent" => "Permintaan enrollment berhasil dikirim. Menunggu persetujuan.",
+    "enrolled_success" => "Enrol berhasil.",
+    "key_based_success" => "Enrol berhasil menggunakan kode kunci.",
   ],
 
   // Assignments Module

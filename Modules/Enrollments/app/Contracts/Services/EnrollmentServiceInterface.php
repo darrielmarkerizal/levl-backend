@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Enrollments\Contracts\Services;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -15,6 +17,8 @@ interface EnrollmentServiceInterface
     public function paginateByCourseIds(array $courseIds, int $perPage = 15): LengthAwarePaginator;
 
     public function paginateByUser(int $userId, int $perPage = 15): LengthAwarePaginator;
+
+    public function paginateAll(int $perPage = 15): LengthAwarePaginator;
 
     public function findById(int $id): ?Enrollment;
 
@@ -32,13 +36,17 @@ interface EnrollmentServiceInterface
 
     public function remove(Enrollment $enrollment): Enrollment;
 
-    /**
-     * Check if user is enrolled in a course with active or completed status
-     */
     public function isUserEnrolledInCourse(int $userId, int $courseId): bool;
 
-    /**
-     * Get active enrollment for user in a course
-     */
     public function getActiveEnrollment(int $userId, int $courseId): ?Enrollment;
+
+    public function listEnrollments(User $user, int $perPage, ?string $courseSlug): LengthAwarePaginator;
+
+    public function getManagedEnrollments(User $user, int $perPage, ?string $courseSlug): array;
+
+    public function cancelEnrollment(Course $course, User $user, ?int $targetUserId): Enrollment;
+
+    public function withdrawEnrollment(Course $course, User $user, ?int $targetUserId): Enrollment;
+
+    public function getEnrollmentStatus(Course $course, User $user, ?int $targetUserId): array;
 }
