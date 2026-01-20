@@ -106,7 +106,10 @@ class Course extends Model implements HasMedia
     "status",
     "published_at",
     "instructor_id",
-    "deleted_by",
+  ];
+
+  protected $guarded = [
+    "deleted_by", // Should only be set automatically during soft delete
   ];
 
   protected $casts = [

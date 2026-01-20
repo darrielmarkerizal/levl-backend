@@ -38,11 +38,22 @@ class UnitPolicy
 
     public function update(User $user, Unit $unit): bool
     {
-        if ($user->hasRole('Superadmin') || $user->hasRole('Admin')) {
+        if ($user->hasRole('Superadmin')) {
             return true;
         }
 
-        return $user->hasRole('Instructor') && $unit->course?->instructor_id === $user->id;
+        $course = $unit->course;
+        if (!$course) {
+            return false;
+        }
+
+        // Check if user is assigned admin for this course
+        if ($user->hasRole('Admin') && $course->admins()->where('user_id', $user->id)->exists()) {
+            return true;
+        }
+
+        // Check if user is the instructor
+        return $user->hasRole('Instructor') && $course->instructor_id === $user->id;
     }
 
     public function delete(User $user, Unit $unit): bool
@@ -51,7 +62,18 @@ class UnitPolicy
             return true;
         }
 
-        return $user->hasRole('Admin') || ($user->hasRole('Instructor') && $unit->course?->instructor_id === $user->id);
+        $course = $unit->course;
+        if (!$course) {
+            return false;
+        }
+
+        // Check if user is assigned admin for this course
+        if ($user->hasRole('Admin') && $course->admins()->where('user_id', $user->id)->exists()) {
+            return true;
+        }
+
+        // Check if user is the instructor
+        return $user->hasRole('Instructor') && $course->instructor_id === $user->id;
     }
 
     public function reorder(User $user, Unit $unit): bool

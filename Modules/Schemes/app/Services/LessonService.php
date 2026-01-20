@@ -9,7 +9,9 @@ use Illuminate\Support\Arr;
 use Modules\Schemes\Contracts\Repositories\LessonRepositoryInterface;
 use Modules\Schemes\DTOs\CreateLessonDTO;
 use Modules\Schemes\DTOs\UpdateLessonDTO;
+use Modules\Schemes\Models\Course;
 use Modules\Schemes\Models\Lesson;
+use Modules\Schemes\Models\Unit;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -43,7 +45,7 @@ class LessonService
         $query = QueryBuilder::for(Lesson::class, $this->buildQueryBuilderRequest($filters))
             ->where('unit_id', $unitId)
             ->allowedFilters([
-                AllowedFilter::exact('type'),
+                AllowedFilter::exact('content_type'),
                 AllowedFilter::exact('status'),
             ])
             ->allowedIncludes(['unit', 'blocks', 'assignments'])
@@ -78,35 +80,87 @@ class LessonService
 
     public function create(int $unitId, CreateLessonDTO|array $data): Lesson
     {
-        $attributes = $data instanceof CreateLessonDTO ? $data->toArrayWithoutNull() : $data;
-        $attributes['unit_id'] = $unitId;
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($unitId, $data) {
+            $attributes = $data instanceof CreateLessonDTO ? $data->toArrayWithoutNull() : $data;
+            $attributes['unit_id'] = $unitId;
 
-        $attributes = Arr::except($attributes, ['slug']);
+            if (isset($attributes['order'])) {
+                // Increment existing items at this position and above to make room
+                Lesson::where('unit_id', $unitId)
+                    ->where('order', '>=', $attributes['order'])
+                    ->increment('order');
+            } else {
+                $maxOrder = Lesson::where('unit_id', $unitId)->max('order');
+                $attributes['order'] = $maxOrder ? $maxOrder + 1 : 1;
+            }
 
-        return $this->repository->create($attributes);
+            $attributes = Arr::except($attributes, ['slug']);
+
+            return $this->repository->create($attributes);
+        });
     }
 
     public function update(int $id, UpdateLessonDTO|array $data): Lesson
     {
-        $lesson = $this->repository->findByIdOrFail($id);
-        $attributes = $data instanceof UpdateLessonDTO ? $data->toArrayWithoutNull() : $data;
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($id, $data) {
+            $lesson = $this->repository->findByIdOrFail($id);
+            $attributes = $data instanceof UpdateLessonDTO ? $data->toArrayWithoutNull() : $data;
 
-        $attributes = Arr::except($attributes, ['slug']);
+            // Handle order change
+            if (isset($attributes['order']) && $attributes['order'] != $lesson->order) {
+                $newOrder = $attributes['order'];
+                $currentOrder = $lesson->order;
+                $unitId = $lesson->unit_id;
 
-        return $this->repository->update($lesson, $attributes);
+                if ($newOrder < $currentOrder) {
+                    // Moving up: increment items in between
+                    Lesson::where('unit_id', $unitId)
+                        ->where('order', '>=', $newOrder)
+                        ->where('order', '<', $currentOrder)
+                        ->increment('order');
+                } elseif ($newOrder > $currentOrder) {
+                    // Moving down: decrement items in between
+                    Lesson::where('unit_id', $unitId)
+                        ->where('order', '>', $currentOrder)
+                        ->where('order', '<=', $newOrder)
+                        ->decrement('order');
+                }
+            }
+
+            $attributes = Arr::except($attributes, ['slug']);
+
+            return $this->repository->update($lesson, $attributes);
+        });
     }
 
     public function delete(int $id): bool
     {
-        $lesson = $this->repository->findByIdOrFail($id);
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($id) {
+            $lesson = $this->repository->findByIdOrFail($id);
+            $unitId = $lesson->unit_id;
+            $deletedOrder = $lesson->order;
 
-        return $this->repository->delete($lesson);
+            $deleted = $this->repository->delete($lesson);
+
+            if ($deleted) {
+                // Reorder remaining lessons: decrement order for all lessons with order > deleted order
+                Lesson::where('unit_id', $unitId)
+                    ->where('order', '>', $deletedOrder)
+                    ->decrement('order');
+            }
+
+            return $deleted;
+        });
     }
 
     public function publish(int $id): Lesson
     {
         $lesson = $this->repository->findByIdOrFail($id);
         $lesson->update(['status' => 'published']);
+
+        // Invalidate course cache
+        $courseId = $lesson->unit->course_id;
+        app(\Modules\Schemes\Services\SchemesCacheService::class)->invalidateCourse($courseId);
 
         return $lesson->fresh();
     }
@@ -115,6 +169,10 @@ class LessonService
     {
         $lesson = $this->repository->findByIdOrFail($id);
         $lesson->update(['status' => 'draft']);
+
+        // Invalidate course cache
+        $courseId = $lesson->unit->course_id;
+        app(\Modules\Schemes\Services\SchemesCacheService::class)->invalidateCourse($courseId);
 
         return $lesson->fresh();
     }

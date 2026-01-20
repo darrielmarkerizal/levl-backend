@@ -49,15 +49,23 @@ class LessonBlockService
     public function create(int $lessonId, array $data, ?UploadedFile $mediaFile): LessonBlock
     {
         return DB::transaction(function () use ($lessonId, $data, $mediaFile) {
-            $nextOrder = $this->repository->getMaxOrderForLesson($lessonId);
-            $nextOrder = $nextOrder ? $nextOrder + 1 : 1;
+            if (isset($data['order'])) {
+                // Increment existing items at this position and above to make room
+                LessonBlock::where('lesson_id', $lessonId)
+                    ->where('order', '>=', $data['order'])
+                    ->increment('order');
+                $nextOrder = $data['order'];
+            } else {
+                $nextOrder = $this->repository->getMaxOrderForLesson($lessonId);
+                $nextOrder = $nextOrder ? $nextOrder + 1 : 1;
+            }
 
             $block = $this->repository->create([
                 'lesson_id' => $lessonId,
                 'slug' => (string) Str::uuid(),
                 'block_type' => $data['type'],
                 'content' => $data['content'] ?? null,
-                'order' => $data['order'] ?? $nextOrder,
+                'order' => $nextOrder,
             ]);
 
             if ($mediaFile && collect(['image', 'video', 'file'])->contains($data['type'])) {
@@ -88,8 +96,26 @@ class LessonBlockService
                 'content' => data_get($data, 'content', $block->content),
             ];
 
-            if (isset($data['order'])) {
-                $update['order'] = $data['order'];
+            // Handle order change
+            if (isset($data['order']) && $data['order'] != $block->order) {
+                $newOrder = $data['order'];
+                $currentOrder = $block->order;
+
+                if ($newOrder < $currentOrder) {
+                    // Moving up: increment items in between
+                    LessonBlock::where('lesson_id', $lessonId)
+                        ->where('order', '>=', $newOrder)
+                        ->where('order', '<', $currentOrder)
+                        ->increment('order');
+                } elseif ($newOrder > $currentOrder) {
+                    // Moving down: decrement items in between
+                    LessonBlock::where('lesson_id', $lessonId)
+                        ->where('order', '>', $currentOrder)
+                        ->where('order', '<=', $newOrder)
+                        ->decrement('order');
+                }
+                
+                $update['order'] = $newOrder;
             }
 
             $block->update($update);
@@ -113,13 +139,25 @@ class LessonBlockService
 
     public function delete(int $lessonId, int $blockId): bool
     {
-        $block = $this->repository->findByLessonAndId($lessonId, $blockId);
-        
-        if (!$block) {
-            throw new \Illuminate\Database\Eloquent\ModelNotFoundException();
-        }
+        return DB::transaction(function () use ($lessonId, $blockId) {
+            $block = $this->repository->findByLessonAndId($lessonId, $blockId);
+            
+            if (!$block) {
+                throw new \Illuminate\Database\Eloquent\ModelNotFoundException();
+            }
 
-        return (bool) $block->delete();
+            $deletedOrder = $block->order;
+            $deleted = (bool) $block->delete();
+
+            if ($deleted) {
+                // Reorder remaining blocks: decrement order for all blocks with order > deleted order
+                LessonBlock::where('lesson_id', $lessonId)
+                    ->where('order', '>', $deletedOrder)
+                    ->decrement('order');
+            }
+
+            return $deleted;
+        });
     }
 
     private function storeVideoMetadata($media): void

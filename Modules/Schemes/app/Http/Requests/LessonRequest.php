@@ -33,12 +33,10 @@ class LessonRequest extends FormRequest
         return $this->messagesLesson();
     }
 
-    protected function prepareForValidation(): void
-    {
-        if ($this->has('markdown_content') && is_string($this->markdown_content)) {
-            $this->merge([
-                'markdown_content' => strip_tags($this->markdown_content),
-            ]);
-        }
-    }
+    /**
+     * Note: Markdown content is NOT sanitized at input time.
+     * Sanitization should be performed at render time using a proper
+     * markdown parser with HTML sanitization (e.g., league/commonmark).
+     * This preserves valid markdown syntax including code blocks and HTML.
+     */
 }

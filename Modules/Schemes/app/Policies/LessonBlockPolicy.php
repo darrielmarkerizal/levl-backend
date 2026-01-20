@@ -38,18 +38,41 @@ class LessonBlockPolicy
 
     public function update(User $user, LessonBlock $block): bool
     {
-        $lesson = $block->lesson;
-        if (!$lesson) return false;
-
-        if ($user->hasRole('Superadmin') || $user->hasRole('Admin')) {
+        if ($user->hasRole('Superadmin')) {
             return true;
         }
 
-        return $user->hasRole('Instructor') && $lesson->unit?->course?->instructor_id === $user->id;
+        $course = $block->lesson?->unit?->course;
+        if (!$course) {
+            return false;
+        }
+
+        // Check if user is assigned admin for this course
+        if ($user->hasRole('Admin') && $course->admins()->where('user_id', $user->id)->exists()) {
+            return true;
+        }
+
+        // Check if user is the instructor
+        return $user->hasRole('Instructor') && $course->instructor_id === $user->id;
     }
 
     public function delete(User $user, LessonBlock $block): bool
     {
-        return $this->update($user, $block);
+        if ($user->hasRole('Superadmin')) {
+            return true;
+        }
+
+        $course = $block->lesson?->unit?->course;
+        if (!$course) {
+            return false;
+        }
+
+        // Check if user is assigned admin for this course
+        if ($user->hasRole('Admin') && $course->admins()->where('user_id', $user->id)->exists()) {
+            return true;
+        }
+
+        // Check if user is the instructor
+        return $user->hasRole('Instructor') && $course->instructor_id === $user->id;
     }
 }

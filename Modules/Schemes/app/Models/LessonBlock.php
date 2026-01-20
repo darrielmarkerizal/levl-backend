@@ -47,6 +47,11 @@ class LessonBlock extends Model implements HasMedia
         "audio/mp3",
         // Documents (for downloadable resources)
         "application/pdf",
+        // Microsoft Office
+        "application/msword", // .doc
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
+        "application/vnd.ms-excel", // .xls
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
       ]);
   }
 

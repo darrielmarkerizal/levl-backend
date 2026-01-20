@@ -38,10 +38,16 @@ class CoursePolicy
 
     public function update(User $user, Course $course): bool
     {
-        if ($user->hasRole('Superadmin') || $user->hasRole('Admin')) {
+        if ($user->hasRole('Superadmin')) {
             return true;
         }
 
+        // Check if user is assigned admin for this course
+        if ($user->hasRole('Admin') && $course->admins()->where('user_id', $user->id)->exists()) {
+            return true;
+        }
+
+        // Check if user is the instructor
         return $user->hasRole('Instructor') && $course->instructor_id === $user->id;
     }
 
@@ -51,12 +57,23 @@ class CoursePolicy
             return true;
         }
 
-        return $user->hasRole('Admin') || ($user->hasRole('Instructor') && $course->instructor_id === $user->id);
+        // Check if user is assigned admin for this course
+        if ($user->hasRole('Admin') && $course->admins()->where('user_id', $user->id)->exists()) {
+            return true;
+        }
+
+        // Check if user is the instructor
+        return $user->hasRole('Instructor') && $course->instructor_id === $user->id;
     }
 
     public function publish(User $user, Course $course): bool
     {
-        return $user->hasRole('Superadmin') || $user->hasRole('Admin');
+        if ($user->hasRole('Superadmin') || $user->hasRole('Admin')) {
+            return true;
+        }
+
+        // Allow instructor to publish their own course
+        return $user->hasRole('Instructor') && $course->instructor_id === $user->id;
     }
 
     public function manageContent(User $user, Course $course): bool

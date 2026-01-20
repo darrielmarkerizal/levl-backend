@@ -67,7 +67,12 @@ return [
     "no_publish_access" => "Anda tidak memiliki akses untuk mempublish unit ini.",
     "no_unpublish_access" => "Anda tidak memiliki akses untuk unpublish unit ini.",
     "no_reorder_access" => "Anda tidak memiliki akses untuk mengatur urutan unit di course ini.",
+    "no_reorder_access" => "Anda tidak memiliki akses untuk mengatur urutan unit di course ini.",
     "some_not_found" => "Beberapa unit tidak ditemukan di course ini.",
+    "code_required" => "Kode unit wajib diisi.",
+    "code_unique" => "Kode unit sudah digunakan.",
+    "title_required" => "Judul unit wajib diisi.",
+    "order_unique" => "Urutan unit sudah digunakan di course ini.",
   ],
 
   // Lessons Module
@@ -375,6 +380,14 @@ return [
   // Learning Module
   "learning" => [
     "progress_saved" => "Progres pembelajaran berhasil disimpan.",
+  ],
+
+  // Progress Module
+  "progress" => [
+    "locked_prerequisite" => "Lesson ini terkunci. Selesaikan lesson prasyarat terlebih dahulu.",
+    "lesson_not_in_unit" => "Lesson tidak ditemukan di unit ini.",
+    "enrollment_not_found" => "Enrollment tidak ditemukan.",
+    "updated" => "Progress berhasil diperbarui.",
   ],
 
   // Challenges Module

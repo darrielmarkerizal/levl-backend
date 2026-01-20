@@ -245,11 +245,38 @@ class CourseService implements CourseServiceInterface
             );
         }
 
+        $publishedUnitsCount = $course->units()->where('status', 'published')->count();
+        if ($publishedUnitsCount === 0) {
+            throw new BusinessException(
+                __('messages.courses.cannot_publish_without_published_units'),
+                ['units' => [__('messages.courses.must_have_one_published_unit')]]
+            );
+        }
+
         $hasLessons = $course->units()->whereHas('lessons')->exists();
         if (! $hasLessons) {
             throw new BusinessException(
                 __('messages.courses.cannot_publish_without_lessons'),
                 ['lessons' => [__('messages.courses.must_have_one_lesson')]]
+            );
+        }
+
+        $hasPublishedLessons = $course->units()
+            ->where('status', 'published')
+            ->whereHas('lessons', fn ($q) => $q->where('status', 'published'))
+            ->exists();
+
+        if (! $hasPublishedLessons) {
+            throw new BusinessException(
+                __('messages.courses.cannot_publish_without_published_lessons'),
+                ['lessons' => [__('messages.courses.must_have_one_published_lesson')]]
+            );
+        }
+
+        if ($course->enrollment_type === 'key_based' && empty($course->enrollment_key_hash)) {
+            throw new BusinessException(
+                __('messages.courses.cannot_publish_without_enrollment_key'),
+                ['enrollment_key' => [__('messages.courses.must_have_enrollment_key')]]
             );
         }
 

@@ -60,45 +60,119 @@ class UnitService
 
     public function create(int $courseId, CreateUnitDTO|array $data): Unit
     {
-        $attributes = $data instanceof CreateUnitDTO ? $data->toArrayWithoutNull() : $data;
-        $attributes['course_id'] = $courseId;
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($courseId, $data) {
+            $attributes = $data instanceof CreateUnitDTO ? $data->toArrayWithoutNull() : $data;
+            $attributes['course_id'] = $courseId;
 
-        if (empty($attributes['code'])) {
-            $attributes['code'] = CodeGenerator::generate('UNIT-', 4, Unit::class);
-        }
+            if (empty($attributes['code'])) {
+                $attributes['code'] = CodeGenerator::generate('UNIT-', 4, Unit::class);
+            }
 
-        $attributes = Arr::except($attributes, ['slug']);
+            if (isset($attributes['order'])) {
+                // Increment existing items at this position and above to make room
+                Unit::where('course_id', $courseId)
+                    ->where('order', '>=', $attributes['order'])
+                    ->increment('order');
+            } else {
+                $maxOrder = Unit::where('course_id', $courseId)->max('order');
+                $attributes['order'] = $maxOrder ? $maxOrder + 1 : 1;
+            }
 
-        return $this->repository->create($attributes);
+            $attributes = Arr::except($attributes, ['slug']);
+
+            return $this->repository->create($attributes);
+        });
     }
 
     public function update(int $id, UpdateUnitDTO|array $data): Unit
     {
-        $unit = $this->repository->findByIdOrFail($id);
-        $attributes = $data instanceof UpdateUnitDTO ? $data->toArrayWithoutNull() : $data;
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($id, $data) {
+            $unit = $this->repository->findByIdOrFail($id);
+            $attributes = $data instanceof UpdateUnitDTO ? $data->toArrayWithoutNull() : $data;
 
-        $attributes = Arr::except($attributes, ['slug']);
+            // Handle order change
+            if (isset($attributes['order']) && $attributes['order'] != $unit->order) {
+                $newOrder = $attributes['order'];
+                $currentOrder = $unit->order;
+                $courseId = $unit->course_id;
 
-        return $this->repository->update($unit, $attributes);
+                if ($newOrder < $currentOrder) {
+                    // Moving up: increment items in between
+                    Unit::where('course_id', $courseId)
+                        ->where('order', '>=', $newOrder)
+                        ->where('order', '<', $currentOrder)
+                        ->increment('order');
+                } elseif ($newOrder > $currentOrder) {
+                    // Moving down: decrement items in between
+                    Unit::where('course_id', $courseId)
+                        ->where('order', '>', $currentOrder)
+                        ->where('order', '<=', $newOrder)
+                        ->decrement('order');
+                }
+            }
+
+            $attributes = Arr::except($attributes, ['slug']);
+
+            return $this->repository->update($unit, $attributes);
+        });
     }
 
     public function delete(int $id): bool
     {
-        $unit = $this->repository->findByIdOrFail($id);
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($id) {
+            $unit = $this->repository->findByIdOrFail($id);
+            $courseId = $unit->course_id;
+            $deletedOrder = $unit->order;
 
-        return $this->repository->delete($unit);
+            $deleted = $this->repository->delete($unit);
+
+            if ($deleted) {
+                // Reorder remaining units: decrement order for all units with order > deleted order
+                Unit::where('course_id', $courseId)
+                    ->where('order', '>', $deletedOrder)
+                    ->decrement('order');
+            }
+
+            return $deleted;
+        });
     }
 
     public function reorder(int $courseId, array $data): bool
     {
-        foreach ($data['units'] as $item) {
-            $unitId = $item['id'];
-            $newOrder = $item['order'];
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($courseId, $data) {
+            $unitIds = array_map('intval', $data['units']);
 
-            $this->repository->updateOrder($unitId, $newOrder);
-        }
+            // Check for duplicate IDs
+            if (count($unitIds) !== count(array_unique($unitIds))) {
+                throw new \InvalidArgumentException(__('messages.units.duplicate_ids'));
+            }
 
-        return true;
+            // Get all units for this course
+            $allUnits = Unit::where('course_id', $courseId)->pluck('id')->toArray();
+
+            // Ensure all units are included in reorder
+            if (count($unitIds) !== count($allUnits) || array_diff($allUnits, $unitIds)) {
+                throw new \InvalidArgumentException(__('messages.units.must_include_all'));
+            }
+
+            // Strict Validation: Ensure all IDs belong to this course
+            $count = Unit::whereIn('id', $unitIds)
+                ->where('course_id', $courseId)
+                ->count();
+
+            if ($count !== count($unitIds)) {
+                throw new \Illuminate\Database\Eloquent\ModelNotFoundException(__('messages.units.some_not_found'));
+            }
+
+            foreach ($unitIds as $index => $unitId) {
+                $this->repository->updateOrder($unitId, $index + 1);
+            }
+
+            // Invalidate course cache after reorder
+            $this->cacheService->invalidateCourse($courseId);
+
+            return true;
+        });
     }
 
     public function publish(int $id): Unit

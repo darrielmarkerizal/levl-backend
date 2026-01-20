@@ -27,10 +27,29 @@ class ProgressionService
             throw new \Illuminate\Database\Eloquent\ModelNotFoundException(__('messages.progress.lesson_not_in_unit'));
         }
 
+        $user = \Modules\Auth\Models\User::find($userId);
+        
+        // Admin, Instructor, and Superadmin can access any lesson without prerequisite checks
+        if ($user && ($user->hasRole('Superadmin') || $user->hasRole('Admin') || $user->hasRole('Instructor'))) {
+            // Still need enrollment for progress tracking, create if doesn't exist
+            $enrollment = $this->getEnrollmentForCourse($course->id, $userId);
+            if (!$enrollment) {
+                // Create enrollment for admin/instructor
+                $enrollment = \Modules\Enrollments\Models\Enrollment::create([
+                    'user_id' => $userId,
+                    'course_id' => $course->id,
+                    'status' => \Modules\Enrollments\Enums\EnrollmentStatus::Active,
+                    'enrolled_at' => now(),
+                ]);
+            }
+            return $enrollment;
+        }
+
+        // For students, check enrollment and prerequisites
         $enrollment = $this->getEnrollmentForCourse($course->id, $userId);
         
         if (!$enrollment || !$this->canAccessLesson($lesson, $enrollment)) {
-            throw new \App\Exceptions\BusinessException(__('messages.progress.locked_prerequisite'), 403);
+            throw new \App\Exceptions\BusinessException(__('messages.progress.locked_prerequisite'), [], 403);
         }
 
         return $enrollment;
@@ -60,6 +79,19 @@ class ProgressionService
     public function markLessonCompleted(Lesson $lesson, Enrollment $enrollment): void
     {
         DB::transaction(function () use ($lesson, $enrollment) {
+            // Lock enrollment to prevent race conditions
+            $lockedEnrollment = Enrollment::lockForUpdate()->findOrFail($enrollment->id);
+
+            // Idempotency check: Skip if already completed
+            $existingProgress = LessonProgress::where('enrollment_id', $lockedEnrollment->id)
+                ->where('lesson_id', $lesson->id)
+                ->where('status', ProgressStatus::Completed)
+                ->first();
+
+            if ($existingProgress) {
+                return; // Already completed, skip to prevent duplicate processing
+            }
+
             $lessonModel = $lesson->fresh([
                 'unit.course',
                 'unit.lessons' => function ($query) {
@@ -71,27 +103,68 @@ class ProgressionService
                 return;
             }
 
-            $this->storeLessonCompletion($lessonModel, $enrollment);
-
-            \Modules\Schemes\Events\LessonCompleted::dispatch($lessonModel, $enrollment->user_id, $enrollment->id);
+            $this->storeLessonCompletion($lessonModel, $lockedEnrollment);
 
             $unitResult = $this->updateUnitProgress(
                 $lessonModel->unit,
-                $enrollment,
+                $lockedEnrollment,
                 $lessonModel->unit->lessons
             );
 
-            $this->updateCourseProgress($lessonModel->unit->course, $enrollment);
+            $this->updateCourseProgress($lessonModel->unit->course, $lockedEnrollment);
 
-            if ($unitResult['just_completed']) {
-                UnitCompleted::dispatch($lessonModel->unit, $enrollment->user_id, $enrollment->id);
-            }
+            // Dispatch events AFTER transaction commits
+            DB::afterCommit(function () use ($lessonModel, $lockedEnrollment, $unitResult) {
+                \Modules\Schemes\Events\LessonCompleted::dispatch($lessonModel, $lockedEnrollment->user_id, $lockedEnrollment->id);
+
+                if ($unitResult['just_completed']) {
+                    UnitCompleted::dispatch($lessonModel->unit, $lockedEnrollment->user_id, $lockedEnrollment->id);
+                }
+            });
         });
     }
 
     public function onLessonCompleted(Lesson $lesson, Enrollment $enrollment): void
     {
         $this->markLessonCompleted($lesson, $enrollment);
+    }
+
+    public function markLessonUncompleted(Lesson $lesson, Enrollment $enrollment): void
+    {
+        DB::transaction(function () use ($lesson, $enrollment) {
+            $lessonModel = $lesson->fresh([
+                'unit.course',
+                'unit.lessons' => function ($query) {
+                    $query->where('status', 'published')->orderBy('order');
+                },
+            ]);
+
+            if (! $lessonModel || ! $lessonModel->unit || ! $lessonModel->unit->course) {
+                return;
+            }
+
+            // Reset lesson progress
+            $progress = LessonProgress::query()
+                ->where('enrollment_id', $enrollment->id)
+                ->where('lesson_id', $lessonModel->id)
+                ->first();
+
+            if ($progress) {
+                $progress->status = ProgressStatus::NotStarted;
+                $progress->progress_percent = 0;
+                $progress->completed_at = null;
+                $progress->save();
+            }
+
+            // Update unit and course progress
+            $this->updateUnitProgress(
+                $lessonModel->unit,
+                $enrollment,
+                $lessonModel->unit->lessons
+            );
+
+            $this->updateCourseProgress($lessonModel->unit->course, $enrollment);
+        });
     }
 
     public function markUnitCompleted(Unit $unit, Enrollment $enrollment): void

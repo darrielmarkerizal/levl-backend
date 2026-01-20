@@ -42,7 +42,10 @@ trait HasSchemesRequestRules
                     }
 
                     if ($courseId > 0) {
-                        return false;
+                        $course = \Modules\Schemes\Models\Course::find($courseId);
+                        if ($course && ! empty($course->enrollment_key_hash)) {
+                            return false;
+                        }
                     }
 
                     return true;
