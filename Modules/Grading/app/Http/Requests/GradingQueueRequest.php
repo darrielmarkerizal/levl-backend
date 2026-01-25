@@ -6,26 +6,13 @@ namespace Modules\Grading\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-/**
- * Request validation for grading queue filters.
- *
- * Requirements: 10.1, 10.2, 10.3
- */
 class GradingQueueRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return true; // Authorization handled by controller
+        return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
@@ -38,11 +25,6 @@ class GradingQueueRequest extends FormRequest
         ];
     }
 
-    /**
-     * Get custom attributes for validator errors.
-     *
-     * @return array<string, string>
-     */
     public function attributes(): array
     {
         return [

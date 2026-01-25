@@ -42,4 +42,13 @@ return [
     'total_storage_used' => 'Total storage used',
     'newest_backup_date' => 'Newest backup date',
     'oldest_backup_date' => 'Oldest backup date',
+
+    'grading' => [
+        'submission_graded' => 'Submission :id graded for User :user_id',
+        'grades_released' => 'Grades released for :count submissions',
+        'manual_grading_required' => 'Manual grading required for Submission :id',
+        'appeal_submitted' => 'Appeal :id submitted by User :user_id',
+        'appeal_decision' => 'Appeal :id decided for User :user_id',
+        'grade_recalculated' => 'Grade recalculated for Submission :id. Old: :old_score, New: :new_score',
+    ],
 ];

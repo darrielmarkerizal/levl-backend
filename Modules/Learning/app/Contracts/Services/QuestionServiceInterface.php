@@ -19,7 +19,7 @@ interface QuestionServiceInterface
 
     public function generateQuestionSet(int $assignmentId, ?int $seed = null): Collection;
 
-    public function getQuestionsByAssignment(int $assignmentId): Collection;
+    public function getQuestionsByAssignment(int $assignmentId, ?\Modules\Auth\Models\User $user = null, array $filters = []): Collection;
 
     public function reorderQuestions(int $assignmentId, array $questionIds): void;
 }

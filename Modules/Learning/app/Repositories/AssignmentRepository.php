@@ -61,7 +61,7 @@ class AssignmentRepository extends BaseRepository implements AssignmentRepositor
 
     public function findWithRelations(Assignment $assignment): Assignment
     {
-        return $assignment->loadMissing(['creator:id,name,email', 'lesson:id,title,slug', 'questions']);
+        return $assignment->loadMissing(['creator:id,name,email', 'lesson:id,title,slug', 'questions', 'assignable']);
     }
 
     public function attachPrerequisite(int $assignmentId, int $prerequisiteId): void

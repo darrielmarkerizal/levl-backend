@@ -19,6 +19,8 @@ interface AssignmentServiceInterface
 
     public function listByCourse(\Modules\Schemes\Models\Course $course, array $filters = []);
 
+    public function listIncomplete(\Modules\Schemes\Models\Course $course, int $studentId, array $filters = []);
+
     public function create(array $data, int $createdBy): Assignment;
 
     public function update(Assignment $assignment, array $data): Assignment;

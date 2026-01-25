@@ -7,21 +7,10 @@ namespace Modules\Grading\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/**
- * Resource for grading queue items.
- *
- * Requirements: 10.4 - Display submission metadata
- */
 class GradingQueueItemResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
-        // Handle both array and object data
         if (is_array($this->resource)) {
             return $this->resource;
         }

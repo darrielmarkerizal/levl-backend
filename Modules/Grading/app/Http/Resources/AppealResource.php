@@ -6,22 +6,9 @@ namespace Modules\Grading\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Modules\Grading\Models\Appeal;
 
-/**
- * Resource for Appeal model.
- *
- * Requirements: 17.1, 17.4, 17.5
- *
- * @mixin Appeal
- */
 class AppealResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
         return [
@@ -37,10 +24,7 @@ class AppealResource extends JsonResource
             'decided_at' => $this->decided_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-
-            // Relationships
             'submission' => $this->whenLoaded('submission', function () {
-                /** @var \Modules\Learning\Models\Submission $submission */
                 $submission = $this->submission;
 
                 $data = [
@@ -62,7 +46,6 @@ class AppealResource extends JsonResource
                 return $data;
             }),
             'student' => $this->whenLoaded('student', function () {
-                /** @var \Modules\Auth\Models\User $student */
                 $student = $this->student;
 
                 return [
@@ -76,7 +59,6 @@ class AppealResource extends JsonResource
                     return null;
                 }
 
-                /** @var \Modules\Auth\Models\User $reviewer */
                 $reviewer = $this->reviewer;
 
                 return [

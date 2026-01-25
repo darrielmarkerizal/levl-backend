@@ -50,6 +50,24 @@ class AssignmentController extends Controller
         }
     }
 
+    public function indexIncomplete(Request $request, \Modules\Schemes\Models\Course $course): JsonResponse
+    {
+        try {
+            $user = auth('api')->user();
+            $paginator = $this->assignmentService->listIncomplete($course, $user->id, $request->all());
+
+            $paginator->getCollection()->transform(fn($item) => new AssignmentResource($item));
+
+            return $this->paginateResponse($paginator, 'messages.assignments.incomplete_list_retrieved');
+        } catch (\Modules\Learning\Exceptions\AssignmentException $e) {
+            return $this->error($e->getMessage(), [], $e->getCode() ?: 400);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return $this->error($e->getMessage(), [], 404);
+        } catch (\InvalidArgumentException $e) {
+            return $this->error($e->getMessage(), [], 400);
+        }
+    }
+
     public function store(StoreAssignmentRequest $request): JsonResponse
     {
         $user = auth('api')->user();
@@ -64,7 +82,7 @@ class AssignmentController extends Controller
         $validated['assignable_type'] = $scope['assignable_type'];
         $validated['assignable_id'] = $scope['assignable_id'];
 
-        $course = $this->resolveCourseFromScope(
+        $course = $this->assignmentService->resolveCourseFromScope(
             $validated['assignable_type'],
             $validated['assignable_id']
         );
@@ -78,26 +96,16 @@ class AssignmentController extends Controller
         $assignment = $this->assignmentService->create($validated, $user->id);
 
         return $this->created(
-            ['assignment' => AssignmentResource::make($assignment)],
+            AssignmentResource::make($assignment),
             __('messages.assignments.created')
         );
-    }
-
-    private function resolveCourseFromScope(string $assignableType, int $assignableId): ?\Modules\Schemes\Models\Course
-    {
-        return match ($assignableType) {
-            'Modules\\Schemes\\Models\\Course' => \Modules\Schemes\Models\Course::find($assignableId),
-            'Modules\\Schemes\\Models\\Unit' => \Modules\Schemes\Models\Unit::find($assignableId)?->course,
-            'Modules\\Schemes\\Models\\Lesson' => \Modules\Schemes\Models\Lesson::find($assignableId)?->unit?->course,
-            default => null,
-        };
     }
 
     public function show(Assignment $assignment): JsonResponse
     {
         $assignment = $this->assignmentService->getWithRelations($assignment);
 
-        return $this->success(['assignment' => AssignmentResource::make($assignment)]);
+        return $this->success(AssignmentResource::make($assignment));
     }
 
     public function update(UpdateAssignmentRequest $request, Assignment $assignment): JsonResponse
@@ -107,7 +115,7 @@ class AssignmentController extends Controller
         $updated = $this->assignmentService->update($assignment, $validated);
 
         return $this->success(
-            ['assignment' => AssignmentResource::make($updated)],
+            AssignmentResource::make($updated),
             __('messages.assignments.updated')
         );
     }
@@ -124,7 +132,7 @@ class AssignmentController extends Controller
         $updated = $this->assignmentService->publish($assignment);
 
         return $this->success(
-            ['assignment' => AssignmentResource::make($updated)],
+            AssignmentResource::make($updated),
             __('messages.assignments.published')
         );
     }
@@ -134,7 +142,7 @@ class AssignmentController extends Controller
         $updated = $this->assignmentService->unpublish($assignment);
 
         return $this->success(
-            ['assignment' => AssignmentResource::make($updated)],
+            AssignmentResource::make($updated),
             __('messages.assignments.unpublished')
         );
     }
@@ -144,18 +152,31 @@ class AssignmentController extends Controller
         $archived = $this->assignmentService->archive($assignment);
 
         return $this->success(
-            ['assignment' => AssignmentResource::make($archived)],
+            AssignmentResource::make($archived),
             __('messages.assignments.archived')
         );
     }
 
-    public function listQuestions(Assignment $assignment): JsonResponse
+    public function listQuestions(Request $request, Assignment $assignment): JsonResponse
+    {
+        $this->authorize('listQuestions', $assignment);
+
+        $user = auth('api')->user();
+
+        $questions = $this->questionService->getQuestionsByAssignment($assignment->id, $user, $request->all());
+
+        return $this->success(QuestionResource::collection($questions));
+    }
+
+    public function showQuestion(Assignment $assignment, Question $question): JsonResponse
     {
         $this->authorize('view', $assignment);
 
-        $questions = $this->questionService->getQuestionsByAssignment($assignment->id);
+        if ($question->assignment_id !== $assignment->id) {
+            return $this->error(__('messages.questions.not_found'), [], 404);
+        }
 
-        return $this->success(['questions' => QuestionResource::collection($questions)]);
+        return $this->success(QuestionResource::make($question));
     }
 
     public function addQuestion(StoreQuestionRequest $request, Assignment $assignment): JsonResponse
@@ -167,7 +188,7 @@ class AssignmentController extends Controller
         $question = $this->questionService->createQuestion($assignment->id, $validated);
 
         return $this->created(
-            ['question' => QuestionResource::make($question)],
+            QuestionResource::make($question),
             __('messages.questions.created')
         );
     }
@@ -184,7 +205,7 @@ class AssignmentController extends Controller
         $updated = $this->questionService->updateQuestion($question->id, $validated, $assignment->id);
 
         return $this->success(
-            ['question' => QuestionResource::make($updated)],
+            QuestionResource::make($updated),
             __('messages.questions.updated')
         );
     }
@@ -211,23 +232,16 @@ class AssignmentController extends Controller
     {
         $this->authorize('grantOverride', $assignment);
 
-        $validated = $request->validated();
-
-        $user = auth('api')->user();
-
         $override = $this->assignmentService->grantOverride(
             assignmentId: $assignment->id,
-            studentId: (int) $validated['student_id'],
-            overrideType: (string) $validated['type'],
-            reason: (string) $validated['reason'],
-            value: $validated['value'] ?? [],
-            grantorId: $user->id
+            studentId: (int) $request->validated('student_id'),
+            overrideType: (string) $request->validated('type'),
+            reason: (string) $request->validated('reason'),
+            value: $request->validated('value', []),
+            grantorId: auth('api')->user()->id
         );
 
-        return $this->created(
-            ['override' => OverrideResource::make($override)],
-            __('messages.overrides.granted')
-        );
+        return $this->created(OverrideResource::make($override), __('messages.overrides.granted'));
     }
 
     public function listOverrides(Assignment $assignment): JsonResponse
@@ -236,35 +250,24 @@ class AssignmentController extends Controller
 
         $overrides = $this->assignmentService->getOverridesForAssignment($assignment->id);
 
-        return $this->success(['overrides' => OverrideResource::collection($overrides)]);
+        return $this->success(OverrideResource::collection($overrides));
     }
 
     public function duplicate(DuplicateAssignmentRequest $request, Assignment $assignment): JsonResponse
     {
         $this->authorize('duplicate', $assignment);
 
-        $user = auth('api')->user();
-
-        $overrides = $request->validated();
-        $overrides['created_by'] = $user->id;
-
+        $overrides = array_merge($request->validated(), ['created_by' => auth('api')->user()->id]);
         $duplicated = $this->assignmentService->duplicateAssignment($assignment->id, $overrides);
 
-        return $this->created(
-            ['assignment' => AssignmentResource::make($duplicated)],
-            __('messages.assignments.duplicated')
-        );
+        return $this->created(AssignmentResource::make($duplicated), __('messages.assignments.duplicated'));
     }
 
     public function reorderQuestions(Request $request, Assignment $assignment): JsonResponse
     {
         $this->authorize('update', $assignment);
 
-        $validated = $request->validate([
-            'ids' => ['required', 'array'],
-            'ids.*' => ['integer', 'exists:assignment_questions,id'],
-        ]);
-
+        $validated = $request->validate(['ids' => ['required', 'array'], 'ids.*' => ['integer', 'exists:assignment_questions,id']]);
         $this->questionService->reorderQuestions($assignment->id, $validated['ids']);
 
         return $this->success([], __('messages.questions.reordered'));

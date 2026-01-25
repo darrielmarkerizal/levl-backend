@@ -7,16 +7,8 @@ namespace Modules\Grading\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/**
- * Resource for Grade model.
- */
 class GradeResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
         return [
@@ -37,8 +29,6 @@ class GradeResource extends JsonResource
             'released_at' => $this->released_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-
-            // Relationships
             'submission' => $this->whenLoaded('submission'),
             'user' => $this->whenLoaded('user', function () {
                 return [

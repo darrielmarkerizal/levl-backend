@@ -49,7 +49,65 @@ Mengambil daftar tugas yang dipaginasi untuk kursus tertentu.
 
 ---
 
-### 2. Buat Tugas
+### 2. Daftar Tugas Belum Dikerjakan (Berdasarkan Kursus)
+Mengambil daftar tugas yang belum dikerjakan/diserahkan oleh siswa untuk kursus tertentu.
+
+**Endpoint:** `GET /courses/{course_slug}/assignments/incomplete`
+
+> [!INFO]
+> **HANYA UNTUK SISWA:** Endpoint ini menampilkan assignment yang:
+> - Status: **Published** (Dipublikasi)
+> - Belum ada submission dengan status `submitted` atau `graded` dari siswa yang sedang login
+
+**Parameter Query:**
+
+| Parameter | Tipe | Deskripsi | Nilai yang Tersedia |
+|-----------|------|-------------|-----------------|
+| `filter[status]` | string | Filter berdasarkan status | `published` (Dipublikasi) |
+| `filter[submission_type]` | string | Filter berdasarkan tipe pengumpulan | `text` (Teks saja)<br>`file` (File saja)<br>`mixed` (Teks & File) |
+| `sort` | string | Urutkan hasil | `-created_at` (Terbaru)<br>`title` (Judul A-Z)<br>`deadline_at` (Tenggat waktu) |
+| `include` | csv | Sertakan relasi | `questions` (Soal-soal)<br>`lesson` (Pelajaran)<br>`creator` (Pembuat) |
+| `page` | int | Nomor halaman | Default: 1 |
+| `per_page` | int | Item per halaman | Default: 15 |
+
+**Contoh Request:**
+```
+GET /api/v1/courses/junior-web-programmer/assignments/incomplete?page=1&per_page=15&sort=-deadline_at
+```
+
+**Contoh Respons:**
+```json
+{
+  "success": true,
+  "message": "messages.assignments.incomplete_list_retrieved",
+  "data": [
+    {
+      "id": 5,
+      "title": "Kuis Laravel Controllers",
+      "status": "published",
+      "deadline_at": "2026-02-01T23:59:59Z",
+      "lesson": { "id": 101, "title": "Laravel Controllers" }
+    },
+    {
+      "id": 8,
+      "title": "Project Mini Laravel Routing",
+      "status": "published",
+      "deadline_at": "2026-02-15T23:59:59Z",
+      "lesson": { "id": 102, "title": "Laravel Routing" }
+    }
+  ],
+  "meta": { 
+    "total": 12, 
+    "per_page": 15,
+    "current_page": 1,
+    "last_page": 1
+  }
+}
+```
+
+---
+
+### 3. Buat Tugas
 
 **Endpoint:** `POST /assignments`
 
@@ -66,6 +124,7 @@ Mengambil daftar tugas yang dipaginasi untuk kursus tertentu.
 | `available_from` | datetime | Tidak | Waktu mulai tersedia | Format: ISO 8601<br>Contoh: `2024-03-01 08:00:00` |
 | `deadline_at` | datetime | Tidak | Batas waktu pengumpulan | Format: ISO 8601<br>Contoh: `2024-03-07 23:59:59` |
 | `tolerance_minutes` | int | Tidak | Toleransi keterlambatan (menit) | Contoh: 15, 30, 60 |
+| `time_limit_minutes` | int | Tidak | Batas waktu pengerjaan per percobaan (menit). Jika diisi, server membatasi pengerjaan sesuai timer dengan toleransi jaringan 60 detik. | Contoh: 30, 60, 120 |
 | `late_penalty_percent` | int | Tidak | Penalti terlambat (persen) | Nilai: 0-100<br>Contoh: 20 = potongan 20% |
 | `max_attempts` | int | Tidak | Maksimal percobaan | `null` = tidak terbatas<br>Contoh: 1, 2, 3 |
 | `cooldown_minutes` | int | Tidak | Jeda waktu antar percobaan (menit) | Contoh: 30, 60, 120 |
@@ -436,7 +495,7 @@ Tes akhir untuk membandingkan dengan pre-assessment.
 
 ---
 
-### 3. Dapatkan Detail Tugas
+### 4. Dapatkan Detail Tugas
 
 **Endpoint:** `GET /assignments/{id}`
 
@@ -470,7 +529,7 @@ Mengambil detail lengkap dari satu tugas.
 
 ---
 
-### 4. Perbarui Tugas
+### 5. Perbarui Tugas
 
 **Endpoint:** `PUT /assignments/{id}`
 
@@ -493,7 +552,7 @@ Perbarui field apa pun yang diizinkan dalam Create. Kirim `null` untuk mengosong
 
 ---
 
-### 5. Duplikasi Tugas
+### 6. Duplikasi Tugas
 
 **Endpoint:** `POST /assignments/{id}/duplicate`
 
@@ -509,17 +568,20 @@ Kloning tugas. Timpa field di body jika diperlukan.
 
 ---
 
-### 6. Publikasi / Batalkan Publikasi
+### 7. Publikasi / Batalkan Publikasi
 
 **Publikasi:**
 **Endpoint:** `PUT /assignments/{id}/publish`
+
+> [!IMPORTANT]
+> Publikasi akan ditolak jika total bobot seluruh soal melebihi `max_score` assignment. Saat draf, Anda bisa menambahkan soal melebihi total, namun saat publish sistem akan memvalidasi dan mengembalikan pesan kesalahan.
 
 **Batalkan Publikasi:**
 **Endpoint:** `PUT /assignments/{id}/unpublish`
 
 ---
 
-### 7. Arsipkan Tugas
+### 8. Arsipkan Tugas
 
 **Endpoint:** `PUT /assignments/{id}/archived`
 
@@ -529,7 +591,7 @@ Mengubah status tugas menjadi "archived".
 
 ---
 
-### 8. Hapus Tugas
+### 9. Hapus Tugas
 
 **Endpoint:** `DELETE /assignments/{id}`
 
@@ -543,9 +605,25 @@ Hapus permanen tugas dan semua soal yang terkait.
 
 ### 1. Daftar Soal
 
+### 1. Daftar Soal
+
 **Endpoint:** `GET /assignments/{id}/questions`
 
-Mengambil daftar semua soal dalam tugas.
+Mengambil daftar semua soal dalam tugas. 
+
+> [!WARNING]
+> **RESTRICTED ACCESS:** Endpoint ini HANYA untuk **Admin dan Instructor**. Siswa TIDAK BISA mengakses endpoint ini. Siswa harus menggunakan `GET /submissions/{id}/questions` untuk melihat soal ujian mereka.
+
+**Parameter Query (Admin/Instructor Only):**
+
+| Parameter | Tipe | Deskripsi |
+|-----------|------|-------------|
+| `search` | string | Cari konten soal (Meilisearch) |
+| `filter[type]` | string | Filter tipe soal |
+| `sort` | string | Urutkan hasil |
+
+**Contoh Request:**
+`GET /assignments/1/questions?search=Laravel&sort=-weight`
 
 ---
 
@@ -559,11 +637,20 @@ Mengambil daftar semua soal dalam tugas.
 |-------|------|----------|-------------|---------------------|
 | `type` | enum | Ya | Tipe soal | `multiple_choice` (Pilihan ganda - pilih satu)<br>`checkbox` (Pilihan ganda - pilih banyak)<br>`essay` (Esai/teks bebas)<br>`file_upload` (Upload file sebagai jawaban) |
 | `content` | string | Ya | Teks/konten soal | - |
-| `options` | array | **Wajib (Pilihan)** | Daftar opsi jawaban | - |
-| `correct_answers` | array | **Wajib (Otomatis)** | Kunci jawaban (index opsi) | - |
-| `points` | int | Tidak | Bobot poin soal | Default: 1 |
+| `options` | array | **Wajib (Pilihan)** | Daftar opsi jawaban. Bisa string atau object `{text, image}`. | - |
+| `answer_key` | array | **Wajib (Otomatis)** | Kunci jawaban (index opsi) | - |
+| `weight` | float | **Ya** | Bobot poin soal | Default: 1 |
 
-**Contoh Body:**
+> [!NOTE]
+> Selama status tugas masih draf, Anda boleh menambahkan soal meskipun total `weight` melebihi `max_score`. Namun, saat publish sistem akan menolak jika total bobot melebihi `max_score`.
+| `max_score` | float | Tidak | Skor maksimum (biasanya sama dengan weight) | - |
+| `allowed_file_types` | array | **Wajib (Upload)** | Ekstensi yang diizinkan | `['jpg', 'pdf', ...]` |
+| `max_file_size` | int | Tidak | Maksimum ukuran file (bytes) | Default: system setting |
+| `allow_multiple_files` | boolean | Tidak | Izinkan upload banyak file? | Default: false |
+
+**Contoh Body per Tipe Soal:**
+
+**1. Pilihan Ganda (Teks Biasa)**
 ```json
 {
   "type": "multiple_choice",
@@ -572,8 +659,47 @@ Mengambil daftar semua soal dalam tugas.
     "Personal Home Page",
     "PHP: Hypertext Preprocessor"
   ],
-  "correct_answers": [1],
-  "points": 5
+  "answer_key": [1],
+  "weight": 5
+}
+```
+
+**2. Pilihan Ganda / Checkbox (Dengan Gambar)**
+*Opsi bisa berupa Object yang berisi `text` dan `image`.*
+```json
+{
+  "type": "checkbox",
+  "content": "Pilih hewan yang berkaki empat:",
+  "options": [
+    { "text": "Kucing", "image": "https://example.com/cat.jpg" },
+    { "text": "Ayam", "image": "https://example.com/chicken.jpg" },
+    { "text": "Sapi", "image": null }
+  ],
+  "answer_key": [0, 2],
+  "weight": 10
+}
+```
+
+**3. Esai (Essay)**
+```json
+{
+  "type": "essay",
+  "content": "Jelaskan sejarah PHP secara singkat.",
+  "options": [],
+  "answer_key": [],
+  "weight": 10
+}
+```
+
+**4. Upload File**
+```json
+{
+  "type": "file_upload",
+  "content": "Upload diagram database anda.",
+  "allowed_file_types": ["pdf", "jpg", "png"],
+  "max_file_size": 5242880, // 5MB in bytes
+  "allow_multiple_files": false,
+  "weight": 20
 }
 ```
 
@@ -698,13 +824,94 @@ Cek apakah tenggat waktu sudah lewat atau masih ada toleransi.
 
 Memulai sesi pengerjaan baru. Mengembalikan `submission_id` yang digunakan untuk submit.
 
+Jika `time_limit_minutes` diatur pada assignment, UI sebaiknya menampilkan hitung mundur. Server juga menegakkan batas waktu dengan toleransi jaringan 60 detik (grace buffer).
+
 ---
 
-### 4. Kirim Percobaan
+### 4. Ambil Soal Ujian (Active Question Set)
+
+**Endpoint:** `GET /submissions/{submission_id}/questions`
+
+Mengambil daftar soal yang **sudah diurutkan (randomized)** khusus untuk sesi ujian siswa ini.
+Respons juga menyertakan `current_answer` jika siswa sudah pernah menyimpan jawaban sebelumnya (Resume Progress).
+
+**Respons:**
+```json
+{
+  "data": [
+    {
+      "id": 105,
+      "content": "Pertanyaan No 1...",
+      "current_answer": {
+        "content": "Jawaban Saya"
+      }
+    },
+    {
+      "id": 203,
+      "content": "Pertanyaan No 2...",
+      "current_answer": null
+    }
+  ]
+}
+```
+
+---
+
+### 5. Simpan Jawaban (Progres)
+
+**Endpoint:** `POST /submissions/{submission_id}/answers`
+
+Menyimpan atau memperbarui jawaban untuk satu soalan tertentu. Endpoint ini dapat dipanggil berkali-kali sebelum melakukan final submit.
+
+Jika timer kedaluwarsa, server akan menolak penyimpanan dengan pesan kesalahan `timer_expired`.
+
+**Contoh Body per Tipe Soal:**
+
+**1. Esai (Essay)**
+```json
+{
+  "question_id": 101,
+  "answer": "Jawaban teks esai saya."
+}
+```
+
+**2. Pilihan Ganda (Multiple Choice - Single)**
+*Kirim value opsi yang dipilih (bukan index array).*
+```json
+{
+  "question_id": 102,
+  "answer": "Jakarta"
+}
+```
+
+**3. Pilihan Ganda Majemuk (Checkbox - Multiple)**
+*Kirim array value opsi yang dipilih.*
+```json
+{
+  "question_id": 103,
+  "answer": ["Jakarta", "Bandung"]
+}
+```
+
+**4. Upload File**
+*Wajib menggunakan `multipart/form-data`, bukan JSON raw.*
+```http
+POST /api/v1/submissions/{submission_id}/answers
+Content-Type: multipart/form-data
+
+question_id: 104
+answer: [File Binary / Gambar]
+```
+
+---
+
+### 6. Kirim Percobaan
 
 **Endpoint:** `POST /submissions/{submission_id}/submit`
 
 Mengirimkan jawaban siswa untuk disubmit (final).
+
+Jika timer kedaluwarsa, server akan menolak submit dengan pesan kesalahan `timer_expired`. Setelah lewat `deadline_at + tolerance_minutes`, percobaan yang masih `in_progress` akan otomatis ditandai sebagai `missing` oleh proses housekeeping setiap menit.
 
 **Body (tergantung `submission_type`):**
 
@@ -755,17 +962,48 @@ Menyimpan jawaban sementara tanpa mengubah status menjadi submitted (berguna unt
 ## 🎓 Penilaian (Grading - Untuk Instruktur)
 
 ### 1. Daftar Pengumpulan
-
 **Endpoint:** `GET /assignments/{id}/submissions`
 
 Melihat semua pengumpulan siswa untuk tugas tertentu.
 
-**Query Parameters:**
+**Parameter Query:**
 
 | Parameter | Tipe | Deskripsi | Nilai yang Tersedia |
 |-----------|------|-------------|---------------------|
-| `filter[status]` | string | Filter berdasarkan status | `pending` (Menunggu penilaian)<br>`graded` (Sudah dinilai)<br>`late` (Terlambat) |
-| `sort` | string | Urutkan | `-submitted_at` (Terbaru)<br>`score` (Skor terendah)<br>`-score` (Skor tertinggi) |
+| `filter[status]` | string | Filter berdasarkan status | `draft`, `submitted`, `graded`, `late` |
+| `filter[status]` | string | Filter berdasarkan status | Tambahan: `missing` |
+| `filter[user_id]` | int | Filter berdasarkan siswa | ID Siswa |
+| `filter[is_late]` | bool | Filter keterlambatan | `true` (Terlambat), `false` (Tepat waktu) |
+| `filter[score_range]` | string | Filter rentang nilai | Format: `min,max` (Contoh: `0,50`) |
+| `sort` | string | Urutkan hasil | `submitted_at`, `-submitted_at` (Default), `created_at`, `-created_at`, `score`, `-score`, `status` |
+| `page` | int | Nomor halaman | Default: 1 |
+| `per_page` | int | Item per halaman | Default: 15 |
+
+**Contoh Request:**
+`GET /assignments/1/submissions?filter[status]=graded&sort=-score&page=1`
+
+**Contoh Respons:**
+```json
+{
+  "success": true,
+  "message": "Data berhasil diambil.",
+  "data": [
+    {
+      "id": 105,
+      "user": { "id": 5, "name": "Budi Santoso" },
+      "status": "graded",
+      "score": 85,
+      "submitted_at": "2024-03-01T10:00:00.000000Z"
+    }
+  ],
+  "meta": {
+    "current_page": 1,
+    "last_page": 5,
+    "per_page": 15,
+    "total": 75
+  }
+}
+```
 
 ---
 

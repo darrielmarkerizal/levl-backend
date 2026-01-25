@@ -12,11 +12,6 @@ use Modules\Learning\Models\Assignment;
 
 class AppealRepository implements AppealRepositoryInterface
 {
-    /**
-     * Default eager loading relationships for appeals.
-     * Prevents N+1 query problems when loading appeals with related data.
-     * Requirements: 28.5
-     */
     protected const DEFAULT_EAGER_LOAD = [
         'submission.assignment:id,title,deadline_at',
         'submission.user:id,name,email',
@@ -24,11 +19,6 @@ class AppealRepository implements AppealRepositoryInterface
         'reviewer:id,name,email',
     ];
 
-    /**
-     * Extended eager loading for detailed appeal views.
-     * Includes submission answers for complete appeal data.
-     * Requirements: 28.5
-     */
     protected const DETAILED_EAGER_LOAD = [
         'submission.assignment:id,title,deadline_at,tolerance_minutes',
         'submission.user:id,name,email',
@@ -38,40 +28,24 @@ class AppealRepository implements AppealRepositoryInterface
         'reviewer:id,name,email',
     ];
 
-    public function __construct(private readonly Appeal $model) {}
+    public function __construct(
+        private readonly Appeal $model
+    ) {}
 
-    /**
-     * Create a new appeal with eager loading.
-     *
-     * @param  array<string, mixed>  $data
-     */
     public function create(array $data): Appeal
     {
-        /** @var Appeal */
         $appeal = $this->model->newQuery()->create($data);
-
         return $appeal->load(self::DEFAULT_EAGER_LOAD);
     }
 
-    /**
-     * Update an existing appeal with eager loading.
-     *
-     * @param  array<string, mixed>  $data
-     */
     public function update(int $id, array $data): Appeal
     {
-        /** @var Appeal $appeal */
         $appeal = $this->model->newQuery()->findOrFail($id);
         $appeal->update($data);
 
-        /** @var Appeal */
         return $appeal->fresh()->load(self::DEFAULT_EAGER_LOAD);
     }
 
-    /**
-     * Find an appeal by ID with eager loading.
-     * Requirements: 28.5
-     */
     public function findById(int $id): ?Appeal
     {
         return $this->model
@@ -79,10 +53,6 @@ class AppealRepository implements AppealRepositoryInterface
             ->find($id);
     }
 
-    /**
-     * Find an appeal by ID with all related data for detailed view.
-     * Requirements: 28.5
-     */
     public function findByIdWithDetails(int $id): ?Appeal
     {
         return $this->model
@@ -90,12 +60,6 @@ class AppealRepository implements AppealRepositoryInterface
             ->find($id);
     }
 
-    /**
-     * Find pending appeals with eager loading.
-     * Requirements: 28.5
-     *
-     * @return Collection<int, Appeal>
-     */
     public function findPending(): Collection
     {
         return $this->model
@@ -105,10 +69,6 @@ class AppealRepository implements AppealRepositoryInterface
             ->get();
     }
 
-    /**
-     * Find an appeal by submission ID with eager loading.
-     * Requirements: 28.5
-     */
     public function findBySubmission(int $submissionId): ?Appeal
     {
         return $this->model
@@ -117,10 +77,6 @@ class AppealRepository implements AppealRepositoryInterface
             ->first();
     }
 
-    /**
-     * Find an appeal by submission ID with all related data.
-     * Requirements: 28.5
-     */
     public function findBySubmissionWithDetails(int $submissionId): ?Appeal
     {
         return $this->model
@@ -129,17 +85,8 @@ class AppealRepository implements AppealRepositoryInterface
             ->first();
     }
 
-    /**
-     * Find pending appeals for an instructor's assignments with eager loading.
-     *
-     * This finds all pending appeals for assignments created by the instructor.
-     * Requirements: 28.5
-     *
-     * @return Collection<int, Appeal>
-     */
     public function findPendingForInstructor(int $instructorId): Collection
     {
-        // Get assignment IDs created by this instructor
         $assignmentIds = Assignment::where('created_by', $instructorId)->pluck('id');
 
         return $this->model
@@ -152,12 +99,6 @@ class AppealRepository implements AppealRepositoryInterface
             ->get();
     }
 
-    /**
-     * Find appeals by student with eager loading.
-     * Requirements: 28.5
-     *
-     * @return Collection<int, Appeal>
-     */
     public function findByStudent(int $studentId): Collection
     {
         return $this->model
@@ -167,12 +108,6 @@ class AppealRepository implements AppealRepositoryInterface
             ->get();
     }
 
-    /**
-     * Find appeals by reviewer with eager loading.
-     * Requirements: 28.5
-     *
-     * @return Collection<int, Appeal>
-     */
     public function findByReviewer(int $reviewerId): Collection
     {
         return $this->model
@@ -182,12 +117,6 @@ class AppealRepository implements AppealRepositoryInterface
             ->get();
     }
 
-    /**
-     * Find approved appeals with eager loading.
-     * Requirements: 28.5
-     *
-     * @return Collection<int, Appeal>
-     */
     public function findApproved(): Collection
     {
         return $this->model
@@ -197,12 +126,6 @@ class AppealRepository implements AppealRepositoryInterface
             ->get();
     }
 
-    /**
-     * Find denied appeals with eager loading.
-     * Requirements: 28.5
-     *
-     * @return Collection<int, Appeal>
-     */
     public function findDenied(): Collection
     {
         return $this->model

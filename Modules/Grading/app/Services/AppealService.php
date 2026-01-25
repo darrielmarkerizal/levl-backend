@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Modules\Grading\Services;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
 use Modules\Grading\Contracts\Repositories\AppealRepositoryInterface;
 use Modules\Grading\Contracts\Services\AppealServiceInterface;
@@ -30,12 +32,12 @@ class AppealService implements AppealServiceInterface
      *
      * @param  int  $submissionId  The ID of the rejected submission
      * @param  string  $reason  The reason for the appeal
-     * @param  array  $documents  Optional supporting documents
+     * @param  array  $files  Optional supporting document files (from request)
      * @return Appeal The created appeal
      *
      * @throws InvalidArgumentException if reason is empty or submission is not eligible for appeal
      */
-    public function submitAppeal(int $submissionId, string $reason, array $documents = []): Appeal
+    public function submitAppeal(int $submissionId, string $reason, array $files = []): Appeal
     {
         // Validate reason is not empty (Requirements 17.2)
         if (empty(trim($reason))) {
@@ -59,20 +61,49 @@ class AppealService implements AppealServiceInterface
             );
         }
 
-        // Create the appeal
-        $appeal = $this->appealRepository->create([
-            'submission_id' => $submissionId,
-            'student_id' => $submission->user_id,
-            'reason' => trim($reason),
-            'supporting_documents' => $documents,
-            'status' => AppealStatus::Pending,
-            'submitted_at' => now(),
-        ]);
+        // Process and store files
+        $documents = [];
 
-        // Notify instructors of pending appeal (Requirements 17.3)
-        $this->notifyInstructorsOfAppeal($appeal);
+        return DB::transaction(function () use ($submissionId, $reason, $files, $documents) {
+            try {
+                // Handle file uploads if present
+                if (! empty($files['documents'])) {
+                    foreach ($files['documents'] as $file) {
+                        $path = $file->store('appeals/'.$submissionId, 'local');
+                        $documents[] = [
+                            'path' => $path,
+                            'original_name' => $file->getClientOriginalName(),
+                            'mime_type' => $file->getMimeType(),
+                            'size' => $file->getSize(),
+                        ];
+                    }
+                }
 
-        return $appeal;
+                // Create the appeal
+                $appeal = $this->appealRepository->create([
+                    'submission_id' => $submissionId,
+                    'student_id' => Submission::findOrFail($submissionId)->user_id,
+                    'reason' => trim($reason),
+                    'supporting_documents' => $documents,
+                    'status' => AppealStatus::Pending,
+                    'submitted_at' => now(),
+                ]);
+
+                // Notify instructors of pending appeal (Requirements 17.3)
+                $this->notifyInstructorsOfAppeal($appeal);
+
+                return $appeal;
+            } catch (\Exception $e) {
+                // Clean up uploaded files on error
+                foreach ($documents as $doc) {
+                    if (isset($doc['path']) && is_string($doc['path'])) {
+                        Storage::disk('local')->delete($doc['path']);
+                    }
+                }
+
+                throw $e;
+            }
+        });
     }
 
     /**

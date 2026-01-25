@@ -15,14 +15,21 @@ class QuestionResource extends JsonResource
         /** @var Question $question */
         $question = $this->resource;
 
+        $user = $request->user();
+        $isInstructorOrAdmin = $user && ($user->hasRole(['Instructor', 'Admin', 'Super Admin']) || $user->can('grade', $question->assignment));
+
+        $currentAnswer = $question->current_answer ?? null;
+        $hasContent = is_string($currentAnswer?->content) && trim($currentAnswer->content) !== '';
+        $hasSelectedOptions = is_array($currentAnswer?->selected_options) && count($currentAnswer->selected_options) > 0;
+        $hasFiles = is_array($currentAnswer?->file_paths) && count($currentAnswer->file_paths) > 0;
+        $isAnswered = $currentAnswer !== null && ($hasContent || $hasSelectedOptions || $hasFiles);
+
         return [
             'id' => $question->id,
             'assignment_id' => $question->assignment_id,
             'type' => $question->type?->value,
             'content' => $question->content,
-            'options' => $this->shouldShowAnswerKey($request)
-                ? $question->options
-                : $this->sanitizeOptionsForStudent($question->options),
+            'options' => $question->options,
             'weight' => (float) $question->weight,
             'order' => $question->order,
             'max_score' => $question->max_score ? (float) $question->max_score : null,
@@ -32,38 +39,13 @@ class QuestionResource extends JsonResource
             'can_auto_grade' => $question->canAutoGrade(),
             'created_at' => $question->created_at?->toIso8601String(),
             'updated_at' => $question->updated_at?->toIso8601String(),
-
-            
-            'answer_key' => $this->when(
-                $this->shouldShowAnswerKey($request),
-                $question->answer_key
+            'attachments' => $question->getMedia('question_attachments')->map(fn ($media) => $media->getUrl()),
+            'answer_key' => $this->when($isInstructorOrAdmin, $question->answer_key),
+            'is_answered' => $this->when(! $isInstructorOrAdmin, $isAnswered),
+            'current_answer' => $this->when(
+                isset($question->current_answer),
+                fn () => $question->current_answer ? AnswerResource::make($question->current_answer) : null
             ),
         ];
-    }
-
-    private function shouldShowAnswerKey(Request $request): bool
-    {
-        $user = $request->user();
-
-        if (! $user) {
-            return false;
-        }
-
-        return $user->hasAnyRole(['Admin', 'Instructor', 'Superadmin']);
-    }
-
-    private function sanitizeOptionsForStudent(?array $options): ?array
-    {
-        if (! $options) {
-            return null;
-        }
-
-        return array_map(function ($option) {
-            if (is_array($option)) {
-                unset($option['is_correct']);
-            }
-
-            return $option;
-        }, $options);
     }
 }

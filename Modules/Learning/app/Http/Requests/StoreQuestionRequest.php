@@ -15,13 +15,29 @@ class StoreQuestionRequest extends FormRequest
         return true; 
     }
 
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('answer_key') && ! is_array($this->answer_key)) {
+            $this->merge([
+                'answer_key' => [$this->answer_key],
+            ]);
+        }
+    }
+
+    public function messages(): array
+    {
+        return [
+            'attachments.*.max' => 'Ukuran file tidak boleh lebih dari 2 MB.',
+        ];
+    }
+
     public function rules(): array
     {
         return [
             'type' => ['required', Rule::enum(QuestionType::class)],
             'content' => ['required', 'string', 'max:65535'],
             'options' => ['nullable', 'array'],
-            'options.*' => ['string', 'max:1000'],
+            'options.*' => ['nullable'], 
             'answer_key' => ['nullable', 'array'],
             'weight' => ['required', 'numeric', 'gt:0'],
             'order' => ['nullable', 'integer', 'min:0'],
@@ -30,6 +46,8 @@ class StoreQuestionRequest extends FormRequest
             'allowed_file_types' => ['nullable', 'array'],
             'allowed_file_types.*' => ['string', 'max:50'],
             'allow_multiple_files' => ['nullable', 'boolean'],
+            'attachments' => ['nullable', 'array'],
+            'attachments.*' => ['image', 'max:2048'], 
         ];
     }
 
@@ -40,8 +58,26 @@ class StoreQuestionRequest extends FormRequest
 
 
             if (in_array($type, [QuestionType::MultipleChoice->value, QuestionType::Checkbox->value])) {
-                if (empty($this->input('options'))) {
+                $options = $this->input('options') ?? [];
+                $answerKey = $this->input('answer_key');
+
+                if (empty($options)) {
                     $validator->errors()->add('options', __('messages.validations.question_options_required'));
+                }
+                
+                if (empty($answerKey)) {
+                    $validator->errors()->add('answer_key', __('messages.validations.question_answer_key_required'));
+                } else {
+                    if (is_array($answerKey)) {
+                        if ($type === QuestionType::MultipleChoice->value && count($answerKey) > 1) {
+                             $validator->errors()->add('answer_key', __('messages.validations.multiple_choice_single_answer'));
+                        }
+                        foreach ($answerKey as $keyIndex) {
+                            if (!array_key_exists($keyIndex, $options)) {
+                                $validator->errors()->add('answer_key', __('messages.validations.invalid_answer_key_index', ['index' => $keyIndex]));
+                            }
+                        }
+                    }
                 }
             }
 
@@ -66,6 +102,8 @@ class StoreQuestionRequest extends FormRequest
             'max_file_size' => __('validation.attributes.max_file_size'),
             'allowed_file_types' => __('validation.attributes.allowed_file_types'),
             'allow_multiple_files' => __('validation.attributes.allow_multiple_files'),
+            'attachments' => 'Lampiran',
+            'attachments.*' => 'Lampiran',
         ];
     }
 }

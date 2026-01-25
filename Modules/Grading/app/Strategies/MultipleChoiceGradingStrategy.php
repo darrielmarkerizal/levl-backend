@@ -19,11 +19,9 @@ class MultipleChoiceGradingStrategy implements GradingStrategyInterface
             return 0.0;
         }
 
-        // MCQ should have exactly one correct answer
         $correctAnswer = is_array($answerKey) ? ($answerKey[0] ?? null) : $answerKey;
         $selectedAnswer = is_array($selectedOptions) ? ($selectedOptions[0] ?? null) : $selectedOptions;
 
-        // Exact match required
         if ($correctAnswer === $selectedAnswer) {
             return (float) $question->max_score;
         }

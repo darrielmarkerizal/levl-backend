@@ -76,17 +76,6 @@ class AssignmentResource extends JsonResource
 
     }
 
-    public static function make(...$parameters)
-    {
-        $resource = $parameters[0] ?? null;
-
-        if ($resource instanceof Assignment) {
-            $resource->loadMissing(['creator:id,name,email', 'assignable']);
-        }
-
-        return parent::make(...$parameters);
-    }
-
     private function getLessonSlug(): ?string
     {
         $resource = $this->resource;

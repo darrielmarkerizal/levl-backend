@@ -10,6 +10,7 @@ enum SubmissionStatus: string
     case Submitted = 'submitted';
     case Graded = 'graded';
     case Late = 'late';
+    case Missing = 'missing';
 
     public static function values(): array
     {
@@ -28,6 +29,7 @@ enum SubmissionStatus: string
             self::Submitted => __('enums.submission_status.submitted'),
             self::Graded => __('enums.submission_status.graded'),
             self::Late => __('enums.submission_status.late'),
+            self::Missing => __('enums.submission_status.missing'),
         };
     }
 }

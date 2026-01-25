@@ -36,6 +36,16 @@ class AssignmentService implements AssignmentServiceInterface
         private readonly ?LessonServiceInterface $lessonService = null
     ) {}
 
+    public function resolveCourseFromScope(string $assignableType, int $assignableId): ?\Modules\Schemes\Models\Course
+    {
+        return match ($assignableType) {
+            'Modules\\Schemes\\Models\\Course' => \Modules\Schemes\Models\Course::find($assignableId),
+            'Modules\\Schemes\\Models\\Unit' => \Modules\Schemes\Models\Unit::find($assignableId)?->course,
+            'Modules\\Schemes\\Models\\Lesson' => \Modules\Schemes\Models\Lesson::find($assignableId)?->unit?->course,
+            default => null,
+        };
+    }
+
     public function list(\Modules\Schemes\Models\Course $course, array $filters = []): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
         $unitSlug = data_get($filters, 'unit_slug');
@@ -105,6 +115,28 @@ class AssignmentService implements AssignmentServiceInterface
             ->paginate($perPage);
     }
 
+    public function listIncomplete(\Modules\Schemes\Models\Course $course, int $studentId, array $filters = []): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    {
+        $perPage = (int) data_get($filters, 'per_page', 15);
+        $perPage = max(1, $perPage);
+
+        $query = $this->buildQuery($filters)
+            ->forCourse($course->id)
+            ->where('assignments.status', AssignmentStatus::Published->value);
+
+        // Left join with submissions to find incomplete assignments
+        $query->leftJoin('submissions', function ($join) use ($studentId) {
+            $join->on('assignments.id', '=', 'submissions.assignment_id')
+                 ->where('submissions.user_id', $studentId)
+                 ->whereIn('submissions.status', ['submitted', 'graded']);
+        })
+        ->whereNull('submissions.id')
+        ->select('assignments.*')
+        ->distinct();
+
+        return $query->paginate($perPage);
+    }
+
     public function listByScope(string $scopeType, int $scopeId, array $filters = []): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
         // Deprecated or kept for internal use if needed
@@ -129,7 +161,7 @@ class AssignmentService implements AssignmentServiceInterface
         $filters = data_get($payload, 'filter', []);
 
         $builder = QueryBuilder::for(
-            Assignment::with(['creator', 'lesson.unit.course']),
+            Assignment::with(['creator', 'lesson.unit.course', 'assignable']),
             $this->buildQueryBuilderRequest($filters)
         );
 
@@ -141,10 +173,10 @@ class AssignmentService implements AssignmentServiceInterface
         return $builder
             ->allowedFilters([
                 AllowedFilter::exact('status'),
-                AllowedFilter::exact('type'),
+
                 AllowedFilter::exact('submission_type'),
             ])
-            ->allowedIncludes(['questions', 'prerequisites', 'overrides', 'creator', 'lesson'])
+            ->allowedIncludes(['questions', 'prerequisites', 'overrides', 'creator', 'lesson', 'assignable'])
             ->allowedSorts(['id', 'title', 'created_at', 'updated_at', 'deadline_at', 'available_from'])
             ->defaultSort('-created_at');
     }
@@ -152,6 +184,18 @@ class AssignmentService implements AssignmentServiceInterface
     public function create(array $data, int $createdBy): Assignment
     {
         return DB::transaction(function () use ($data, $createdBy) {
+            // Process deadline to be end-of-day (23:59:59)
+            $deadlineAt = null;
+            if (!empty($data['deadline_at'])) {
+                $deadlineAt = Carbon::parse($data['deadline_at'])->endOfDay();
+            }
+
+            // Process available_from to be start-of-day (00:00:00)
+            $availableFrom = null;
+            if (!empty($data['available_from'])) {
+                $availableFrom = Carbon::parse($data['available_from'])->startOfDay();
+            }
+
             $assignment = $this->repository->create([
                 'assignable_type' => $data['assignable_type'],
                 'assignable_id' => $data['assignable_id'],
@@ -160,8 +204,8 @@ class AssignmentService implements AssignmentServiceInterface
                 'description' => $data['description'] ?? null,
                 'submission_type' => $data['submission_type'] ?? 'text',
                 'max_score' => $data['max_score'] ?? 100,
-                'available_from' => $data['available_from'] ?? null,
-                'deadline_at' => $data['deadline_at'] ?? null,
+                'available_from' => $availableFrom,
+                'deadline_at' => $deadlineAt,
                 'status' => $data['status'] ?? AssignmentStatus::Draft->value,
                 'allow_resubmit' => data_get($data, 'allow_resubmit') !== null ? (bool) $data['allow_resubmit'] : null,
                 'late_penalty_percent' => $data['late_penalty_percent'] ?? null,
@@ -172,6 +216,7 @@ class AssignmentService implements AssignmentServiceInterface
                 'review_mode' => $data['review_mode'] ?? ReviewMode::Immediate->value,
                 'randomization_type' => $data['randomization_type'] ?? RandomizationType::Static->value,
                 'question_bank_count' => $data['question_bank_count'] ?? null,
+                'time_limit_minutes' => $data['time_limit_minutes'] ?? null,
             ]);
 
             if (isset($data['attachments']) && is_array($data['attachments'])) {
@@ -188,13 +233,29 @@ class AssignmentService implements AssignmentServiceInterface
     public function update(Assignment $assignment, array $data): Assignment
     {
         return DB::transaction(function () use ($assignment, $data) {
+            // Process deadline to be end-of-day (23:59:59)
+            $deadlineAt = $assignment->deadline_at;
+            if (isset($data['deadline_at'])) {
+                $deadlineAt = !empty($data['deadline_at']) 
+                    ? Carbon::parse($data['deadline_at'])->endOfDay() 
+                    : null;
+            }
+
+            // Process available_from to be start-of-day (00:00:00)
+            $availableFrom = $assignment->available_from;
+            if (isset($data['available_from'])) {
+                $availableFrom = !empty($data['available_from']) 
+                    ? Carbon::parse($data['available_from'])->startOfDay() 
+                    : null;
+            }
+
             $updated = $this->repository->update($assignment, [
                 'title' => $data['title'] ?? $assignment->title,
                 'description' => $data['description'] ?? $assignment->description,
                 'submission_type' => $data['submission_type'] ?? $assignment->submission_type ?? 'text',
                 'max_score' => $data['max_score'] ?? $assignment->max_score,
-                'available_from' => $data['available_from'] ?? $assignment->available_from,
-                'deadline_at' => $data['deadline_at'] ?? $assignment->deadline_at,
+                'available_from' => $availableFrom,
+                'deadline_at' => $deadlineAt,
                 'status' => $data['status'] ?? ($assignment->status?->value ?? AssignmentStatus::Draft->value),
                 'allow_resubmit' => data_get($data, 'allow_resubmit') !== null ? (bool) $data['allow_resubmit'] : $assignment->allow_resubmit,
                 'late_penalty_percent' => data_get($data, 'late_penalty_percent', $assignment->late_penalty_percent),
@@ -205,6 +266,7 @@ class AssignmentService implements AssignmentServiceInterface
                 'review_mode' => data_get($data, 'review_mode', $assignment->review_mode),
                 'randomization_type' => data_get($data, 'randomization_type', $assignment->randomization_type),
                 'question_bank_count' => data_get($data, 'question_bank_count', $assignment->question_bank_count),
+                'time_limit_minutes' => data_get($data, 'time_limit_minutes', $assignment->time_limit_minutes),
             ]);
 
             if (isset($data['delete_attachments']) && is_array($data['delete_attachments'])) {
@@ -225,6 +287,25 @@ class AssignmentService implements AssignmentServiceInterface
     public function publish(Assignment $assignment): Assignment
     {
         return DB::transaction(function () use ($assignment) {
+            // Enforce total question weight <= max_score before publishing
+            $stats = \Modules\Learning\Services\QuestionService::computeWeightStats($assignment->id);
+            if ($stats['exceeds'] ?? false) {
+                throw new \Illuminate\Validation\ValidationException(
+                    \Illuminate\Support\Facades\Validator::make(
+                        ['weight' => $stats['total']],
+                        ['weight' => 'required'],
+                        [
+                            'weight.custom' => __('messages.questions.weight_exceeds_max_score', [
+                                'current' => $stats['current'],
+                                'new' => 0,
+                                'max' => $stats['max'],
+                                'total' => $stats['total'],
+                            ]),
+                        ]
+                    )->errors()
+                );
+            }
+
             $wasDraft = $assignment->status === AssignmentStatus::Draft;
             $published = $this->repository->update($assignment, ['status' => AssignmentStatus::Published->value]);
             $freshAssignment = $published->fresh(['lesson', 'creator']);
@@ -610,7 +691,6 @@ class AssignmentService implements AssignmentServiceInterface
             'created_by' => $overrides['created_by'] ?? $original->created_by,
             'title' => $overrides['title'] ?? $original->title.' (Copy)',
             'description' => $overrides['description'] ?? $original->description,
-            'type' => $original->type,
             'submission_type' => $original->submission_type?->value ?? $original->getRawOriginal('submission_type'),
             'max_score' => $overrides['max_score'] ?? $original->max_score,
             'available_from' => $overrides['available_from'] ?? $original->available_from,

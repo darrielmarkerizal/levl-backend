@@ -13,3 +13,6 @@ Schedule::job(new \Modules\Content\Jobs\PublishScheduledContent)->everyFiveMinut
 
 // Schedule Account Cleanup (Daily)
 Schedule::command('auth:cleanup-deleted-accounts')->daily();
+
+// Housekeeping: mark missing submissions shortly after deadlines
+Schedule::job(new \Modules\Learning\Jobs\MarkMissingSubmissionsJob)->everyMinute();

@@ -58,7 +58,7 @@ class GradingService implements GradingServiceInterface
             ? SubmissionState::PendingManualGrading
             : SubmissionState::AutoGraded;
 
-        $submission->transitionTo($newState);
+        $submission->transitionTo($newState, $submission->user_id);
 
         // Check for new high score and trigger course grade recalculation (Requirements 22.4, 22.5)
         if (! $hasManualQuestions) {
@@ -75,8 +75,19 @@ class GradingService implements GradingServiceInterface
     {
         $submission = Submission::with(['answers.question', 'assignment'])->findOrFail($submissionId);
 
+        // Check for global override score
+        $globalScoreOverride = null;
+        if (isset($grades['score'])) {
+            $globalScoreOverride = (float) $grades['score'];
+        }
+
         // Validate and update answer scores
         foreach ($grades as $questionId => $gradeData) {
+            // Skip if it's the global score key
+            if ($questionId === 'score') {
+                continue;
+            }
+
             $answer = $submission->answers->where('question_id', $questionId)->first();
 
             if (! $answer) {
@@ -89,8 +100,11 @@ class GradingService implements GradingServiceInterface
             // Validate score range (Requirements 12.1)
             $maxScore = $question->max_score ?? 100;
             if ($score < 0 || $score > $maxScore) {
-                throw new InvalidArgumentException(
-                    "Score for question {$questionId} must be between 0 and {$maxScore}"
+                throw \Modules\Learning\Exceptions\SubmissionException::invalidScore(
+                    __('messages.submissions.score_out_of_range', [
+                        'question_id' => $questionId,
+                        'max_score' => $maxScore
+                    ])
                 );
             }
 
@@ -101,15 +115,22 @@ class GradingService implements GradingServiceInterface
             ]);
         }
 
-        // Validate all required questions have scores (Requirements 11.4, 11.5)
-        if (! $this->validateGradingComplete($submissionId)) {
-            throw new InvalidArgumentException(
-                'Cannot finalize grading: not all required questions have been graded'
-            );
+        // If no global score override, enforce strict granular grading validation
+        if ($globalScoreOverride === null) {
+            // Validate all required questions have scores (Requirements 11.4, 11.5)
+            if (! $this->validateGradingComplete($submissionId)) {
+                throw \Modules\Learning\Exceptions\SubmissionException::notAllowed(
+                    __('messages.submissions.grading_incomplete')
+                );
+            }
+
+             // Calculate final score from answers
+            $score = $this->calculateScore($submissionId);
+        } else {
+            // Use global override score
+            $score = $globalScoreOverride;
         }
 
-        // Calculate final score
-        $score = $this->calculateScore($submissionId);
         $submission->update(['score' => $score]);
 
         // Create or update grade record
@@ -135,7 +156,7 @@ class GradingService implements GradingServiceInterface
         }
 
         // Transition to graded state
-        $submission->transitionTo(SubmissionState::Graded);
+        $submission->transitionTo(SubmissionState::Graded, (int) auth('api')->id());
 
         // Check for new high score and trigger course grade recalculation (Requirements 22.4, 22.5)
         $this->checkAndDispatchNewHighScore($submission->fresh());
@@ -386,8 +407,14 @@ class GradingService implements GradingServiceInterface
     public function validateGradingComplete(int $submissionId): bool
     {
         $submission = Submission::with(['answers.question'])->findOrFail($submissionId);
+        $questionSet = $submission->question_set;
 
         foreach ($submission->answers as $answer) {
+             // If question_set is defined, skip answers not in the set
+            if (! empty($questionSet) && ! in_array($answer->question_id, $questionSet)) {
+                continue;
+            }
+            
             // All answers must have a score
             if ($answer->score === null) {
                 return false;
@@ -416,7 +443,7 @@ class GradingService implements GradingServiceInterface
         }
 
         $submission->grade->release();
-        $submission->transitionTo(SubmissionState::Released);
+        $submission->transitionTo(SubmissionState::Released, (int) auth('api')->id());
 
         // Dispatch event to trigger notifications (Requirements 14.6)
         GradesReleased::dispatch(collect([$submission]), auth('api')->id());
@@ -535,7 +562,7 @@ class GradingService implements GradingServiceInterface
 
             // Release the grade
             $submission->grade->release();
-            $submission->transitionTo(SubmissionState::Released);
+            $submission->transitionTo(SubmissionState::Released, (int) auth('api')->id());
             $releasedSubmissions->push($submission);
             $successCount++;
         }

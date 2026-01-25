@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Learning\Contracts\Services;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Modules\Auth\Models\User;
 use Modules\Learning\Enums\OverrideType;
@@ -12,7 +13,7 @@ use Modules\Learning\Models\Submission;
 
 interface SubmissionServiceInterface
 {
-    public function listForAssignment(Assignment $assignment, User $user, array $filters = []): Collection;
+    public function listForAssignment(Assignment $assignment, User $user, array $filters = []): LengthAwarePaginator;
 
     public function listByAssignment(Assignment $assignment, array $filters = []);
 
@@ -27,6 +28,12 @@ interface SubmissionServiceInterface
     public function getHighestScoreSubmission(int $assignmentId, int $studentId): ?Submission;
 
     public function startSubmission(int $assignmentId, int $studentId): Submission;
+
+    public function saveAnswer(Submission $submission, int $questionId, mixed $answer): \Modules\Learning\Models\Answer;
+
+    public function getSubmissionQuestions(Submission $submission): \Illuminate\Support\Collection;
+
+    public function getSubmissionQuestionsPaginated(Submission $submission, int $perPage = 1): LengthAwarePaginator;
 
     public function submitAnswers(int $submissionId, array $answers): Submission;
 

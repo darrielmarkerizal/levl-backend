@@ -7,8 +7,12 @@ namespace Modules\Learning\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Answer extends Model
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+
+class Answer extends Model implements HasMedia
 {
+    use InteractsWithMedia;
     protected $fillable = [
         'submission_id',
         'question_id',

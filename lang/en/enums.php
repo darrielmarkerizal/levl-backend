@@ -77,6 +77,7 @@ return [
         'submitted' => 'Submitted',
         'graded' => 'Graded',
         'late' => 'Late',
+        'missing' => 'Missing',
     ],
 
     'submission_type' => [

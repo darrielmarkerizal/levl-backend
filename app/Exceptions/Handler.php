@@ -40,7 +40,8 @@ class Handler extends ExceptionHandler
 
         $this->renderable(function (AuthorizationException $e, Request $request) {
             if ($this->isApiRequest($request)) {
-                return $this->forbidden(__('messages.forbidden'));
+                $message = $e->getMessage() ?: __('messages.forbidden');
+                return $this->forbidden($message);
             }
         });
     }
@@ -103,9 +104,27 @@ class Handler extends ExceptionHandler
 
         // AuthorizationException - user not authorized
         if ($e instanceof AuthorizationException) {
-            $messageKey = $this->getExceptionMessageKey($e);
+            // Try to get message from exception first, then from response, then fallback to translation key
+            $message = $e->getMessage();
+            
+            // If getMessage() is empty but response has message, use that
+            if (empty($message) && method_exists($e, 'response') && $e->response() && $e->response()->message()) {
+                $message = $e->response()->message();
+            }
+            
+            // Final fallback to translation key
+            if (empty($message)) {
+                $message = $this->getExceptionMessageKey($e);
+            }
 
-            return $this->forbidden($messageKey);
+            \Log::critical('AUTHORIZATION_EXCEPTION_DEBUG_v2', [
+                'exception_message' => $e->getMessage(),
+                'response_message' => method_exists($e, 'response') && $e->response() ? $e->response()->message() : null,
+                'final_message' => $message,
+                'translated_forbidden' => __('messages.forbidden'),
+            ]);
+
+            return $this->forbidden($message);
         }
 
         // Custom application exceptions

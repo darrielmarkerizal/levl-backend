@@ -15,7 +15,7 @@ class SubmitAnswersRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'answers' => ['required', 'array'],
+            'answers' => ['nullable', 'array'],
             'answers.*.question_id' => ['required', 'integer', 'exists:questions,id'],
             'answers.*.content' => ['nullable', 'string'],
             'answers.*.selected_options' => ['nullable', 'array'],

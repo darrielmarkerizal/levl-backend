@@ -15,31 +15,13 @@ use Modules\Grading\Strategies\GradingStrategyFactory;
 use Modules\Learning\Models\Answer;
 use Modules\Learning\Models\Question;
 
-/**
- * Job to recalculate grades after an answer key change.
- *
- * This job identifies all affected submissions and recalculates
- * auto-graded questions while preserving manual grades.
- *
- * Requirements: 15.1, 15.2, 15.3, 15.6
- */
 class RecalculateGradesJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * The number of times the job may be attempted.
-     */
     public int $tries = 3;
-
-    /**
-     * The number of seconds the job can run before timing out.
-     */
     public int $timeout = 120;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct(
         public int $questionId,
         public array $oldAnswerKey,
@@ -49,9 +31,6 @@ class RecalculateGradesJob implements ShouldQueue
         $this->onQueue('grading');
     }
 
-    /**
-     * Execute the job.
-     */
     public function handle(): void
     {
         $question = Question::find($this->questionId);
@@ -64,7 +43,6 @@ class RecalculateGradesJob implements ShouldQueue
             return;
         }
 
-        // Only recalculate for auto-gradable questions (Requirements 15.2)
         if (! $question->canAutoGrade()) {
             Log::info('RecalculateGradesJob: Question is not auto-gradable, skipping', [
                 'question_id' => $this->questionId,
@@ -73,8 +51,6 @@ class RecalculateGradesJob implements ShouldQueue
             return;
         }
 
-        // Find all auto-graded answers for this question (Requirements 15.1, 15.6)
-        // Only recalculate answers that were auto-graded, preserving manual grades
         $answers = Answer::where('question_id', $this->questionId)
             ->where('is_auto_graded', true)
             ->with('submission')
@@ -99,14 +75,12 @@ class RecalculateGradesJob implements ShouldQueue
             $oldScore = $answer->score;
             $newScore = $strategy->grade($question, $answer);
 
-            // Only update if score changed
             if ($oldScore != $newScore) {
                 $answer->update(['score' => $newScore]);
                 $affectedSubmissions->push($answer->submission);
             }
         }
 
-        // Recalculate submission scores for affected submissions (Requirements 15.3)
         $uniqueSubmissions = $affectedSubmissions->unique('id');
 
         foreach ($uniqueSubmissions as $submission) {
@@ -120,17 +94,10 @@ class RecalculateGradesJob implements ShouldQueue
         ]);
     }
 
-    /**
-     * Recalculate the total score for a submission.
-     *
-     * Dispatches GradeRecalculated event to trigger notifications.
-     * Requirements: 15.5 - THE System SHALL notify affected students of grade changes
-     */
     private function recalculateSubmissionScore($submission): void
     {
         $submission->load('answers.question');
 
-        // Store old score for notification
         $oldScore = (float) ($submission->score ?? 0);
 
         $totalWeightedScore = 0;
@@ -155,23 +122,17 @@ class RecalculateGradesJob implements ShouldQueue
 
         $submission->update(['score' => $newScore]);
 
-        // Update the grade record if it exists
         if ($submission->grade) {
-            // Only update if not overridden (preserve manual overrides)
             if (! $submission->grade->is_override) {
                 $submission->grade->update(['score' => $newScore]);
             }
         }
 
-        // Dispatch event to trigger notification if score changed (Requirements 15.5)
         if (abs($oldScore - $newScore) >= 0.01) {
             GradeRecalculated::dispatch($submission, $oldScore, $newScore);
         }
     }
 
-    /**
-     * Handle a job failure.
-     */
     public function failed(\Throwable $exception): void
     {
         Log::error('RecalculateGradesJob: Failed to recalculate grades', [

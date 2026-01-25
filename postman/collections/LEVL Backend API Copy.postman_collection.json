@@ -5115,8 +5115,44 @@
                   "variable": [
                     {
                       "key": "assignmentId",
-                      "value": "24",
-                      "uuid": "5d3c7871-a2f2-4c9a-afe1-7a02b62cd866"
+                      "value": "24"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Lihat Tugas Belum Selesai",
+              "id": "b5194b92-9e8a-4deb-9486-3d198970a3f4",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token_student}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{url}}/courses/:courseSlug/assignments/incomplete",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "courses",
+                    ":courseSlug",
+                    "assignments",
+                    "incomplete"
+                  ],
+                  "variable": [
+                    {
+                      "key": "courseSlug",
+                      "value": "junior-web-programmer"
                     }
                   ]
                 }
@@ -5297,6 +5333,13 @@
                       "type": "file",
                       "uuid": "848b57ee-436f-4aaf-ba60-504e4c380cf9",
                       "src": []
+                    },
+                    {
+                      "key": "time_limit_minutes",
+                      "value": "60",
+                      "description": "opsional menit | ",
+                      "type": "text",
+                      "uuid": "0b6caf71-f5f8-4443-b78c-b42768c1e668"
                     }
                   ],
                   "options": {
@@ -5538,6 +5581,13 @@
                       "value": "",
                       "type": "text",
                       "uuid": "9bac4ad5-3d30-4789-b249-5936a3931505"
+                    },
+                    {
+                      "key": "time_limit_minutes",
+                      "value": "60",
+                      "description": "opsional menit",
+                      "type": "text",
+                      "uuid": "529d7fb6-6400-46d7-9fd4-9649f29630a0"
                     }
                   ],
                   "options": {
@@ -5603,8 +5653,7 @@
                   "variable": [
                     {
                       "key": "assignmentId",
-                      "value": "27",
-                      "uuid": "369ce4be-acc2-4669-ae1c-c6d2490c550f"
+                      "value": "27"
                     }
                   ]
                 }
@@ -5685,8 +5734,7 @@
                   "variable": [
                     {
                       "key": "assignmentId",
-                      "value": "27",
-                      "uuid": "b97709b5-7ff0-434b-ac67-e5d36c46177e"
+                      "value": "27"
                     }
                   ]
                 }
@@ -5767,8 +5815,7 @@
                   "variable": [
                     {
                       "key": "assignmentId",
-                      "value": "27",
-                      "uuid": "b97709b5-7ff0-434b-ac67-e5d36c46177e"
+                      "value": "27"
                     }
                   ]
                 }
@@ -5849,8 +5896,7 @@
                   "variable": [
                     {
                       "key": "assignmentId",
-                      "value": "27",
-                      "uuid": "b97709b5-7ff0-434b-ac67-e5d36c46177e"
+                      "value": "27"
                     }
                   ]
                 }
@@ -5930,8 +5976,88 @@
                   "variable": [
                     {
                       "key": "assignmentId",
-                      "value": "26",
-                      "uuid": "b97709b5-7ff0-434b-ac67-e5d36c46177e"
+                      "value": "26"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Duplikasi Tugas",
+              "id": "b785761f-8ec9-461e-ba5f-529012f309af",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token_admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{url}}/assignments/:assignmentId/duplicate",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "assignments",
+                    ":assignmentId",
+                    "duplicate"
+                  ],
+                  "query": [
+                    {
+                      "key": "unit_slug",
+                      "value": "mengenal-htmlcss1",
+                      "uuid": "71f47ef4-9f44-43b0-b029-bdc59e1aee5c",
+                      "disabled": true
+                    },
+                    {
+                      "key": "lesson_slug",
+                      "value": "laravel-routing",
+                      "uuid": "dfca064e-34df-45b1-8a95-2aec577ef59f",
+                      "disabled": true
+                    },
+                    {
+                      "key": "filter[status]",
+                      "value": "",
+                      "description": "draft, published, archieved",
+                      "uuid": "e3227d88-42a6-4962-92f4-7c8d658c345a",
+                      "disabled": true
+                    },
+                    {
+                      "key": "filter[submission_type]",
+                      "value": null,
+                      "description": "text, file, mixed",
+                      "type": "text",
+                      "uuid": "db5f3d7d-e0ae-484e-b742-9e1eff1b15bf",
+                      "disabled": true
+                    },
+                    {
+                      "key": "sort",
+                      "value": null,
+                      "description": "id, title, created_at, updated_at, deadline_at, available_from",
+                      "type": "text",
+                      "uuid": "f6247495-1532-4c5c-a049-e13e4c416cba",
+                      "disabled": true
+                    },
+                    {
+                      "key": "include",
+                      "value": "",
+                      "description": "questions, questionsCount, questionsExists, prerequisites, prerequisitesCount, prerequisitesExists, overrides, overridesCount, overridesExists, creator, creatorCount, creatorExists, lesson, lessonCount, lessonExists",
+                      "type": "text",
+                      "uuid": "c1fd3a75-d70e-4888-8794-369391a4b64a",
+                      "disabled": true
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "key": "assignmentId",
+                      "value": "25"
                     }
                   ]
                 }
@@ -5942,12 +6068,1777 @@
           "id": "487eb1c9-82e7-473f-988d-d28d127d1981"
         },
         {
-          "name": "Pertanyaan",
+          "name": "Soal",
           "item": [
             {
-              "name": "New Request",
+              "name": "Buat Soal",
+              "item": [
+                {
+                  "name": "[Pilihan Ganda] - Tanpa Gambar",
+                  "id": "ced603d0-34a0-440d-b9aa-43a5b58ae97b",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_admin}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"type\": \"multiple_choice\",\n  \"content\": \"Apa kepanjangan dari PHP?\",\n  \"options\": [\n    \"Personal Home Page\",\n    \"PHP: Hypertext Preprocessor\"\n  ],\n  \"answer_key\": [1],\n  \"weight\": 5 // opsional\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{url}}/assignments/:assignmentId/questions",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "assignments",
+                        ":assignmentId",
+                        "questions"
+                      ],
+                      "variable": [
+                        {
+                          "key": "assignmentId",
+                          "value": "25"
+                        }
+                      ]
+                    },
+                    "description": "**\\[!NOTE\\]** Parameter `search`, `filter`, dan `sort` hanya berfungsi untuk **Superadmin, Admin, dan Instructor**. Student akan selalu menerima daftar soal lengkap sesuai pengaturan pengacakan assignment."
+                  },
+                  "response": []
+                },
+                {
+                  "name": "[Pilihan Ganda] - Dengan Gambar",
+                  "id": "28bbc687-8f46-416a-9a42-18151d8d3195",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_admin}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "type",
+                          "value": "multiple_choice",
+                          "type": "text",
+                          "uuid": "20c392ca-0794-4eda-a574-b624934a511f"
+                        },
+                        {
+                          "key": "content",
+                          "value": "Pilih hewan yang berkaki empat",
+                          "type": "text",
+                          "uuid": "10325a7e-de89-4f08-a23d-83cf9440c4c7"
+                        },
+                        {
+                          "key": "weight",
+                          "value": "10",
+                          "type": "text",
+                          "uuid": "d6523025-a453-4463-ad66-4fc5933a702c"
+                        },
+                        {
+                          "key": "options[0][text]",
+                          "value": "kucing",
+                          "type": "text",
+                          "uuid": "51437781-de67-4ba0-8a11-9686f8445aeb"
+                        },
+                        {
+                          "key": "options[0][image]",
+                          "type": "file",
+                          "uuid": "51d16c97-5c1b-4935-9231-5fa80bb6ef12",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/action.png"
+                          ]
+                        },
+                        {
+                          "key": "options[1][text]",
+                          "value": "ayam",
+                          "type": "text",
+                          "uuid": "c14ceeb8-6dad-4c88-a9ab-aae416955654"
+                        },
+                        {
+                          "key": "options[1][image]",
+                          "type": "file",
+                          "uuid": "e2e1e0ad-133b-41f5-b858-5eb8efd66c5f",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/Special Edition Birthday Greeting Logo (2).png"
+                          ]
+                        },
+                        {
+                          "key": "options[2][text]",
+                          "value": "ikan",
+                          "type": "text",
+                          "uuid": "d6cf3d33-5f5d-4546-a5aa-24a4762c7b71"
+                        },
+                        {
+                          "key": "options[2][image]",
+                          "type": "file",
+                          "uuid": "e7f0922f-3f54-4495-a0e3-bf59d6c41874",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/file_example_PNG_500kB.png"
+                          ]
+                        },
+                        {
+                          "key": "answer_key",
+                          "value": "2",
+                          "type": "text",
+                          "uuid": "bdb28ade-89df-4d81-b767-ea2d4638fcb8"
+                        }
+                      ],
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{url}}/assignments/:assignmentId/questions",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "assignments",
+                        ":assignmentId",
+                        "questions"
+                      ],
+                      "variable": [
+                        {
+                          "key": "assignmentId",
+                          "value": "25"
+                        }
+                      ]
+                    },
+                    "description": "**\\[!NOTE\\]** Parameter `search`, `filter`, dan `sort` hanya berfungsi untuk **Superadmin, Admin, dan Instructor**. Student akan selalu menerima daftar soal lengkap sesuai pengaturan pengacakan assignment."
+                  },
+                  "response": []
+                },
+                {
+                  "name": "[Pilihan Ganda] - Dengan Attachment",
+                  "id": "c8cd781c-cbc9-4e4f-aceb-c2d5ead06ec8",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_admin}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "type",
+                          "value": "multiple_choice",
+                          "type": "text",
+                          "uuid": "20c392ca-0794-4eda-a574-b624934a511f"
+                        },
+                        {
+                          "key": "content",
+                          "value": "Pilih hewan yang berkaki empat",
+                          "type": "text",
+                          "uuid": "10325a7e-de89-4f08-a23d-83cf9440c4c7"
+                        },
+                        {
+                          "key": "weight",
+                          "value": "10",
+                          "type": "text",
+                          "uuid": "d6523025-a453-4463-ad66-4fc5933a702c"
+                        },
+                        {
+                          "key": "options[0][text]",
+                          "value": "kucing",
+                          "type": "text",
+                          "uuid": "51437781-de67-4ba0-8a11-9686f8445aeb"
+                        },
+                        {
+                          "key": "options[0][image]",
+                          "type": "file",
+                          "uuid": "51d16c97-5c1b-4935-9231-5fa80bb6ef12",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/action.png"
+                          ]
+                        },
+                        {
+                          "key": "options[1][text]",
+                          "value": "ayam",
+                          "type": "text",
+                          "uuid": "c14ceeb8-6dad-4c88-a9ab-aae416955654"
+                        },
+                        {
+                          "key": "options[1][image]",
+                          "type": "file",
+                          "uuid": "e2e1e0ad-133b-41f5-b858-5eb8efd66c5f",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/Special Edition Birthday Greeting Logo (2).png"
+                          ]
+                        },
+                        {
+                          "key": "options[2][text]",
+                          "value": "ikan",
+                          "type": "text",
+                          "uuid": "d6cf3d33-5f5d-4546-a5aa-24a4762c7b71"
+                        },
+                        {
+                          "key": "options[2][image]",
+                          "type": "file",
+                          "uuid": "e7f0922f-3f54-4495-a0e3-bf59d6c41874",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/file_example_PNG_500kB.png"
+                          ]
+                        },
+                        {
+                          "key": "answer_key",
+                          "value": "2",
+                          "type": "text",
+                          "uuid": "bdb28ade-89df-4d81-b767-ea2d4638fcb8"
+                        },
+                        {
+                          "key": "attachments[0]",
+                          "description": "max 2mb",
+                          "type": "file",
+                          "uuid": "3f86e222-5eb3-499b-84a1-685a6b88bdb8",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/Frame.png"
+                          ]
+                        },
+                        {
+                          "key": "attachments[1]",
+                          "type": "file",
+                          "uuid": "97d7c644-d236-4e46-9b29-ae67d5ddd5b1",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/cursor-2025.png"
+                          ]
+                        }
+                      ],
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{url}}/assignments/:assignmentId/questions",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "assignments",
+                        ":assignmentId",
+                        "questions"
+                      ],
+                      "variable": [
+                        {
+                          "key": "assignmentId",
+                          "value": "25"
+                        }
+                      ]
+                    },
+                    "description": "**\\[!NOTE\\]** Parameter `search`, `filter`, dan `sort` hanya berfungsi untuk **Superadmin, Admin, dan Instructor**. Student akan selalu menerima daftar soal lengkap sesuai pengaturan pengacakan assignment."
+                  },
+                  "response": []
+                },
+                {
+                  "name": "[Checkbox] - Tanpa Gambar",
+                  "id": "b33d1014-83a0-47da-aee0-82d301fa41d0",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_admin}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"type\": \"checkbox\",\n  \"content\": \"Pilih fitur bawaan Laravel yang berkaitan dengan keamanan aplikasi:\",\n  \"options\": [\n    { \"text\": \"CSRF Protection\" },\n    { \"text\": \"Blade Templating Engine\" },\n    { \"text\": \"Password Hashing\" },\n    { \"text\": \"Eloquent ORM\" }\n  ],\n  \"answer_key\": [0, 2],\n  \"weight\": 10\n}\n",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{url}}/assignments/:assignmentId/questions",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "assignments",
+                        ":assignmentId",
+                        "questions"
+                      ],
+                      "variable": [
+                        {
+                          "key": "assignmentId",
+                          "value": "25"
+                        }
+                      ]
+                    },
+                    "description": "**\\[!NOTE\\]** Parameter `search`, `filter`, dan `sort` hanya berfungsi untuk **Superadmin, Admin, dan Instructor**. Student akan selalu menerima daftar soal lengkap sesuai pengaturan pengacakan assignment."
+                  },
+                  "response": []
+                },
+                {
+                  "name": "[Checkbox] - Dengan Gambar",
+                  "id": "d9b86cb1-f8ce-4fc5-9e33-ac487400cfee",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_admin}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "type",
+                          "value": "checkbox",
+                          "type": "text",
+                          "uuid": "20c392ca-0794-4eda-a574-b624934a511f"
+                        },
+                        {
+                          "key": "content",
+                          "value": "Pilih hewan yang berkaki empat",
+                          "type": "text",
+                          "uuid": "10325a7e-de89-4f08-a23d-83cf9440c4c7"
+                        },
+                        {
+                          "key": "weight",
+                          "value": "10",
+                          "type": "text",
+                          "uuid": "d6523025-a453-4463-ad66-4fc5933a702c"
+                        },
+                        {
+                          "key": "options[0][text]",
+                          "value": "kucing",
+                          "type": "text",
+                          "uuid": "51437781-de67-4ba0-8a11-9686f8445aeb"
+                        },
+                        {
+                          "key": "options[0][image]",
+                          "type": "file",
+                          "uuid": "51d16c97-5c1b-4935-9231-5fa80bb6ef12",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/jpg contoh.jpg"
+                          ]
+                        },
+                        {
+                          "key": "options[1][text]",
+                          "value": "ayam",
+                          "type": "text",
+                          "uuid": "c14ceeb8-6dad-4c88-a9ab-aae416955654"
+                        },
+                        {
+                          "key": "options[1][image]",
+                          "type": "file",
+                          "uuid": "e2e1e0ad-133b-41f5-b858-5eb8efd66c5f",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/contoh.png"
+                          ]
+                        },
+                        {
+                          "key": "options[2][text]",
+                          "value": "ikan",
+                          "type": "text",
+                          "uuid": "d6cf3d33-5f5d-4546-a5aa-24a4762c7b71"
+                        },
+                        {
+                          "key": "options[2][image]",
+                          "type": "file",
+                          "uuid": "e7f0922f-3f54-4495-a0e3-bf59d6c41874",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/jpg contoh.jpg"
+                          ]
+                        },
+                        {
+                          "key": "answer_key[0]",
+                          "value": "0",
+                          "type": "text",
+                          "uuid": "bdb28ade-89df-4d81-b767-ea2d4638fcb8"
+                        },
+                        {
+                          "key": "answer_key[1]",
+                          "value": "2",
+                          "type": "text",
+                          "uuid": "5afe78bc-bab3-4ac0-b738-474e27331760"
+                        }
+                      ],
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{url}}/assignments/:assignmentId/questions",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "assignments",
+                        ":assignmentId",
+                        "questions"
+                      ],
+                      "variable": [
+                        {
+                          "key": "assignmentId",
+                          "value": "25"
+                        }
+                      ]
+                    },
+                    "description": "**\\[!NOTE\\]** Parameter `search`, `filter`, dan `sort` hanya berfungsi untuk **Superadmin, Admin, dan Instructor**. Student akan selalu menerima daftar soal lengkap sesuai pengaturan pengacakan assignment."
+                  },
+                  "response": []
+                },
+                {
+                  "name": "[Checkbox] - Dengan Attachment",
+                  "id": "f3955b7a-43ae-4db7-9879-67ebde5c2ae5",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_admin}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "type",
+                          "value": "checkbox",
+                          "type": "text",
+                          "uuid": "20c392ca-0794-4eda-a574-b624934a511f"
+                        },
+                        {
+                          "key": "content",
+                          "value": "Pilih hewan yang berkaki empat",
+                          "type": "text",
+                          "uuid": "10325a7e-de89-4f08-a23d-83cf9440c4c7"
+                        },
+                        {
+                          "key": "weight",
+                          "value": "10",
+                          "type": "text",
+                          "uuid": "d6523025-a453-4463-ad66-4fc5933a702c"
+                        },
+                        {
+                          "key": "options[0][text]",
+                          "value": "kucing",
+                          "type": "text",
+                          "uuid": "51437781-de67-4ba0-8a11-9686f8445aeb"
+                        },
+                        {
+                          "key": "options[0][image]",
+                          "type": "file",
+                          "uuid": "51d16c97-5c1b-4935-9231-5fa80bb6ef12",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/jpg contoh.jpg"
+                          ]
+                        },
+                        {
+                          "key": "options[1][text]",
+                          "value": "ayam",
+                          "type": "text",
+                          "uuid": "c14ceeb8-6dad-4c88-a9ab-aae416955654"
+                        },
+                        {
+                          "key": "options[1][image]",
+                          "type": "file",
+                          "uuid": "e2e1e0ad-133b-41f5-b858-5eb8efd66c5f",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/contoh.png"
+                          ]
+                        },
+                        {
+                          "key": "options[2][text]",
+                          "value": "ikan",
+                          "type": "text",
+                          "uuid": "d6cf3d33-5f5d-4546-a5aa-24a4762c7b71"
+                        },
+                        {
+                          "key": "options[2][image]",
+                          "type": "file",
+                          "uuid": "e7f0922f-3f54-4495-a0e3-bf59d6c41874",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/jpg contoh.jpg"
+                          ]
+                        },
+                        {
+                          "key": "answer_key[0]",
+                          "value": "0",
+                          "type": "text",
+                          "uuid": "bdb28ade-89df-4d81-b767-ea2d4638fcb8"
+                        },
+                        {
+                          "key": "answer_key[1]",
+                          "value": "2",
+                          "type": "text",
+                          "uuid": "5afe78bc-bab3-4ac0-b738-474e27331760"
+                        },
+                        {
+                          "key": "attachments[0]",
+                          "type": "file",
+                          "uuid": "5660d349-832b-4a5d-90c1-ae87a16ed8f0",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/41.png"
+                          ]
+                        },
+                        {
+                          "key": "attachments[1]",
+                          "type": "file",
+                          "uuid": "ec9cc1bf-df9d-4647-93cd-3e9959466cdc",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/43.png"
+                          ]
+                        }
+                      ],
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{url}}/assignments/:assignmentId/questions",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "assignments",
+                        ":assignmentId",
+                        "questions"
+                      ],
+                      "variable": [
+                        {
+                          "key": "assignmentId",
+                          "value": "25"
+                        }
+                      ]
+                    },
+                    "description": "**\\[!NOTE\\]** Parameter `search`, `filter`, dan `sort` hanya berfungsi untuk **Superadmin, Admin, dan Instructor**. Student akan selalu menerima daftar soal lengkap sesuai pengaturan pengacakan assignment."
+                  },
+                  "response": []
+                },
+                {
+                  "name": "[Essay] - Tanpa Attachment",
+                  "id": "b539412c-deb6-4bd3-a7e8-f2d6ea3cd176",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_admin}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"type\": \"essay\",\n  \"content\": \"Jelaskan sejarah PHP secara singkat.\",\n  \"weight\": 10\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{url}}/assignments/:assignmentId/questions",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "assignments",
+                        ":assignmentId",
+                        "questions"
+                      ],
+                      "variable": [
+                        {
+                          "key": "assignmentId",
+                          "value": "25"
+                        }
+                      ]
+                    },
+                    "description": "**\\[!NOTE\\]** Parameter `search`, `filter`, dan `sort` hanya berfungsi untuk **Superadmin, Admin, dan Instructor**. Student akan selalu menerima daftar soal lengkap sesuai pengaturan pengacakan assignment."
+                  },
+                  "response": []
+                },
+                {
+                  "name": "[Essay] - Dengan Attachment",
+                  "id": "885b5107-5c80-4509-965c-d3a3ad9bbd45",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_admin}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "type",
+                          "value": " essay",
+                          "type": "text"
+                        },
+                        {
+                          "key": "content",
+                          "value": " Jelaskan sejarah PHP secara singkat.",
+                          "type": "text"
+                        },
+                        {
+                          "key": "weight",
+                          "value": " 10",
+                          "type": "text"
+                        },
+                        {
+                          "key": "attachments[0]",
+                          "type": "file",
+                          "uuid": "5cab33d4-35aa-4b19-9e16-a0062bf44e83",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/Biru Ungu Ilustrasi 5 Tips Menentukan Karir Yang Tepat Poster.png"
+                          ]
+                        }
+                      ],
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{url}}/assignments/:assignmentId/questions",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "assignments",
+                        ":assignmentId",
+                        "questions"
+                      ],
+                      "variable": [
+                        {
+                          "key": "assignmentId",
+                          "value": "25"
+                        }
+                      ]
+                    },
+                    "description": "**\\[!NOTE\\]** Parameter `search`, `filter`, dan `sort` hanya berfungsi untuk **Superadmin, Admin, dan Instructor**. Student akan selalu menerima daftar soal lengkap sesuai pengaturan pengacakan assignment."
+                  },
+                  "response": []
+                },
+                {
+                  "name": "[File Upload] - Tanpa Attachment",
+                  "id": "f6c5bc2f-3776-4a01-96d8-378ce1c1d321",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_admin}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"type\": \"file_upload\",\n  \"content\": \"Upload diagram database anda.\",\n  \"allowed_file_types\": [\"pdf\", \"jpg\", \"png\"],\n  \"max_file_size\": 5242880, // 5MB in bytes\n  \"allow_multiple_files\": false,\n  \"weight\": 20\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{url}}/assignments/:assignmentId/questions",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "assignments",
+                        ":assignmentId",
+                        "questions"
+                      ],
+                      "variable": [
+                        {
+                          "key": "assignmentId",
+                          "value": "25"
+                        }
+                      ]
+                    },
+                    "description": "**\\[!NOTE\\]** Parameter `search`, `filter`, dan `sort` hanya berfungsi untuk **Superadmin, Admin, dan Instructor**. Student akan selalu menerima daftar soal lengkap sesuai pengaturan pengacakan assignment."
+                  },
+                  "response": []
+                },
+                {
+                  "name": "[File Upload] - Dengan Attachment",
+                  "id": "377a9025-8968-4291-867f-5104ec1d7eb6",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_admin}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "type",
+                          "value": "file_upload",
+                          "type": "text"
+                        },
+                        {
+                          "key": "content",
+                          "value": "Upload diagram database anda.",
+                          "type": "text"
+                        },
+                        {
+                          "key": "weight",
+                          "value": "20",
+                          "type": "text"
+                        },
+                        {
+                          "key": "allowed_file_types[0]",
+                          "value": "pdf",
+                          "type": "text"
+                        },
+                        {
+                          "key": "allowed_file_types[1]",
+                          "value": "jpg",
+                          "type": "text"
+                        },
+                        {
+                          "key": "allowed_file_types[2]",
+                          "value": "png",
+                          "type": "text"
+                        },
+                        {
+                          "key": "max_file_size",
+                          "value": "5242880",
+                          "type": "text"
+                        },
+                        {
+                          "key": "allow_multiple_files",
+                          "value": "false",
+                          "type": "text",
+                          "disabled": true
+                        },
+                        {
+                          "key": "attachments[0]",
+                          "type": "file",
+                          "uuid": "f844ad49-eef5-49ee-8891-0a9a9749018b",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/43.png"
+                          ]
+                        }
+                      ],
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{url}}/assignments/:assignmentId/questions",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "assignments",
+                        ":assignmentId",
+                        "questions"
+                      ],
+                      "variable": [
+                        {
+                          "key": "assignmentId",
+                          "value": "25"
+                        }
+                      ]
+                    },
+                    "description": "**\\[!NOTE\\]** Parameter `search`, `filter`, dan `sort` hanya berfungsi untuk **Superadmin, Admin, dan Instructor**. Student akan selalu menerima daftar soal lengkap sesuai pengaturan pengacakan assignment."
+                  },
+                  "response": []
+                }
+              ],
+              "id": "0e477699-bb29-4ba1-85ee-dc958a97d4be"
+            },
+            {
+              "name": "Ubah Soal",
+              "item": [
+                {
+                  "name": "[Pilihan Ganda] - Tanpa Gambar",
+                  "id": "6bb85fc1-cb6b-4e20-9eb5-9a8d156c61b2",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_admin}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "PUT",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"type\": \"multiple_choice\",\n  \"content\": \"Apa kepanjangan dari PHP?\",\n  \"options\": [\n    \"Personal Home Page\",\n    \"PHP: Hypertext Preprocessor\"\n  ],\n  \"answer_key\": [1],\n  \"weight\": 5 // opsional\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{url}}/assignments/:assignmentId/questions/:questionId",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "assignments",
+                        ":assignmentId",
+                        "questions",
+                        ":questionId"
+                      ],
+                      "variable": [
+                        {
+                          "key": "assignmentId",
+                          "value": "25"
+                        },
+                        {
+                          "key": "questionId",
+                          "value": ""
+                        }
+                      ]
+                    },
+                    "description": "**\\[!NOTE\\]** Parameter `search`, `filter`, dan `sort` hanya berfungsi untuk **Superadmin, Admin, dan Instructor**. Student akan selalu menerima daftar soal lengkap sesuai pengaturan pengacakan assignment."
+                  },
+                  "response": []
+                },
+                {
+                  "name": "[Pilihan Ganda] - Dengan Gambar",
+                  "id": "995949f1-1c31-4481-978e-0b0f75e2afb8",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_admin}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "PUT",
+                    "header": [],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "type",
+                          "value": "multiple_choice",
+                          "type": "text",
+                          "uuid": "20c392ca-0794-4eda-a574-b624934a511f"
+                        },
+                        {
+                          "key": "content",
+                          "value": "Pilih hewan yang berkaki empat",
+                          "type": "text",
+                          "uuid": "10325a7e-de89-4f08-a23d-83cf9440c4c7"
+                        },
+                        {
+                          "key": "weight",
+                          "value": "10",
+                          "type": "text",
+                          "uuid": "d6523025-a453-4463-ad66-4fc5933a702c"
+                        },
+                        {
+                          "key": "options[0][text]",
+                          "value": "kucing",
+                          "type": "text",
+                          "uuid": "51437781-de67-4ba0-8a11-9686f8445aeb"
+                        },
+                        {
+                          "key": "options[0][image]",
+                          "type": "file",
+                          "uuid": "51d16c97-5c1b-4935-9231-5fa80bb6ef12",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/action.png"
+                          ]
+                        },
+                        {
+                          "key": "options[1][text]",
+                          "value": "ayam",
+                          "type": "text",
+                          "uuid": "c14ceeb8-6dad-4c88-a9ab-aae416955654"
+                        },
+                        {
+                          "key": "options[1][image]",
+                          "type": "file",
+                          "uuid": "e2e1e0ad-133b-41f5-b858-5eb8efd66c5f",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/Special Edition Birthday Greeting Logo (2).png"
+                          ]
+                        },
+                        {
+                          "key": "options[2][text]",
+                          "value": "ikan",
+                          "type": "text",
+                          "uuid": "d6cf3d33-5f5d-4546-a5aa-24a4762c7b71"
+                        },
+                        {
+                          "key": "options[2][image]",
+                          "type": "file",
+                          "uuid": "e7f0922f-3f54-4495-a0e3-bf59d6c41874",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/file_example_PNG_500kB.png"
+                          ]
+                        },
+                        {
+                          "key": "answer_key",
+                          "value": "2",
+                          "type": "text",
+                          "uuid": "bdb28ade-89df-4d81-b767-ea2d4638fcb8"
+                        }
+                      ],
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{url}}/assignments/:assignmentId/questions/:questionId",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "assignments",
+                        ":assignmentId",
+                        "questions",
+                        ":questionId"
+                      ],
+                      "variable": [
+                        {
+                          "key": "assignmentId",
+                          "value": "25"
+                        },
+                        {
+                          "key": "questionId",
+                          "value": ""
+                        }
+                      ]
+                    },
+                    "description": "**\\[!NOTE\\]** Parameter `search`, `filter`, dan `sort` hanya berfungsi untuk **Superadmin, Admin, dan Instructor**. Student akan selalu menerima daftar soal lengkap sesuai pengaturan pengacakan assignment."
+                  },
+                  "response": []
+                },
+                {
+                  "name": "[Pilihan Ganda] - Dengan Attachment",
+                  "id": "866694ad-162c-4917-a71b-9433037c8f69",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_admin}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "PUT",
+                    "header": [],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "type",
+                          "value": "multiple_choice",
+                          "type": "text",
+                          "uuid": "20c392ca-0794-4eda-a574-b624934a511f"
+                        },
+                        {
+                          "key": "content",
+                          "value": "Pilih hewan yang berkaki empat",
+                          "type": "text",
+                          "uuid": "10325a7e-de89-4f08-a23d-83cf9440c4c7"
+                        },
+                        {
+                          "key": "weight",
+                          "value": "10",
+                          "type": "text",
+                          "uuid": "d6523025-a453-4463-ad66-4fc5933a702c"
+                        },
+                        {
+                          "key": "options[0][text]",
+                          "value": "kucing",
+                          "type": "text",
+                          "uuid": "51437781-de67-4ba0-8a11-9686f8445aeb"
+                        },
+                        {
+                          "key": "options[0][image]",
+                          "type": "file",
+                          "uuid": "51d16c97-5c1b-4935-9231-5fa80bb6ef12",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/action.png"
+                          ]
+                        },
+                        {
+                          "key": "options[1][text]",
+                          "value": "ayam",
+                          "type": "text",
+                          "uuid": "c14ceeb8-6dad-4c88-a9ab-aae416955654"
+                        },
+                        {
+                          "key": "options[1][image]",
+                          "type": "file",
+                          "uuid": "e2e1e0ad-133b-41f5-b858-5eb8efd66c5f",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/Special Edition Birthday Greeting Logo (2).png"
+                          ]
+                        },
+                        {
+                          "key": "options[2][text]",
+                          "value": "ikan",
+                          "type": "text",
+                          "uuid": "d6cf3d33-5f5d-4546-a5aa-24a4762c7b71"
+                        },
+                        {
+                          "key": "options[2][image]",
+                          "type": "file",
+                          "uuid": "e7f0922f-3f54-4495-a0e3-bf59d6c41874",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/file_example_PNG_500kB.png"
+                          ]
+                        },
+                        {
+                          "key": "answer_key",
+                          "value": "2",
+                          "type": "text",
+                          "uuid": "bdb28ade-89df-4d81-b767-ea2d4638fcb8"
+                        },
+                        {
+                          "key": "attachments[0]",
+                          "description": "max 2mb",
+                          "type": "file",
+                          "uuid": "3f86e222-5eb3-499b-84a1-685a6b88bdb8",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/Frame.png"
+                          ]
+                        },
+                        {
+                          "key": "attachments[1]",
+                          "type": "file",
+                          "uuid": "97d7c644-d236-4e46-9b29-ae67d5ddd5b1",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/cursor-2025.png"
+                          ]
+                        }
+                      ],
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{url}}/assignments/:assignmentId/questions/:questionId",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "assignments",
+                        ":assignmentId",
+                        "questions",
+                        ":questionId"
+                      ],
+                      "variable": [
+                        {
+                          "key": "assignmentId",
+                          "value": "25"
+                        },
+                        {
+                          "key": "questionId",
+                          "value": ""
+                        }
+                      ]
+                    },
+                    "description": "**\\[!NOTE\\]** Parameter `search`, `filter`, dan `sort` hanya berfungsi untuk **Superadmin, Admin, dan Instructor**. Student akan selalu menerima daftar soal lengkap sesuai pengaturan pengacakan assignment."
+                  },
+                  "response": []
+                },
+                {
+                  "name": "[Checkbox] - Tanpa Gambar",
+                  "id": "eada8ac6-5a82-4933-a3bc-5ae9dc4f8a72",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_admin}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "PUT",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"type\": \"checkbox\",\n  \"content\": \"Pilih fitur bawaan Laravel yang berkaitan dengan keamanan aplikasi:\",\n  \"options\": [\n    { \"text\": \"CSRF Protection\" },\n    { \"text\": \"Blade Templating Engine\" },\n    { \"text\": \"Password Hashing\" },\n    { \"text\": \"Eloquent ORM\" }\n  ],\n  \"answer_key\": [0, 2],\n  \"weight\": 10\n}\n",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{url}}/assignments/:assignmentId/questions/:questionId",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "assignments",
+                        ":assignmentId",
+                        "questions",
+                        ":questionId"
+                      ],
+                      "variable": [
+                        {
+                          "key": "assignmentId",
+                          "value": "25"
+                        },
+                        {
+                          "key": "questionId",
+                          "value": ""
+                        }
+                      ]
+                    },
+                    "description": "**\\[!NOTE\\]** Parameter `search`, `filter`, dan `sort` hanya berfungsi untuk **Superadmin, Admin, dan Instructor**. Student akan selalu menerima daftar soal lengkap sesuai pengaturan pengacakan assignment."
+                  },
+                  "response": []
+                },
+                {
+                  "name": "[Checkbox] - Dengan Gambar",
+                  "id": "7f0021aa-24bb-482a-a1ff-21afed84c771",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_admin}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "PUT",
+                    "header": [],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "type",
+                          "value": "checkbox",
+                          "type": "text",
+                          "uuid": "20c392ca-0794-4eda-a574-b624934a511f"
+                        },
+                        {
+                          "key": "content",
+                          "value": "Pilih hewan yang berkaki empat",
+                          "type": "text",
+                          "uuid": "10325a7e-de89-4f08-a23d-83cf9440c4c7"
+                        },
+                        {
+                          "key": "weight",
+                          "value": "10",
+                          "type": "text",
+                          "uuid": "d6523025-a453-4463-ad66-4fc5933a702c"
+                        },
+                        {
+                          "key": "options[0][text]",
+                          "value": "kucing",
+                          "type": "text",
+                          "uuid": "51437781-de67-4ba0-8a11-9686f8445aeb"
+                        },
+                        {
+                          "key": "options[0][image]",
+                          "type": "file",
+                          "uuid": "51d16c97-5c1b-4935-9231-5fa80bb6ef12",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/jpg contoh.jpg"
+                          ]
+                        },
+                        {
+                          "key": "options[1][text]",
+                          "value": "ayam",
+                          "type": "text",
+                          "uuid": "c14ceeb8-6dad-4c88-a9ab-aae416955654"
+                        },
+                        {
+                          "key": "options[1][image]",
+                          "type": "file",
+                          "uuid": "e2e1e0ad-133b-41f5-b858-5eb8efd66c5f",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/contoh.png"
+                          ]
+                        },
+                        {
+                          "key": "options[2][text]",
+                          "value": "ikan",
+                          "type": "text",
+                          "uuid": "d6cf3d33-5f5d-4546-a5aa-24a4762c7b71"
+                        },
+                        {
+                          "key": "options[2][image]",
+                          "type": "file",
+                          "uuid": "e7f0922f-3f54-4495-a0e3-bf59d6c41874",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/jpg contoh.jpg"
+                          ]
+                        },
+                        {
+                          "key": "answer_key[0]",
+                          "value": "0",
+                          "type": "text",
+                          "uuid": "bdb28ade-89df-4d81-b767-ea2d4638fcb8"
+                        },
+                        {
+                          "key": "answer_key[1]",
+                          "value": "2",
+                          "type": "text",
+                          "uuid": "5afe78bc-bab3-4ac0-b738-474e27331760"
+                        }
+                      ],
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{url}}/assignments/:assignmentId/questions/:questionId",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "assignments",
+                        ":assignmentId",
+                        "questions",
+                        ":questionId"
+                      ],
+                      "variable": [
+                        {
+                          "key": "assignmentId",
+                          "value": "25"
+                        },
+                        {
+                          "key": "questionId",
+                          "value": ""
+                        }
+                      ]
+                    },
+                    "description": "**\\[!NOTE\\]** Parameter `search`, `filter`, dan `sort` hanya berfungsi untuk **Superadmin, Admin, dan Instructor**. Student akan selalu menerima daftar soal lengkap sesuai pengaturan pengacakan assignment."
+                  },
+                  "response": []
+                },
+                {
+                  "name": "[Checkbox] - Dengan Attachment",
+                  "id": "25c0e0d1-2b6f-487e-b082-3f23e230ce45",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_admin}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "PUT",
+                    "header": [],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "type",
+                          "value": "checkbox",
+                          "type": "text",
+                          "uuid": "20c392ca-0794-4eda-a574-b624934a511f"
+                        },
+                        {
+                          "key": "content",
+                          "value": "Pilih hewan yang berkaki empat",
+                          "type": "text",
+                          "uuid": "10325a7e-de89-4f08-a23d-83cf9440c4c7"
+                        },
+                        {
+                          "key": "weight",
+                          "value": "10",
+                          "type": "text",
+                          "uuid": "d6523025-a453-4463-ad66-4fc5933a702c"
+                        },
+                        {
+                          "key": "options[0][text]",
+                          "value": "kucing",
+                          "type": "text",
+                          "uuid": "51437781-de67-4ba0-8a11-9686f8445aeb"
+                        },
+                        {
+                          "key": "options[0][image]",
+                          "type": "file",
+                          "uuid": "51d16c97-5c1b-4935-9231-5fa80bb6ef12",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/jpg contoh.jpg"
+                          ]
+                        },
+                        {
+                          "key": "options[1][text]",
+                          "value": "ayam",
+                          "type": "text",
+                          "uuid": "c14ceeb8-6dad-4c88-a9ab-aae416955654"
+                        },
+                        {
+                          "key": "options[1][image]",
+                          "type": "file",
+                          "uuid": "e2e1e0ad-133b-41f5-b858-5eb8efd66c5f",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/contoh.png"
+                          ]
+                        },
+                        {
+                          "key": "options[2][text]",
+                          "value": "ikan",
+                          "type": "text",
+                          "uuid": "d6cf3d33-5f5d-4546-a5aa-24a4762c7b71"
+                        },
+                        {
+                          "key": "options[2][image]",
+                          "type": "file",
+                          "uuid": "e7f0922f-3f54-4495-a0e3-bf59d6c41874",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/jpg contoh.jpg"
+                          ]
+                        },
+                        {
+                          "key": "answer_key[0]",
+                          "value": "0",
+                          "type": "text",
+                          "uuid": "bdb28ade-89df-4d81-b767-ea2d4638fcb8"
+                        },
+                        {
+                          "key": "answer_key[1]",
+                          "value": "2",
+                          "type": "text",
+                          "uuid": "5afe78bc-bab3-4ac0-b738-474e27331760"
+                        },
+                        {
+                          "key": "attachments[0]",
+                          "type": "file",
+                          "uuid": "5660d349-832b-4a5d-90c1-ae87a16ed8f0",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/41.png"
+                          ]
+                        },
+                        {
+                          "key": "attachments[1]",
+                          "type": "file",
+                          "uuid": "ec9cc1bf-df9d-4647-93cd-3e9959466cdc",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/43.png"
+                          ]
+                        }
+                      ],
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{url}}/assignments/:assignmentId/questions/:questionId",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "assignments",
+                        ":assignmentId",
+                        "questions",
+                        ":questionId"
+                      ],
+                      "variable": [
+                        {
+                          "key": "assignmentId",
+                          "value": "25"
+                        },
+                        {
+                          "key": "questionId",
+                          "value": ""
+                        }
+                      ]
+                    },
+                    "description": "**\\[!NOTE\\]** Parameter `search`, `filter`, dan `sort` hanya berfungsi untuk **Superadmin, Admin, dan Instructor**. Student akan selalu menerima daftar soal lengkap sesuai pengaturan pengacakan assignment."
+                  },
+                  "response": []
+                },
+                {
+                  "name": "[Essay] - Tanpa Attachment",
+                  "id": "cb599533-5e50-4b99-aac0-e3a46cfcc9f1",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_admin}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "PUT",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"type\": \"essay\",\n  \"content\": \"Jelaskan sejarah PHP secara singkat.\",\n  \"weight\": 10\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{url}}/assignments/:assignmentId/questions/:questionId",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "assignments",
+                        ":assignmentId",
+                        "questions",
+                        ":questionId"
+                      ],
+                      "variable": [
+                        {
+                          "key": "assignmentId",
+                          "value": "25"
+                        },
+                        {
+                          "key": "questionId",
+                          "value": ""
+                        }
+                      ]
+                    },
+                    "description": "**\\[!NOTE\\]** Parameter `search`, `filter`, dan `sort` hanya berfungsi untuk **Superadmin, Admin, dan Instructor**. Student akan selalu menerima daftar soal lengkap sesuai pengaturan pengacakan assignment."
+                  },
+                  "response": []
+                },
+                {
+                  "name": "[Essay] - Dengan Attachment",
+                  "id": "95c6659c-dd06-4942-bad7-6998572fdb7b",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_admin}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "PUT",
+                    "header": [],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "type",
+                          "value": " essay",
+                          "type": "text"
+                        },
+                        {
+                          "key": "content",
+                          "value": " Jelaskan sejarah PHP secara singkat.",
+                          "type": "text"
+                        },
+                        {
+                          "key": "weight",
+                          "value": " 10",
+                          "type": "text"
+                        },
+                        {
+                          "key": "attachments[0]",
+                          "type": "file",
+                          "uuid": "5cab33d4-35aa-4b19-9e16-a0062bf44e83",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/Biru Ungu Ilustrasi 5 Tips Menentukan Karir Yang Tepat Poster.png"
+                          ]
+                        }
+                      ],
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{url}}/assignments/:assignmentId/questions/:questionId",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "assignments",
+                        ":assignmentId",
+                        "questions",
+                        ":questionId"
+                      ],
+                      "variable": [
+                        {
+                          "key": "assignmentId",
+                          "value": "25"
+                        },
+                        {
+                          "key": "questionId",
+                          "value": ""
+                        }
+                      ]
+                    },
+                    "description": "**\\[!NOTE\\]** Parameter `search`, `filter`, dan `sort` hanya berfungsi untuk **Superadmin, Admin, dan Instructor**. Student akan selalu menerima daftar soal lengkap sesuai pengaturan pengacakan assignment."
+                  },
+                  "response": []
+                },
+                {
+                  "name": "[File Upload] - Tanpa Attachment",
+                  "id": "e7167aec-462a-436e-8a50-43c6cabc964b",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_admin}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "PUT",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"type\": \"file_upload\",\n  \"content\": \"Upload diagram database anda.\",\n  \"allowed_file_types\": [\"pdf\", \"jpg\", \"png\"],\n  \"max_file_size\": 5242880, // 5MB in bytes\n  \"allow_multiple_files\": false,\n  \"weight\": 20\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{url}}/assignments/:assignmentId/questions/:questionId",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "assignments",
+                        ":assignmentId",
+                        "questions",
+                        ":questionId"
+                      ],
+                      "variable": [
+                        {
+                          "key": "assignmentId",
+                          "value": "25"
+                        },
+                        {
+                          "key": "questionId",
+                          "value": ""
+                        }
+                      ]
+                    },
+                    "description": "**\\[!NOTE\\]** Parameter `search`, `filter`, dan `sort` hanya berfungsi untuk **Superadmin, Admin, dan Instructor**. Student akan selalu menerima daftar soal lengkap sesuai pengaturan pengacakan assignment."
+                  },
+                  "response": []
+                },
+                {
+                  "name": "[File Upload] - Dengan Attachment",
+                  "id": "b61c485c-751f-4b0a-9e61-f5d32e896872",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_admin}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "PUT",
+                    "header": [],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "type",
+                          "value": "file_upload",
+                          "type": "text"
+                        },
+                        {
+                          "key": "content",
+                          "value": "Upload diagram database anda.",
+                          "type": "text"
+                        },
+                        {
+                          "key": "weight",
+                          "value": "20",
+                          "type": "text"
+                        },
+                        {
+                          "key": "allowed_file_types[0]",
+                          "value": "pdf",
+                          "type": "text"
+                        },
+                        {
+                          "key": "allowed_file_types[1]",
+                          "value": "jpg",
+                          "type": "text"
+                        },
+                        {
+                          "key": "allowed_file_types[2]",
+                          "value": "png",
+                          "type": "text"
+                        },
+                        {
+                          "key": "max_file_size",
+                          "value": "5242880",
+                          "type": "text"
+                        },
+                        {
+                          "key": "allow_multiple_files",
+                          "value": "false",
+                          "type": "text"
+                        },
+                        {
+                          "key": "attachments[0]",
+                          "type": "file",
+                          "uuid": "f844ad49-eef5-49ee-8891-0a9a9749018b",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/43.png"
+                          ]
+                        }
+                      ],
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{url}}/assignments/:assignmentId/questions/:questionId",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "assignments",
+                        ":assignmentId",
+                        "questions",
+                        ":questionId"
+                      ],
+                      "variable": [
+                        {
+                          "key": "assignmentId",
+                          "value": "25"
+                        },
+                        {
+                          "key": "questionId",
+                          "value": ""
+                        }
+                      ]
+                    },
+                    "description": "**\\[!NOTE\\]** Parameter `search`, `filter`, dan `sort` hanya berfungsi untuk **Superadmin, Admin, dan Instructor**. Student akan selalu menerima daftar soal lengkap sesuai pengaturan pengacakan assignment."
+                  },
+                  "response": []
+                }
+              ],
+              "id": "c7afe597-0c70-4abb-b907-04454c2364c6"
+            },
+            {
+              "name": "Daftar Soal",
               "id": "456a6774-5f58-4d49-a89f-540ac4873cb3",
               "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token_admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
                 "method": "GET",
                 "header": [],
                 "url": {
@@ -5960,14 +7851,233 @@
                     ":assignmentId",
                     "questions"
                   ],
+                  "query": [
+                    {
+                      "key": "filter[type]",
+                      "value": null,
+                      "description": "multiple_choice, checkbox, essay, file_upload",
+                      "uuid": "7b5f27e7-8c06-42db-9f99-859da0e64796",
+                      "disabled": true
+                    },
+                    {
+                      "key": "search",
+                      "value": null,
+                      "uuid": "ffa73738-cd90-40eb-99ad-0f36e03cc145",
+                      "disabled": true
+                    },
+                    {
+                      "key": "sort",
+                      "value": null,
+                      "description": "order, weight, created_at",
+                      "uuid": "9859a3cc-6aac-4dd6-93bd-3fc896f6708d",
+                      "disabled": true
+                    }
+                  ],
                   "variable": [
                     {
                       "key": "assignmentId",
-                      "value": "",
-                      "uuid": "e7fc08eb-ab5b-4bd9-804d-e8ddfabb8a04"
+                      "value": "25"
                     }
                   ]
-                }
+                },
+                "description": "\\[!WARNING\\] **RESTRICTED ACCESS:** Endpoint ini HANYA untuk **Admin dan Instructor**. Siswa TIDAK BISA mengakses endpoint ini. Siswa harus menggunakan `GET /submissions/{id}/questions` untuk melihat soal ujian mereka."
+              },
+              "response": []
+            },
+            {
+              "name": "Detail Soal",
+              "id": "fb820f5b-6af7-4412-a318-538438d48ab6",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token_admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{url}}/assignments/:assignmentId/questions/:questionId",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "assignments",
+                    ":assignmentId",
+                    "questions",
+                    ":questionId"
+                  ],
+                  "query": [
+                    {
+                      "key": "filter[type]",
+                      "value": null,
+                      "description": "multiple_choice, checkbox, essay, file_upload",
+                      "uuid": "7b5f27e7-8c06-42db-9f99-859da0e64796",
+                      "disabled": true
+                    },
+                    {
+                      "key": "search",
+                      "value": null,
+                      "uuid": "ffa73738-cd90-40eb-99ad-0f36e03cc145",
+                      "disabled": true
+                    },
+                    {
+                      "key": "sort",
+                      "value": null,
+                      "description": "order, weight, created_at",
+                      "uuid": "9859a3cc-6aac-4dd6-93bd-3fc896f6708d",
+                      "disabled": true
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "key": "assignmentId",
+                      "value": "25"
+                    },
+                    {
+                      "key": "questionId",
+                      "value": "4"
+                    }
+                  ]
+                },
+                "description": "\\[!WARNING\\] **RESTRICTED ACCESS:** Endpoint ini HANYA untuk **Admin dan Instructor**. Siswa TIDAK BISA mengakses endpoint ini. Siswa harus menggunakan `GET /submissions/{id}/questions` untuk melihat soal ujian mereka."
+              },
+              "response": []
+            },
+            {
+              "name": "Hapus Soal",
+              "id": "6d8f02b9-6f01-417d-abc4-25ee071bb8af",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token_admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{url}}/assignments/:assignmentId/questions/:questionId",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "assignments",
+                    ":assignmentId",
+                    "questions",
+                    ":questionId"
+                  ],
+                  "query": [
+                    {
+                      "key": "filter[type]",
+                      "value": null,
+                      "description": "multiple_choice, checkbox, essay, file_upload",
+                      "uuid": "7b5f27e7-8c06-42db-9f99-859da0e64796",
+                      "disabled": true
+                    },
+                    {
+                      "key": "search",
+                      "value": null,
+                      "uuid": "ffa73738-cd90-40eb-99ad-0f36e03cc145",
+                      "disabled": true
+                    },
+                    {
+                      "key": "sort",
+                      "value": null,
+                      "description": "order, weight, created_at",
+                      "uuid": "9859a3cc-6aac-4dd6-93bd-3fc896f6708d",
+                      "disabled": true
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "key": "assignmentId",
+                      "value": "25"
+                    },
+                    {
+                      "key": "questionId",
+                      "value": "3"
+                    }
+                  ]
+                },
+                "description": "\\[!WARNING\\] **RESTRICTED ACCESS:** Endpoint ini HANYA untuk **Admin dan Instructor**. Siswa TIDAK BISA mengakses endpoint ini. Siswa harus menggunakan `GET /submissions/{id}/questions` untuk melihat soal ujian mereka."
+              },
+              "response": []
+            },
+            {
+              "name": "Ubah Urutan Soal",
+              "id": "e2196103-4fba-45f5-86bd-5a7e85ab1d35",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token_admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"ids\": [\n    9,\n    1,\n    2,\n    4,\n    5,\n    6,\n    7,\n    8,\n    10,\n    11,\n    12,\n    13,\n    14,\n    15,\n    16,\n    17,\n    18,\n    19,\n    20\n  ]\n}\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{url}}/assignments/:assignmentId/questions/reorder",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "assignments",
+                    ":assignmentId",
+                    "questions",
+                    "reorder"
+                  ],
+                  "query": [
+                    {
+                      "key": "filter[type]",
+                      "value": null,
+                      "description": "multiple_choice, checkbox, essay, file_upload",
+                      "uuid": "7b5f27e7-8c06-42db-9f99-859da0e64796",
+                      "disabled": true
+                    },
+                    {
+                      "key": "search",
+                      "value": null,
+                      "uuid": "ffa73738-cd90-40eb-99ad-0f36e03cc145",
+                      "disabled": true
+                    },
+                    {
+                      "key": "sort",
+                      "value": null,
+                      "description": "order, weight, created_at",
+                      "uuid": "9859a3cc-6aac-4dd6-93bd-3fc896f6708d",
+                      "disabled": true
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "key": "assignmentId",
+                      "value": "25"
+                    }
+                  ]
+                },
+                "description": "\\[!WARNING\\] **RESTRICTED ACCESS:** Endpoint ini HANYA untuk **Admin dan Instructor**. Siswa TIDAK BISA mengakses endpoint ini. Siswa harus menggunakan `GET /submissions/{id}/questions` untuk melihat soal ujian mereka."
               },
               "response": []
             }
@@ -5975,9 +8085,918 @@
           "id": "29de851a-511b-4e50-b0c3-1c083f8816d4"
         },
         {
-          "name": "Pengumpulan",
-          "item": [],
+          "name": "Pengerjaan",
+          "item": [
+            {
+              "name": "Siswa",
+              "item": [
+                {
+                  "name": "Lihat Pengumpulan",
+                  "id": "0d4cfceb-3b3d-492c-87f4-8b641d1df55e",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_student}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{url}}/assignments/:assignmentId/submissions/me",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "assignments",
+                        ":assignmentId",
+                        "submissions",
+                        "me"
+                      ],
+                      "variable": [
+                        {
+                          "key": "assignmentId",
+                          "value": "25"
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Lihat Detail Pengumpulan",
+                  "id": "b42020a2-9a56-4dea-a4ed-2378c6a97f21",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_student}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{url}}/assignments/:assignmentId/submissions/:submissionId",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "assignments",
+                        ":assignmentId",
+                        "submissions",
+                        ":submissionId"
+                      ],
+                      "variable": [
+                        {
+                          "key": "assignmentId",
+                          "value": "25"
+                        },
+                        {
+                          "key": "submissionId",
+                          "value": "5",
+                          "uuid": "e7b97b93-fcdd-47b3-9652-296e1faccfe2"
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Lihat Percobaan",
+                  "id": "538b152c-67ff-4938-8a13-3f82a9800da5",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_student}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{url}}/assignments/:assignmentId/attempts/check",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "assignments",
+                        ":assignmentId",
+                        "attempts",
+                        "check"
+                      ],
+                      "variable": [
+                        {
+                          "key": "assignmentId",
+                          "value": "25"
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Lihat Deadline",
+                  "id": "ad9449f9-3e4a-4ae6-a1ff-f9a921c61c07",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_student}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{url}}/assignments/:assignmentId/deadline/check",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "assignments",
+                        ":assignmentId",
+                        "deadline",
+                        "check"
+                      ],
+                      "variable": [
+                        {
+                          "key": "assignmentId",
+                          "value": "25"
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Mulai Percobaan",
+                  "id": "484d194c-2a96-42f9-9c43-253ce622e170",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_student}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "url": {
+                      "raw": "{{url}}/assignments/:assignmentId/submissions/start",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "assignments",
+                        ":assignmentId",
+                        "submissions",
+                        "start"
+                      ],
+                      "variable": [
+                        {
+                          "key": "assignmentId",
+                          "value": "25"
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Ambil Soal",
+                  "id": "e543d20b-aa96-4d17-84bf-9965c92f840f",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_student}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{url}}/submissions/:submissionId/questions",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "submissions",
+                        ":submissionId",
+                        "questions"
+                      ],
+                      "query": [
+                        {
+                          "key": "per_page",
+                          "value": "1",
+                          "uuid": "332b1c2c-fe98-4364-ba13-16a5f2f92507",
+                          "disabled": true
+                        },
+                        {
+                          "key": "page",
+                          "value": "16",
+                          "uuid": "02a5d470-1989-4d46-8c4b-c92eee006e98",
+                          "disabled": true
+                        }
+                      ],
+                      "variable": [
+                        {
+                          "key": "submissionId",
+                          "value": "5"
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "[Essai] - Simpan Jawaban",
+                  "id": "cf7b1a15-3778-4a22-9f49-c203f5f2e7ca",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_student}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"question_id\": 18,\n  \"answer\": \"PHP dibuat oleh Rasmus Lerdorf pada tahun 1994 sebagai sekumpulan skrip sederhana bernama Personal Home Page Tools. Seiring waktu, komunitas mengembangkan PHP menjadi bahasa pemrograman server-side yang lebih lengkap dan open source. Versi-versi berikutnya menghadirkan fitur modern seperti Zend Engine, dukungan OOP, dan ekosistem framework, menjadikan PHP salah satu teknologi utama dalam pengembangan web dan fondasi dari platform besar seperti WordPress.\"\n}\n",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{url}}/submissions/:submissionId/answers",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "submissions",
+                        ":submissionId",
+                        "answers"
+                      ],
+                      "variable": [
+                        {
+                          "key": "submissionId",
+                          "value": "5"
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "[Pilihan Ganda] - Simpan Jawaban",
+                  "id": "06202570-8a2d-4477-b6ef-a311d03c4be3",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_student}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"question_id\": 10,\n  \"answer\": 0\n}\n",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{url}}/submissions/:submissionId/answers",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "submissions",
+                        ":submissionId",
+                        "answers"
+                      ],
+                      "variable": [
+                        {
+                          "key": "submissionId",
+                          "value": "5"
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "[Checkbox] - Simpan Jawaban",
+                  "id": "294cd48d-4a8a-4047-9f3b-707b216f532b",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_student}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"question_id\": 20,\n  \"answer\": [0, 1]\n}\n",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{url}}/submissions/:submissionId/answers",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "submissions",
+                        ":submissionId",
+                        "answers"
+                      ],
+                      "variable": [
+                        {
+                          "key": "submissionId",
+                          "value": "5"
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "[File Upload] - Simpan Jawaban",
+                  "id": "7f2ba4bf-3b60-4f97-bc54-4db8c906a199",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_student}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "question_id",
+                          "value": "17",
+                          "type": "text",
+                          "uuid": "f4418809-30a9-4361-88a6-09704747dee4"
+                        },
+                        {
+                          "key": "answer",
+                          "type": "file",
+                          "uuid": "ff2ec064-015f-4631-baf4-21e31fd134aa",
+                          "src": [
+                            "/Users/darrielmarkerizal/Downloads/11zon_compressed.zip"
+                          ]
+                        }
+                      ],
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{url}}/submissions/:submissionId/answers",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "submissions",
+                        ":submissionId",
+                        "answers"
+                      ],
+                      "variable": [
+                        {
+                          "key": "submissionId",
+                          "value": "5"
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Kirim Percobaan",
+                  "id": "7319f96d-8ba0-47d8-8e93-35c83994cf1f",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_student}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "url": {
+                      "raw": "{{url}}/submissions/:submissionId/submit",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "submissions",
+                        ":submissionId",
+                        "submit"
+                      ],
+                      "variable": [
+                        {
+                          "key": "submissionId",
+                          "value": "5"
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Cek Prasyarat",
+                  "id": "481ed928-31d3-4b29-b520-3b60fd7c1e57",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_student}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{url}}/assignments/:assignmentId/prerequisites/check",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "assignments",
+                        ":assignmentId",
+                        "prerequisites",
+                        "check"
+                      ],
+                      "variable": [
+                        {
+                          "key": "assignmentId",
+                          "value": "25"
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Cek Prasyarat Copy",
+                  "id": "0673cd88-e41d-4320-a40a-3fa91c45a24c",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_student}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{url}}/assignments/:assignmentId/prerequisites/check",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "assignments",
+                        ":assignmentId",
+                        "prerequisites",
+                        "check"
+                      ],
+                      "variable": [
+                        {
+                          "key": "assignmentId",
+                          "value": "25"
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ],
+              "id": "4540af3f-1fa6-4ec5-a54c-2b22e5124f3f"
+            },
+            {
+              "name": "Manajemen",
+              "item": [
+                {
+                  "name": "Lihat Daftar Pengumpulan",
+                  "id": "9bc5dda6-3074-4ced-8571-1b79605f3067",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_admin}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{url}}/assignments/:assignmentId/submissions?search=",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "assignments",
+                        ":assignmentId",
+                        "submissions"
+                      ],
+                      "query": [
+                        {
+                          "key": "filter[status]",
+                          "value": null,
+                          "description": "draft, submitted, graded, late, missing",
+                          "uuid": "1be70830-ccb7-4d4f-93c6-539a363f473c",
+                          "disabled": true
+                        },
+                        {
+                          "key": "filter[is_late]",
+                          "value": null,
+                          "description": "true, false",
+                          "uuid": "80273e12-fc6b-4df8-82d7-d7f78bbf4369",
+                          "disabled": true
+                        },
+                        {
+                          "key": "filter[score_range]",
+                          "value": null,
+                          "description": "Format: min,max (Contoh: 0,50)",
+                          "uuid": "47622c21-121c-43b4-ba4d-0fd613d5e30f",
+                          "disabled": true
+                        },
+                        {
+                          "key": "sort",
+                          "value": null,
+                          "description": "submitted_at, -submitted_at, created_at, -created_at, score, -score, status",
+                          "uuid": "03c8c0a9-dc0f-44f4-b8c3-258ca61656ca",
+                          "disabled": true
+                        },
+                        {
+                          "key": "page",
+                          "value": null,
+                          "uuid": "dad18378-1d95-4cda-9763-ca444222a082",
+                          "disabled": true
+                        },
+                        {
+                          "key": "per_page",
+                          "value": null,
+                          "uuid": "f1d73002-6809-47a5-85f0-671a697ba18e",
+                          "disabled": true
+                        },
+                        {
+                          "key": "search",
+                          "value": "",
+                          "uuid": "5188b5b4-8a47-4f58-91c8-13e47c386809"
+                        }
+                      ],
+                      "variable": [
+                        {
+                          "key": "assignmentId",
+                          "value": "25",
+                          "uuid": "57f6881c-d4e1-454a-90b8-f372af23ef07"
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Nilai Pengumpulan",
+                  "id": "d01d6dbb-78ed-48cc-a272-dd5ef6f736d8",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_superadmin}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"score\": 90,\n  \"feedback\": \"Kerja yang bagus. Perhatikan penjelasan di nomor 3.\",\n  \"status\": \"graded\" // graded (Dinilai) / needs_revision (Perlu revisi)\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{url}}/submissions/:submissionId/grade",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "submissions",
+                        ":submissionId",
+                        "grade"
+                      ],
+                      "variable": [
+                        {
+                          "key": "submissionId",
+                          "value": "5",
+                          "uuid": "a84b57f2-589d-47b5-ad09-8ee82367beea"
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Lihat Daftar Pengumpulan Copy",
+                  "id": "637fb2d0-dfad-4750-a12a-7a7ecaf8b8a4",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token_admin}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{url}}/assignments/:assignmentId/submissions/5?include=answers",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "path": [
+                        "assignments",
+                        ":assignmentId",
+                        "submissions",
+                        "5"
+                      ],
+                      "query": [
+                        {
+                          "key": "filter[status]",
+                          "value": null,
+                          "description": "draft, submitted, graded, late, missing",
+                          "uuid": "1be70830-ccb7-4d4f-93c6-539a363f473c",
+                          "disabled": true
+                        },
+                        {
+                          "key": "filter[is_late]",
+                          "value": null,
+                          "description": "true, false",
+                          "uuid": "80273e12-fc6b-4df8-82d7-d7f78bbf4369",
+                          "disabled": true
+                        },
+                        {
+                          "key": "filter[score_range]",
+                          "value": null,
+                          "description": "Format: min,max (Contoh: 0,50)",
+                          "uuid": "47622c21-121c-43b4-ba4d-0fd613d5e30f",
+                          "disabled": true
+                        },
+                        {
+                          "key": "sort",
+                          "value": null,
+                          "description": "submitted_at, -submitted_at, created_at, -created_at, score, -score, status",
+                          "uuid": "03c8c0a9-dc0f-44f4-b8c3-258ca61656ca",
+                          "disabled": true
+                        },
+                        {
+                          "key": "page",
+                          "value": null,
+                          "uuid": "dad18378-1d95-4cda-9763-ca444222a082",
+                          "disabled": true
+                        },
+                        {
+                          "key": "per_page",
+                          "value": null,
+                          "uuid": "f1d73002-6809-47a5-85f0-671a697ba18e",
+                          "disabled": true
+                        },
+                        {
+                          "key": "search",
+                          "value": "",
+                          "uuid": "5188b5b4-8a47-4f58-91c8-13e47c386809",
+                          "disabled": true
+                        },
+                        {
+                          "key": "include",
+                          "value": "answers",
+                          "type": "text",
+                          "uuid": "e36c699f-db1e-4b30-a25b-3c9a24a5d26d"
+                        }
+                      ],
+                      "variable": [
+                        {
+                          "key": "assignmentId",
+                          "value": "25",
+                          "uuid": "57f6881c-d4e1-454a-90b8-f372af23ef07"
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ],
+              "id": "0cd575a1-574e-4941-851c-e913d3336637"
+            }
+          ],
           "id": "8163931e-7931-4a90-ace9-f964cc2083a2"
+        },
+        {
+          "name": "Override",
+          "item": [
+            {
+              "name": "Ambil Override",
+              "id": "bb015877-161d-42a3-a0c1-22623181e8ec",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token_admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{url}}/assignments/:assignmentId/overrides",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "assignments",
+                    ":assignmentId",
+                    "overrides"
+                  ],
+                  "variable": [
+                    {
+                      "key": "assignmentId",
+                      "value": "25"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Ambil Override Detail",
+              "id": "19b17634-df9e-4aae-a1e0-8b34faa96877",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token_admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{url}}/assignments/:assignmentId/overrides/:overridesId",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "assignments",
+                    ":assignmentId",
+                    "overrides",
+                    ":overridesId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "assignmentId",
+                      "value": "25"
+                    },
+                    {
+                      "key": "overridesId",
+                      "value": ""
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Buat Override",
+              "id": "1ddbf683-424c-45da-a383-78c5050f86cb",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token_admin}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"student_id\": 105,\n  \"type\": \"attempts\", //attempts, deadline, prerequisite\n  \"reason\": \"Koneksi internet terputus saat pengerjaan.\",\n  \"value\": { // salah satu saja\n    \"additional_attempts\": 1,\n    \"extended_deadline\": \"2026-04-01 23:59:59\",\n    \"bypassed_prerequisites\": [10, 15], // bypass assignment\n    \"expires_at\": \"2026-06-01 00:00:00\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{url}}/assignments/:assignmentId/overrides",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "assignments",
+                    ":assignmentId",
+                    "overrides"
+                  ],
+                  "variable": [
+                    {
+                      "key": "assignmentId",
+                      "value": "25"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ],
+          "id": "4aec6140-4872-4340-a7bb-a0f3d562588f",
+          "description": "untuk memberikan **pengecualian akses** khusus kepada siswa tertentu dalam sebuah tugas."
         }
       ],
       "id": "562886a9-f6b9-4aba-b6da-7e439ffd574e"

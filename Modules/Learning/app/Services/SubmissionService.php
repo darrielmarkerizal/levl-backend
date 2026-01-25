@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Learning\Services;
 
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +14,7 @@ use Modules\Enrollments\Contracts\Repositories\EnrollmentRepositoryInterface;
 use Modules\Enrollments\Models\Enrollment;
 use Modules\Grading\Contracts\Services\GradingServiceInterface;
 use Modules\Learning\Contracts\Repositories\OverrideRepositoryInterface;
+use Modules\Learning\Contracts\Repositories\QuestionRepositoryInterface;
 use Modules\Learning\Contracts\Repositories\SubmissionRepositoryInterface;
 use Modules\Learning\Contracts\Services\QuestionServiceInterface;
 use Modules\Learning\Contracts\Services\SubmissionServiceInterface;
@@ -22,22 +24,47 @@ use Modules\Learning\Events\NewHighScoreAchieved;
 use Modules\Learning\Events\SubmissionCreated;
 use Modules\Learning\Exceptions\SubmissionException;
 use Modules\Learning\Models\Assignment;
+use Modules\Learning\Models\Question;
 use Modules\Learning\Models\Submission;
 use Modules\Schemes\Models\Lesson;
 
 class SubmissionService implements SubmissionServiceInterface
 {
+    private const TIMER_GRACE_SECONDS = 60;
+
     public function __construct(
         private readonly SubmissionRepositoryInterface $repository,
         private readonly EnrollmentRepositoryInterface $enrollmentRepository,
         private readonly GradingServiceInterface $gradingService,
+        private readonly QuestionRepositoryInterface $questionRepository,
         private readonly ?QuestionServiceInterface $questionService = null,
         private readonly ?OverrideRepositoryInterface $overrideRepository = null,
     ) {}
 
-    public function listForAssignment(Assignment $assignment, User $user, array $filters = []): Collection
+    public function listForAssignment(Assignment $assignment, User $user, array $filters = []): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
-        return $this->repository->listForAssignment($assignment, $user, $filters);
+        $perPage = (int) data_get($filters, 'per_page', 15);
+        $perPage = max(1, $perPage);
+
+        $query = \Spatie\QueryBuilder\QueryBuilder::for(
+            Submission::class
+        )
+            ->allowedFilters([
+                \Spatie\QueryBuilder\AllowedFilter::exact('status'),
+                \Spatie\QueryBuilder\AllowedFilter::exact('user_id'),
+                \Spatie\QueryBuilder\AllowedFilter::exact('is_late'),
+                \Spatie\QueryBuilder\AllowedFilter::scope('score_range', 'filterByScoreRange'), // Needs scope in model
+            ])
+            ->allowedSorts(['submitted_at', 'created_at', 'score', 'status'])
+            ->defaultSort('-submitted_at')
+            ->where('assignment_id', $assignment->id)
+            ->with(['user', 'grade']);
+
+        if ($user->hasRole('Student')) {
+            $query->where('user_id', $user->id);
+        }
+
+        return $query->paginate($perPage);
     }
 
     public function create(Assignment $assignment, int $userId, array $data): Submission
@@ -235,7 +262,135 @@ class SubmissionService implements SubmissionServiceInterface
         });
     }
 
-        public function submitAnswers(int $submissionId, array $answers): Submission
+    public function saveAnswer(Submission $submission, int $questionId, mixed $answer): \Modules\Learning\Models\Answer
+    {
+        return DB::transaction(function () use ($submission, $questionId, $answer) {
+            $assignment = $submission->assignment;
+            $studentId = $submission->user_id;
+
+            if ($submission->state !== SubmissionState::InProgress) {
+                throw SubmissionException::notAllowed(__('messages.submissions.cannot_modify'));
+            }
+
+            if (!$this->checkDeadlineWithOverride($assignment, $studentId)) {
+                throw SubmissionException::deadlinePassed();
+            }
+
+            if ($assignment->time_limit_minutes !== null) {
+                $limitEnds = $submission->created_at?->copy()
+                    ->addMinutes($assignment->time_limit_minutes)
+                    ->addSeconds(self::TIMER_GRACE_SECONDS);
+                if ($limitEnds && now()->gt($limitEnds)) {
+                    throw SubmissionException::timerExpired();
+                }
+            }
+
+            if ($submission->question_set && ! in_array($questionId, $submission->question_set)) {
+                throw new \Illuminate\Database\Eloquent\ModelNotFoundException(__('messages.submissions.question_not_in_set'));
+            } elseif (! $submission->question_set) {
+                $exists = Question::where('id', $questionId)
+                    ->where('assignment_id', $assignment->id)
+                    ->exists();
+                if (! $exists) {
+                    throw new \Illuminate\Database\Eloquent\ModelNotFoundException(__('messages.submissions.question_not_in_assignment'));
+                }
+            }
+            
+            $question = Question::find($questionId);
+
+            $data = [
+                'submission_id' => $submission->id,
+                'question_id' => $questionId,
+            ];
+
+            if ($question->type->requiresOptions()) {
+                $data['selected_options'] = (array) $answer;
+            } elseif ($question->type === \Modules\Learning\Enums\QuestionType::FileUpload) {
+                if (is_array($answer) && ! empty($answer) && is_string(reset($answer))) {
+                    $data['file_paths'] = $answer;
+                }
+            } else {
+                 $data['content'] = (string) $answer;
+            }
+            
+            $createdAnswer = \Modules\Learning\Models\Answer::updateOrCreate(
+                ['submission_id' => $submission->id, 'question_id' => $questionId],
+                $data
+            );
+
+            if ($question->type === \Modules\Learning\Enums\QuestionType::FileUpload && $answer) {
+                $createdAnswer->clearMediaCollection('answers');
+                $files = is_array($answer) ? $answer : [$answer];
+                $paths = [];
+                
+                foreach ($files as $file) {
+                    if ($file instanceof UploadedFile) {
+                        $media = $createdAnswer->addMedia($file)
+                            ->toMediaCollection('answers', config('filesystems.default', 'do'));
+                        $paths[] = $media->getUrl();
+                    }
+                }
+                
+                $createdAnswer->update(['file_paths' => $paths]);
+            }
+
+            return $createdAnswer->withoutRelations();
+        });
+    }
+
+        public function getSubmissionQuestions(Submission $submission): \Illuminate\Support\Collection
+    {
+        $questionIds = $submission->question_set;
+
+        if (empty($questionIds)) {
+            $questions = $this->questionRepository->findByAssignment($submission->assignment_id);
+        } else {
+            $questions = Question::whereIn('id', $questionIds)
+                ->with(['assignment', 'media'])
+                ->get();
+
+            $questions = $questions->sortBy(function ($question) use ($questionIds) {
+                return array_search($question->id, $questionIds);
+            })->values();
+        }
+
+        $submission->load('answers');
+        $answers = $submission->answers->keyBy('question_id');
+
+        $questions->each(function ($question) use ($answers) {
+            $question->current_answer = $answers->get($question->id);
+        });
+
+        return $questions;
+    }
+
+    public function getSubmissionQuestionsPaginated(Submission $submission, int $perPage = 1): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    {
+        $questionIds = $submission->question_set;
+
+        if (empty($questionIds)) {
+            $query = Question::where('assignment_id', $submission->assignment_id)
+                ->with(['assignment', 'media'])
+                ->orderBy('order');
+        } else {
+            $query = Question::whereIn('id', $questionIds)
+                ->with(['assignment', 'media'])
+                ->orderByRaw('array_position(ARRAY[' . implode(',', $questionIds) . '], id)');
+        }
+
+        $paginator = $query->paginate($perPage);
+
+        $submission->load('answers');
+        $answers = $submission->answers->keyBy('question_id');
+
+        $paginator->getCollection()->each(function ($question) use ($answers) {
+            $question->current_answer = $answers->get($question->id);
+        });
+
+        return $paginator;
+    }
+
+    public function submitAnswers(int $submissionId, array $answers): Submission
     {
         return DB::transaction(function () use ($submissionId, $answers) {
             $submission = Submission::findOrFail($submissionId);
@@ -246,9 +401,57 @@ class SubmissionService implements SubmissionServiceInterface
                 throw SubmissionException::notAllowed(__('messages.submissions.cannot_modify'));
             }
 
+            // Save provided answers if any
+            if (! empty($answers)) {
+                foreach ($answers as $answerData) {
+                    if (empty($answerData['question_id'])) {
+                        continue;
+                    }
+
+                    $val = null;
+                    if (isset($answerData['selected_options'])) {
+                        $val = $answerData['selected_options'];
+                    } elseif (isset($answerData['file_paths'])) {
+                        $val = $answerData['file_paths'];
+                    } elseif (isset($answerData['content'])) {
+                        $val = $answerData['content'];
+                    }
+
+                    if ($val !== null) {
+                        try {
+                            $this->saveAnswer($submission, (int) $answerData['question_id'], $val);
+                        } catch (\Exception $e) {
+                           throw $e;
+                        }
+                    }
+                }
+            }
+
+            $questionIds = $submission->question_set;
+            if (empty($questionIds)) {
+                $questionIds = $this->questionRepository->findByAssignment($assignment->id)->pluck('id')->toArray();
+            }
+
+            $answeredQuestionIds = $submission->answers()->pluck('question_id')->toArray();
+
+            $unansweredQuestions = array_diff($questionIds, $answeredQuestionIds);
+
+            if (! empty($unansweredQuestions)) {
+                 throw SubmissionException::notAllowed(__('messages.submissions.incomplete_answers'));
+            }
+
             $isLate = $this->isSubmissionLate($assignment, $studentId);
             if (! $this->checkDeadlineWithOverride($assignment, $studentId)) {
                 throw SubmissionException::deadlinePassed();
+            }
+
+            if ($assignment->time_limit_minutes !== null) {
+                $limitEnds = $submission->created_at?->copy()
+                    ->addMinutes($assignment->time_limit_minutes)
+                    ->addSeconds(self::TIMER_GRACE_SECONDS);
+                if ($limitEnds && now()->gt($limitEnds)) {
+                    throw SubmissionException::timerExpired();
+                }
             }
 
             $submission->update([
@@ -260,6 +463,17 @@ class SubmissionService implements SubmissionServiceInterface
 
             return $submission->fresh(['assignment', 'user', 'answers']);
         });
+
+        if ($submission->state === SubmissionState::Submitted || $submission->state === SubmissionState::PendingManualGrading) {
+            try {
+                $this->gradingService->autoGrade($submission->id);
+                $submission->refresh();
+            } catch (\Exception $e) {
+                report($e);
+            }
+        }
+
+        return $submission->fresh(['assignment', 'user', 'answers']);
     }
 
         public function checkAttemptLimits(Assignment $assignment, int $studentId): array
@@ -279,7 +493,7 @@ class SubmissionService implements SubmissionServiceInterface
             return [
                 'allowed' => false,
                 'remaining' => 0,
-                'message' => 'You have reached the maximum number of attempts for this assignment.',
+                'message' => __('messages.submissions.max_attempts_reached'),
             ];
         }
 
@@ -429,7 +643,7 @@ class SubmissionService implements SubmissionServiceInterface
             return [
                 'allowed' => false,
                 'remaining' => 0,
-                'message' => 'You have reached the maximum number of attempts for this assignment.',
+                'message' => __('messages.submissions.max_attempts_reached'),
             ];
         }
 

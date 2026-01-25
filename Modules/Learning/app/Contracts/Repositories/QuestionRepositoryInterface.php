@@ -21,6 +21,8 @@ interface QuestionRepositoryInterface
 
     public function findRandomFromBank(int $assignmentId, int $count, int $seed): Collection;
 
+    public function searchByAssignment(int $assignmentId, string $query): Collection;
+
     public function reorder(int $assignmentId, array $questionIds): void;
 
     public function findWithDetails(int $id): ?Question;

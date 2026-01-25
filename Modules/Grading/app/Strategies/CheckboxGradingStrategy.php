@@ -15,20 +15,28 @@ class CheckboxGradingStrategy implements GradingStrategyInterface
         $answerKey = $question->answer_key ?? [];
         $selectedOptions = $answer->selected_options ?? [];
 
-        // Normalize to arrays
         $correctSet = is_array($answerKey) ? $answerKey : [$answerKey];
         $selectedSet = is_array($selectedOptions) ? $selectedOptions : [$selectedOptions];
 
-        // Sort both arrays for comparison
-        sort($correctSet);
-        sort($selectedSet);
-
-        // Set equality check - must match exactly
-        if ($correctSet === $selectedSet) {
-            return (float) $question->max_score;
+        $correctCount = 0;
+        $wrongCount = 0;
+        $totalCorrectOptions = count($correctSet);
+        
+        if ($totalCorrectOptions === 0) {
+             return $selectedSet === $correctSet ? (float) $question->max_score : 0.0;
         }
 
-        return 0.0;
+        foreach ($selectedSet as $selection) {
+            if (in_array($selection, $correctSet, true)) {
+                $correctCount++;
+            } else {
+                $wrongCount++;
+            }
+        }
+
+        $rawScore = ($correctCount - $wrongCount) / $totalCorrectOptions * $question->max_score;
+
+        return max(0.0, (float) $rawScore);
     }
 
     public function canAutoGrade(): bool

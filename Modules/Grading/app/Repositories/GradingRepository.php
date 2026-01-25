@@ -9,22 +9,12 @@ use Modules\Grading\Models\Grade;
 
 class GradingRepository implements GradingRepositoryInterface
 {
-    /**
-     * Default eager loading relationships for grades.
-     * Prevents N+1 query problems when loading grades with related data.
-     * Requirements: 28.5
-     */
     protected const DEFAULT_EAGER_LOAD = [
         'submission.user:id,name,email',
         'submission.assignment:id,title',
         'grader:id,name,email',
     ];
 
-    /**
-     * Extended eager loading for detailed grade views.
-     * Includes submission answers with questions for complete grade data.
-     * Requirements: 28.5
-     */
     protected const DETAILED_EAGER_LOAD = [
         'submission.user:id,name,email',
         'submission.assignment:id,title,deadline_at,review_mode',
@@ -34,10 +24,6 @@ class GradingRepository implements GradingRepositoryInterface
 
     public function __construct(private readonly Grade $model) {}
 
-    /**
-     * Find a grade by ID with eager loading.
-     * Requirements: 28.5
-     */
     public function findById(int $id): ?Grade
     {
         return $this->model
@@ -45,10 +31,6 @@ class GradingRepository implements GradingRepositoryInterface
             ->find($id);
     }
 
-    /**
-     * Find a grade by ID with all related data for detailed view.
-     * Requirements: 28.5
-     */
     public function findByIdWithDetails(int $id): ?Grade
     {
         return $this->model
@@ -56,10 +38,6 @@ class GradingRepository implements GradingRepositoryInterface
             ->find($id);
     }
 
-    /**
-     * Find a grade by submission ID with eager loading.
-     * Requirements: 28.5
-     */
     public function findBySubmission(int $submissionId): ?Grade
     {
         return $this->model
@@ -68,10 +46,6 @@ class GradingRepository implements GradingRepositoryInterface
             ->first();
     }
 
-    /**
-     * Find a grade by submission ID with all related data.
-     * Requirements: 28.5
-     */
     public function findBySubmissionWithDetails(int $submissionId): ?Grade
     {
         return $this->model
@@ -80,10 +54,6 @@ class GradingRepository implements GradingRepositoryInterface
             ->first();
     }
 
-    /**
-     * Paginate grades with eager loading.
-     * Requirements: 28.5
-     */
     public function paginate(int $perPage = 15): LengthAwarePaginator
     {
         return $this->model
@@ -95,14 +65,12 @@ class GradingRepository implements GradingRepositoryInterface
     public function create(array $data): Grade
     {
         $grade = $this->model->create($data);
-
         return $grade->load(self::DEFAULT_EAGER_LOAD);
     }
 
     public function update(Grade $grade, array $data): Grade
     {
         $grade->update($data);
-
         return $grade->fresh()->load(self::DEFAULT_EAGER_LOAD);
     }
 
@@ -111,13 +79,6 @@ class GradingRepository implements GradingRepositoryInterface
         return $grade->delete();
     }
 
-    /**
-     * Find submissions pending manual grading with eager loading.
-     * Requirements: 10.1, 28.5
-     *
-     * @param  array<string, mixed>  $filters  Optional filters for assignment_id, date range
-     * @return Collection<int, Grade>
-     */
     public function findPendingManualGrading(array $filters = []): Collection
     {
         $query = $this->model
@@ -138,7 +99,6 @@ class GradingRepository implements GradingRepositoryInterface
             ])
             ->orderBy('created_at', 'asc');
 
-        // Apply filters
         if (isset($filters['assignment_id'])) {
             $query->whereHas('submission', function ($q) use ($filters) {
                 $q->where('assignment_id', $filters['assignment_id']);
@@ -154,10 +114,6 @@ class GradingRepository implements GradingRepositoryInterface
         return $query->get();
     }
 
-    /**
-     * Save draft grades for a submission.
-     * Requirements: 11.1, 11.2, 28.5
-     */
     public function saveDraft(int $submissionId, array $data): void
     {
         $grade = $this->model->where('submission_id', $submissionId)->first();
@@ -172,10 +128,6 @@ class GradingRepository implements GradingRepositoryInterface
         }
     }
 
-    /**
-     * Find grades by user with eager loading.
-     * Requirements: 28.5
-     */
     public function findByUser(int $userId): Collection
     {
         return $this->model
@@ -185,10 +137,6 @@ class GradingRepository implements GradingRepositoryInterface
             ->get();
     }
 
-    /**
-     * Find grades by grader with eager loading.
-     * Requirements: 28.5
-     */
     public function findByGrader(int $graderId): Collection
     {
         return $this->model
@@ -198,10 +146,6 @@ class GradingRepository implements GradingRepositoryInterface
             ->get();
     }
 
-    /**
-     * Find released grades with eager loading.
-     * Requirements: 28.5
-     */
     public function findReleased(): Collection
     {
         return $this->model
@@ -211,10 +155,6 @@ class GradingRepository implements GradingRepositoryInterface
             ->get();
     }
 
-    /**
-     * Find unreleased grades with eager loading.
-     * Requirements: 28.5
-     */
     public function findUnreleased(): Collection
     {
         return $this->model
@@ -225,10 +165,6 @@ class GradingRepository implements GradingRepositoryInterface
             ->get();
     }
 
-    /**
-     * Find overridden grades with eager loading.
-     * Requirements: 28.5
-     */
     public function findOverridden(): Collection
     {
         return $this->model

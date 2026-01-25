@@ -42,9 +42,6 @@ class Grade extends Model
         'released_at' => 'datetime',
     ];
 
-    /**
-     * Get the source model (polymorphic).
-     */
     public function source()
     {
         return match ($this->source_type) {
@@ -56,48 +53,32 @@ class Grade extends Model
         };
     }
 
-    /**
-     * Get the submission for this grade.
-     */
     public function submission(): BelongsTo
     {
         return $this->belongsTo(\Modules\Learning\Models\Submission::class);
     }
 
-    /**
-     * Get the user who received this grade.
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(\Modules\Auth\Models\User::class);
     }
 
-    /**
-     * Get the grader who assigned this grade.
-     */
     public function grader(): BelongsTo
     {
         return $this->belongsTo(\Modules\Auth\Models\User::class, 'graded_by');
     }
 
-    /**
-     * Get the reviews for this grade.
-     */
     public function reviews(): HasMany
     {
         return $this->hasMany(GradeReview::class);
     }
 
-    /**
-     * Override the grade with a new score.
-     */
     public function override(float $newScore, string $reason, int $graderId): bool
     {
         if (empty($reason)) {
             throw new \InvalidArgumentException('Override reason is required');
         }
 
-        // Preserve original score if not already overridden
         if (! $this->is_override) {
             $this->original_score = $this->score;
         }
@@ -111,9 +92,6 @@ class Grade extends Model
         return $this->save();
     }
 
-    /**
-     * Mark the grade as released.
-     */
     public function release(): bool
     {
         if ($this->is_draft) {
@@ -125,65 +103,41 @@ class Grade extends Model
         return $this->save();
     }
 
-    /**
-     * Check if the grade has been released.
-     */
     public function isReleased(): bool
     {
         return $this->released_at !== null;
     }
 
-    /**
-     * Get the effective score (override score if overridden, otherwise original).
-     */
     public function getEffectiveScoreAttribute(): float
     {
         return $this->score;
     }
 
-    /**
-     * Scope to filter draft grades.
-     */
     public function scopeDraft($query)
     {
         return $query->where('is_draft', true);
     }
 
-    /**
-     * Scope to filter finalized grades.
-     */
     public function scopeFinalized($query)
     {
         return $query->where('is_draft', false);
     }
 
-    /**
-     * Scope to filter released grades.
-     */
     public function scopeReleased($query)
     {
         return $query->whereNotNull('released_at');
     }
 
-    /**
-     * Scope to filter unreleased grades.
-     */
     public function scopeUnreleased($query)
     {
         return $query->whereNull('released_at');
     }
 
-    /**
-     * Scope to filter overridden grades.
-     */
     public function scopeOverridden($query)
     {
         return $query->where('is_override', true);
     }
 
-    /**
-     * Scope to filter by submission.
-     */
     public function scopeForSubmission($query, int $submissionId)
     {
         return $query->where('submission_id', $submissionId);

@@ -34,7 +34,6 @@ class Submission extends Model
 
     protected $casts = [
         'status' => SubmissionStatus::class,
-        'state' => SubmissionState::class,
         'submitted_at' => 'datetime',
         'attempt_number' => 'integer',
         'is_late' => 'boolean',
@@ -43,7 +42,32 @@ class Submission extends Model
         'question_set' => 'array',
     ];
 
-        public function searchableAs(): string
+    protected function serializeDate(\DateTimeInterface $date): string
+    {
+        return $date->format('Y-m-d H:i:s');
+    }
+
+    protected function getArrayableAppends(): array
+    {
+        $this->appends = array_unique(array_merge($this->appends, [
+            'status_value',
+            'state_value',
+        ]));
+
+        return parent::getArrayableAppends();
+    }
+
+    public function getStatusValueAttribute(): ?string
+    {
+        return $this->status?->value;
+    }
+
+    public function getStateValueAttribute(): ?string
+    {
+        return $this->state?->value;
+    }
+
+    public function searchableAs(): string
     {
         return 'submissions_index';
     }
@@ -131,12 +155,16 @@ class Submission extends Model
 
         public function getStateAttribute($value): ?SubmissionState
     {
-        
         if ($value) {
-            return $value instanceof SubmissionState ? $value : SubmissionState::from($value);
+            if ($value instanceof SubmissionState) {
+                return $value;
+            }
+            $state = SubmissionState::tryFrom($value);
+            if ($state) {
+                return $state;
+            }
         }
 
-        
         if (! $this->status) {
             return null;
         }
@@ -146,6 +174,7 @@ class Submission extends Model
             'submitted' => SubmissionState::Submitted,
             'graded' => SubmissionState::Graded,
             'late' => SubmissionState::Submitted,
+            'missing' => SubmissionState::Submitted,
             default => null,
         };
     }
@@ -155,8 +184,11 @@ class Submission extends Model
         $currentState = $this->state;
 
         if ($currentState && ! $currentState->canTransitionTo($newState)) {
-            throw new \InvalidArgumentException(
-                "Invalid state transition from {$currentState->value} to {$newState->value}"
+            throw \Modules\Learning\Exceptions\SubmissionException::notAllowed(
+                __('messages.submissions.invalid_state_transition', [
+                    'from' => $currentState->label(),
+                    'to' => $newState->label(),
+                ])
             );
         }
 
@@ -166,7 +198,9 @@ class Submission extends Model
 
         $statusValue = match ($newState) {
             SubmissionState::InProgress => 'draft',
-            SubmissionState::Submitted => $this->is_late ? 'late' : 'submitted',
+            SubmissionState::Submitted => ($this->status?->value === 'missing')
+                ? 'missing'
+                : ($this->is_late ? 'late' : 'submitted'),
             SubmissionState::AutoGraded => 'graded',
             SubmissionState::PendingManualGrading => 'submitted',
             SubmissionState::Graded => 'graded',
@@ -249,6 +283,28 @@ class Submission extends Model
         }
 
         return $this->grade?->graded_at;
+    }
+
+    public function getDurationAttribute(): ?int
+    {
+        if (! $this->submitted_at) {
+            return null;
+        }
+
+        return (int) $this->created_at->diffInSeconds($this->submitted_at);
+    }
+
+    public function getFormattedDurationAttribute(): ?string
+    {
+        if (! $this->submitted_at) {
+            return null;
+        }
+
+        return $this->created_at->locale(app()->getLocale())->diffForHumans($this->submitted_at, [
+            'parts' => 2,
+            'short' => false,
+            'syntax' => \Carbon\CarbonInterface::DIFF_ABSOLUTE,
+        ]);
     }
 
         public function getVisibleFeedback(?int $userId = null): ?string

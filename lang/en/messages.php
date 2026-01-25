@@ -33,6 +33,11 @@ return [
     'user_data_not_found' => 'User data not found.',
     'invalid_credentials' => 'Invalid credentials.',
 
+    // Common messages
+    'common' => [
+        'unauthorized' => 'You do not have permission to perform this action.',
+    ],
+
     // Common action messages
     'resource_created' => ':resource created successfully.',
     'items_count' => '{0} No items|{1} 1 item|[2,*] :count items',
@@ -104,6 +109,7 @@ return [
         'not_enrolled' => 'You must be enrolled to access this lesson.',
         'locked_prerequisite' => 'This lesson is locked. Complete prerequisite lessons first.',
         'unavailable' => 'Lesson is not yet available.',
+        'timer_expired' => 'The lesson time limit has expired.',
     ],
 
     // Questions Module
@@ -115,7 +121,10 @@ return [
         'not_found_with_id' => 'Question not found: :id',
         'cannot_set_answer_key_manual' => 'Cannot set answer key for manual grading questions',
         'weight_must_be_positive' => 'Question weight must be a positive number',
+        'weight_exceeds_max_score' => 'Adding this question (weight: :new) exceeds maximum score. Current weight used: :current/:max. Total would be: :total',
+        'weight_warning' => 'Total question weight exceeds the assignment max score. Draft creation allowed, publishing will be blocked.',
         'options_required' => 'Options are required for this question type',
+        'reordered' => 'Questions reordered successfully.',
     ],
 
     // Lesson Blocks Module
@@ -286,6 +295,7 @@ return [
         'log_user_login' => 'User logged in successfully',
         'log_user_logout' => 'User logged out',
         'bulk_export_queued' => 'User export is being processed and will be sent to your email.',
+        'multiple_choice_single_answer' => 'Multiple choice questions can only have one correct answer.',
     ],
 
     'account' => [
@@ -429,6 +439,7 @@ return [
         'deadline_extension_invalid_format' => 'Invalid deadline extension format.',
         'invalid_prerequisites_list' => 'The following prerequisite IDs are invalid for this assignment: :ids',
         'list_retrieved' => 'Assignment list retrieved successfully.',
+        'incomplete_list_retrieved' => 'Incomplete assignment list retrieved successfully.',
         'created' => 'Assignment created successfully.',
         'updated' => 'Assignment updated successfully.',
         'deleted' => 'Assignment deleted successfully.',
@@ -445,12 +456,30 @@ return [
     // Questions Module
     'questions' => [
         'reordered' => 'Questions reordered successfully.',
+        'created' => 'Question created successfully.',
+        'updated' => 'Question updated successfully.',
+        'deleted' => 'Question deleted successfully.',
+        'not_found' => 'Question not found.',
+        'weight_exceeds_max_score' => 'Adding this question (weight: :new) exceeds maximum score. Current weight used: :current/:max. Total would be: :total',
+    ],
+
+    // Overrides Module
+    'overrides' => [
+        'granted' => 'Override granted successfully.',
+    ],
+
+    // Answers Module
+    'answers' => [
+        'saved' => 'Answer saved successfully.',
     ],
 
     // Submissions Module
     'submissions' => [
+        'submitted' => 'Submission submitted successfully.',
         'created' => 'Submission created successfully.',
         'updated' => 'Submission updated successfully.',
+        'question_not_in_set' => 'Question does not belong to the current submission set.',
+        'question_not_in_assignment' => 'Question does not belong to this assignment.',
         'graded' => 'Submission graded successfully.',
         'started' => 'Submission started successfully.',
         'not_found' => 'Submission not found.',
@@ -465,6 +494,12 @@ return [
         'cannot_modify' => 'This submission cannot be modified.',
         'max_attempts_reached' => 'You have reached the maximum number of attempts for this assignment.',
         'cooldown_active' => 'You must wait until :time before starting a new attempt.',
+        'timer_expired' => 'Your time limit for this attempt has expired.',
+        'incomplete_answers' => 'You must answer all required questions.',
+        'finished' => 'You have finished working on this assignment.',
+        'invalid_state_transition' => 'Cannot change status from :from to :to.',
+        'grading_incomplete' => 'Cannot finalize grading: not all required questions have been graded.',
+        'score_out_of_range' => 'Score for question :question_id must be between 0 and :max_score.',
     ],
 
     // Learning Module
@@ -587,5 +622,10 @@ return [
         'question_not_found' => 'The specified question does not exist.',
         'score_max_gte' => 'Maximum score must be greater than or equal to minimum score.',
         'date_to_after_equal' => 'End date must be after or equal to start date.',
+        'multiple_choice_single_answer' => 'Multiple choice questions can only have one correct answer.',
+        'invalid_answer_key_index' => 'Invalid answer key index: :index.',
+        'question_answer_key_required' => 'Answer key is required.',
+        'multiple_choice_not_array' => 'Multiple choice answer must be a single choice, not an array.',
+        'checkbox_must_be_array' => 'Checkbox answer must be an array of selected choices.',
     ],
 ];

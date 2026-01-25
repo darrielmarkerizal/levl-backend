@@ -72,7 +72,23 @@ class LogApiAction
             }
 
             if ($request->route()) {
-                $meta['route_parameters'] = $request->route()->parameters();
+                // Normalize route parameters to scalars to avoid serializing models/enums in queued job
+                $meta['route_parameters'] = collect($request->route()->parameters())
+                    ->map(function ($value) {
+                        if (is_object($value)) {
+                            // Prefer id property if present
+                            if ($value instanceof \Illuminate\Database\Eloquent\Model) {
+                                return $value->getKey();
+                            }
+                            if (property_exists($value, 'id')) {
+                                return $value->id;
+                            }
+                            // Fallback to stringable representation
+                            return method_exists($value, '__toString') ? (string) $value : get_class($value);
+                        }
+                        return $value;
+                    })
+                    ->toArray();
             }
 
             dispatch(new \App\Jobs\CreateAuditJob([

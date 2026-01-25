@@ -9,8 +9,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\Learning\Enums\QuestionType;
 
-class Question extends Model
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+
+class Question extends Model implements HasMedia
 {
+    use InteractsWithMedia;
     protected $table = 'assignment_questions';
     protected $fillable = [
         'assignment_id',

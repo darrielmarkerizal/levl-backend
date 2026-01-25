@@ -22,6 +22,11 @@ return [
     'user_data_not_found' => 'Data pengguna tidak ditemukan.',
     'invalid_credentials' => 'Kredensial tidak valid.',
 
+    // Common messages
+    'common' => [
+        'unauthorized' => 'Anda tidak memiliki izin untuk melakukan aksi ini.',
+    ],
+
     // Common action messages
     'resource_created' => ':resource berhasil dibuat.',
     'items_count' => '{0} Tidak ada item|{1} 1 item|[2,*] :count item',
@@ -93,10 +98,10 @@ return [
         'no_unpublish_access' => 'Anda tidak memiliki akses untuk unpublish lesson ini.',
         'not_enrolled' => 'Anda harus terdaftar untuk mengakses lesson ini.',
         'locked_prerequisite' => 'Lesson ini terkunci. Selesaikan lesson prasyarat terlebih dahulu.',
+        'timer_expired' => 'Batas waktu untuk percobaan ini telah habis.',
         'unavailable' => 'Lesson belum tersedia.',
     ],
 
-    // Questions Module
     // Questions Module
     'questions' => [
         'created' => 'Pertanyaan berhasil dibuat.',
@@ -106,6 +111,8 @@ return [
         'not_found_with_id' => 'Pertanyaan tidak ditemukan: :id',
         'cannot_set_answer_key_manual' => 'Tidak dapat mengatur kunci jawaban untuk pertanyaan penilaian manual',
         'weight_must_be_positive' => 'Bobot pertanyaan harus berupa angka positif',
+        'weight_exceeds_max_score' => 'Menambahkan pertanyaan ini (bobot: :new) melebihi skor maksimal. Bobot yang digunakan saat ini: :current/:max. Total akan menjadi: :total',
+        'weight_warning' => 'Total bobot pertanyaan melebihi skor maksimal penugasan. Pembuatan draf diizinkan, publikasi akan diblokir.',
         'options_required' => 'Opsi jawaban diperlukan untuk tipe pertanyaan ini',
     ],
 
@@ -248,6 +255,7 @@ return [
         'password_already_set' => 'Password sudah diatur sebelumnya.',
         'avatar_deleted' => 'Avatar berhasil dihapus.',
         'username_already_set' => 'Username sudah diatur untuk akun Anda.',
+        'multiple_choice_single_answer' => 'Pilihan ganda hanya boleh memiliki satu jawaban benar.',
         'username_set_success' => 'Username berhasil diatur.',
         'cannot_deactivate_self' => 'Tidak dapat menonaktifkan akun Anda sendiri.',
         'cannot_delete_self' => 'Tidak dapat menghapus akun Anda sendiri.',
@@ -419,6 +427,7 @@ return [
         'deadline_extension_invalid_format' => 'Format perpanjangan batas waktu tidak valid.',
         'invalid_prerequisites_list' => 'ID prasyarat berikut tidak valid untuk tugas ini: :ids',
         'list_retrieved' => 'Daftar tugas berhasil diambil.',
+        'incomplete_list_retrieved' => 'Daftar tugas yang belum dikerjakan berhasil diambil.',
         'created' => 'Tugas berhasil dibuat.',
         'updated' => 'Tugas berhasil diperbarui.',
         'deleted' => 'Tugas berhasil dihapus.',
@@ -435,10 +444,26 @@ return [
     // Questions Module
     'questions' => [
         'reordered' => 'Pertanyaan berhasil diurutkan ulang.',
+        'created' => 'Pertanyaan berhasil dibuat.',
+        'updated' => 'Pertanyaan berhasil diperbarui.',
+        'deleted' => 'Pertanyaan berhasil dihapus.',
+        'not_found' => 'Pertanyaan tidak ditemukan.',
+        'weight_exceeds_max_score' => 'Menambahkan pertanyaan ini (bobot: :new) melampaui skor maksimum. Bobot yang digunakan saat ini: :current/:max. Total akan menjadi: :total',
+    ],
+
+    // Overrides Module
+    'overrides' => [
+        'granted' => 'Override berhasil diberikan.',
+    ],
+
+    // Answers Module
+    'answers' => [
+        'saved' => 'Jawaban berhasil disimpan.',
     ],
 
     // Submissions Module
     'submissions' => [
+        'submitted' => 'Pengumpulan berhasil dikirim.',
         'created' => 'Pengumpulan berhasil dibuat.',
         'updated' => 'Pengumpulan berhasil diperbarui.',
         'graded' => 'Pengumpulan berhasil dinilai.',
@@ -455,6 +480,14 @@ return [
         'cannot_modify' => 'Pengumpulan ini tidak dapat diubah.',
         'max_attempts_reached' => 'Anda telah mencapai jumlah maksimum percobaan untuk assignment ini.',
         'cooldown_active' => 'Anda harus menunggu hingga :time sebelum memulai percobaan baru.',
+        'timer_expired' => 'Batas waktu untuk percobaan ini telah habis.',
+        'question_not_in_set' => 'Pertanyaan tidak ditemukan dalam set pengumpulan ini.',
+        'question_not_in_assignment' => 'Pertanyaan tidak ditemukan dalam tugas ini.',
+        'incomplete_answers' => 'Masih ada pertanyaan yang belum dijawab. Harap lengkapi semua jawaban sebelum mengumpulkan.',
+        'finished' => 'Anda sudah selesai mengerjakan tugas ini.',
+        'invalid_state_transition' => 'Tidak dapat mengubah status dari :from ke :to.',
+        'grading_incomplete' => 'Penilaian belum selesai: belum semua pertanyaan wajib dinilai.',
+        'score_out_of_range' => 'Nilai untuk pertanyaan :question_id harus antara 0 dan :max_score.',
     ],
 
     // Learning Module
@@ -582,6 +615,7 @@ return [
     'validations' => [
         'override_attempts_required' => 'Tambahan percobaan diperlukan untuk override percobaan.',
         'override_deadline_required' => 'Perpanjangan deadline diperlukan untuk override deadline.',
+        'question_answer_key_required' => 'Kunci jawaban diperlukan untuk pertanyaan pilihan ganda dan kotak centang.',
         'question_options_required' => 'Opsi jawaban diperlukan untuk pertanyaan pilihan ganda dan kotak centang.',
         'question_file_types_required' => 'Tipe file yang diizinkan diperlukan untuk pertanyaan unggah file.',
         'answers_required' => 'Anda harus memberikan jawaban untuk mengirim.',
@@ -590,5 +624,9 @@ return [
         'question_not_found' => 'Pertanyaan yang dimaksud tidak ditemukan.',
         'score_max_gte' => 'Skor maksimum harus lebih besar atau sama dengan skor minimum.',
         'date_to_after_equal' => 'Tanggal akhir harus setelah atau sama dengan tanggal mulai.',
+        'multiple_choice_single_answer' => 'Pilihan ganda hanya boleh memiliki satu jawaban benar.',
+        'invalid_answer_key_index' => 'Index kunci jawaban tidak valid: :index.',
+        'multiple_choice_not_array' => 'Pilihan ganda harus berupa satu pilihan, bukan array.',
+        'checkbox_must_be_array' => 'Checkbox harus berupa array dari pilihan yang dipilih.',
     ],
 ];

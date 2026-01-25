@@ -144,6 +144,13 @@ class QuestionRepository extends BaseRepository implements QuestionRepositoryInt
         });
     }
 
+    public function searchByAssignment(int $assignmentId, string $query): Collection
+    {
+        return Question::search($query)
+            ->where('assignment_id', $assignmentId)
+            ->get();
+    }
+
     public function reorder(int $assignmentId, array $questionIds): void
     {
         foreach ($questionIds as $order => $questionId) {

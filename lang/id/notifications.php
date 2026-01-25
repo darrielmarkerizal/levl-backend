@@ -42,4 +42,13 @@ return [
     'total_storage_used' => 'Total penyimpanan yang digunakan',
     'newest_backup_date' => 'Ukuran cadangan terbaru',
     'oldest_backup_date' => 'Ukuran cadangan tertua',
+
+    'grading' => [
+        'submission_graded' => 'Pengumpulan :id dinilai untuk Pengguna :user_id',
+        'grades_released' => 'Nilai dirilis untuk :count pengumpulan',
+        'manual_grading_required' => 'Penilaian manual diperlukan untuk Pengumpulan :id',
+        'appeal_submitted' => 'Banding :id diajukan oleh Pengguna :user_id',
+        'appeal_decision' => 'Banding :id diputuskan untuk Pengguna :user_id',
+        'grade_recalculated' => 'Nilai dihitung ulang untuk Pengumpulan :id. Lama: :old_score, Baru: :new_score',
+    ],
 ];

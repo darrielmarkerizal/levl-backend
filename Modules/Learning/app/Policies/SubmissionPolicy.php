@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Modules\Learning\Policies;
 
 use Modules\Auth\Models\User;
+use Modules\Learning\Enums\SubmissionState;
+use Modules\Learning\Enums\SubmissionStatus;
 use Modules\Learning\Models\Assignment;
 use Modules\Learning\Models\Submission;
 
@@ -72,6 +74,37 @@ class SubmissionPolicy
         }
 
         return $submission->user_id === $user->id && $submission->status === 'draft';
+    }
+
+    public function accessQuestions(User $user, Submission $submission): \Illuminate\Auth\Access\Response
+    {
+        if ($user->hasRole('Superadmin') || $user->hasRole('Admin')) {
+            return \Illuminate\Auth\Access\Response::allow();
+        }
+
+        if (!$user->hasRole('Student')) {
+            return \Illuminate\Auth\Access\Response::deny(__('messages.forbidden'));
+        }
+
+        if ($submission->user_id !== $user->id) {
+            return \Illuminate\Auth\Access\Response::deny(__('messages.forbidden'));
+        }
+
+        if ($submission->state !== SubmissionState::InProgress) {
+            return \Illuminate\Auth\Access\Response::deny(__('messages.submissions.finished'));
+        }
+
+        return \Illuminate\Auth\Access\Response::allow();
+    }
+
+    public function saveAnswer(User $user, Submission $submission): \Illuminate\Auth\Access\Response
+    {
+        return $this->accessQuestions($user, $submission);
+    }
+
+    public function submit(User $user, Submission $submission): \Illuminate\Auth\Access\Response
+    {
+        return $this->accessQuestions($user, $submission);
     }
 
     public function delete(User $user, Submission $submission): bool

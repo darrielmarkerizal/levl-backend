@@ -43,29 +43,10 @@ class SubmissionResource extends JsonResource
             }),
             'enrollment' => $this->whenLoaded('enrollment'),
             'files' => $this->whenLoaded('files'),
-            'answers' => $this->whenLoaded('answers'),
+            'answers' => AnswerResource::collection($this->whenLoaded('answers')),
             'previousSubmission' => $this->whenLoaded('previousSubmission'),
             'grade' => $this->whenLoaded('grade'),
             'appeal' => $this->whenLoaded('appeal'),
         ];
-    }
-
-    public static function make(...$parameters)
-    {
-        $resource = $parameters[0] ?? null;
-
-        if ($resource && method_exists($resource, 'loadMissing')) {
-            $resource->loadMissing([
-                'assignment',
-                'user:id,name,email',
-                'enrollment',
-                'files',
-                'answers',
-                'previousSubmission',
-                'grade',
-            ]);
-        }
-
-        return parent::make(...$parameters);
     }
 }

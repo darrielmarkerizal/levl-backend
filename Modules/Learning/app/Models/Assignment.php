@@ -101,6 +101,7 @@ class Assignment extends Model implements HasMedia
         'status',
         'allow_resubmit',
         'late_penalty_percent',
+        'time_limit_minutes',
     ];
 
     protected $casts = [

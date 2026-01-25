@@ -66,6 +66,7 @@ class GrantOverrideRequest extends FormRequest
             'value.additional_attempts' => __('validation.attributes.additional_attempts'),
             'value.extended_deadline' => __('validation.attributes.extended_deadline'),
             'value.bypassed_prerequisites' => __('validation.attributes.bypassed_prerequisites'),
+            'value.bypassed_prerequisites.*' => __('validation.attributes.bypassed_prerequisites'),
             'value.expires_at' => __('validation.attributes.expires_at'),
         ];
     }

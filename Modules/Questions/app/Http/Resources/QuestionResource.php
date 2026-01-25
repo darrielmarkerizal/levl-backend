@@ -10,6 +10,10 @@ class QuestionResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        // 🔒 SECURITY: Determine if user is authorized to see sensitive fields
+        $user = $request->user();
+        $isAuthorized = $user && $user->hasAnyRole(['Admin', 'Instructor', 'Superadmin']);
+
         return [
             'id' => $this->id,
             'category' => new CategoryResource($this->whenLoaded('category')),
@@ -23,7 +27,7 @@ class QuestionResource extends JsonResource
             'difficulty' => $this->difficulty?->value,
             'difficulty_label' => $this->difficulty?->label(),
             'question_text' => $this->question_text,
-            'explanation' => $this->explanation,
+            'explanation' => $this->when($isAuthorized, $this->explanation),
             'points' => $this->points,
             'tags' => $this->tags,
             'meta' => $this->meta,
@@ -32,9 +36,22 @@ class QuestionResource extends JsonResource
             'status' => $this->status?->value,
             'status_label' => $this->status?->label(),
             'options' => QuestionOptionResource::collection($this->whenLoaded('options')),
+            
+            // ⚠️ CRITICAL: answer_key should NOT be visible to students
+            'answer_key' => $this->when($isAuthorized, fn() => $this->getAnswerKey()),
+            
             'created_at' => $this->created_at?->toIso8601String(),
-            'updated_at' => $this->updated_at?->toIso8601String(),
-            'deleted_at' => $this->deleted_at?->toIso8601String(),
+            'updated_at' => $this->when($isAuthorized, $this->updated_at?->toIso8601String()),
+            'deleted_at' => $this->when($isAuthorized, $this->deleted_at?->toIso8601String()),
         ];
+    }
+
+    /**
+     * Get answer key safely - only call when already authorized
+     */
+    private function getAnswerKey(): mixed
+    {
+        // Return answer_key if exists, otherwise null
+        return $this->resource->answer_key ?? null;
     }
 }

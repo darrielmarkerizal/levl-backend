@@ -20,7 +20,12 @@ class SubmissionRepository extends BaseRepository implements SubmissionRepositor
         protected const DEFAULT_EAGER_LOAD = [
         'user:id,name,email',
         'assignment:id,title,deadline_at,tolerance_minutes,review_mode',
+        'answers.question',
         'grade',
+            'enrollment',
+            'files',
+            'previousSubmission',
+            'appeal',
     ];
 
         protected const DETAILED_EAGER_LOAD = [
@@ -67,7 +72,10 @@ class SubmissionRepository extends BaseRepository implements SubmissionRepositor
 
     public function create(array $attributes): Submission
     {
-        return Submission::create($attributes);
+        // Temporarily disable Scout observer to prevent serialization issues with enums during model creation
+        return Submission::withoutSyncingToSearch(function () use ($attributes) {
+            return Submission::create($attributes);
+        });
     }
 
     public function update(Model|Submission $model, array $attributes): Model|Submission

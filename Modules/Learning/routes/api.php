@@ -9,6 +9,10 @@ Route::middleware(['auth:api'])->prefix('v1')->scopeBindings()->group(function (
         ->middleware('can:viewAssignments,course')
         ->name('courses.assignments.index');
 
+    Route::get('courses/{course:slug}/assignments/incomplete', [AssignmentController::class, 'indexIncomplete'])
+        ->middleware('can:viewAssignments,course')
+        ->name('courses.assignments.incomplete');
+
     Route::get('assignments/{assignment}', [AssignmentController::class, 'show'])
         ->middleware('can:view,assignment')
         ->name('assignments.show');
@@ -31,6 +35,9 @@ Route::middleware(['auth:api'])->prefix('v1')->scopeBindings()->group(function (
 
     Route::get('assignments/{assignment}/submissions/highest', [SubmissionController::class, 'highestSubmission'])
         ->name('assignments.submissions.highest');
+
+    Route::get('assignments/{assignment}/submissions/{submission}', [SubmissionController::class, 'showForAssignment'])
+        ->name('assignments.submissions.detail');
 
     // Assignment management routes (Admin, Instructor, Superadmin only)
     Route::middleware(['role:Superadmin|Admin|Instructor'])->group(function () {
@@ -56,6 +63,10 @@ Route::middleware(['auth:api'])->prefix('v1')->scopeBindings()->group(function (
         Route::put('assignments/{assignment}/archived', [AssignmentController::class, 'archive'])
             ->middleware('can:update,assignment')
             ->name('assignments.archive');
+
+        Route::get('assignments/{assignment}/questions/{question}', [AssignmentController::class, 'showQuestion'])
+            ->middleware('can:view,assignment')
+            ->name('assignments.questions.show');
 
         Route::post('assignments/{assignment}/questions', [AssignmentController::class, 'addQuestion'])
             ->middleware('can:update,assignment')
@@ -99,16 +110,22 @@ Route::middleware(['auth:api'])->prefix('v1')->scopeBindings()->group(function (
     Route::post('assignments/{assignment}/submissions/start', [SubmissionController::class, 'start'])
         ->name('assignments.submissions.start');
 
-    Route::get('submissions/{submission}', [SubmissionController::class, 'show'])
-        ->middleware('can:view,submission')
-        ->name('submissions.show');
+
+
+    Route::get('submissions/{submission}/questions', [SubmissionController::class, 'listQuestions'])
+        ->middleware('can:accessQuestions,submission')
+        ->name('submissions.questions.index');
 
     Route::put('submissions/{submission}', [SubmissionController::class, 'update'])
         ->middleware('can:update,submission')
         ->name('submissions.update');
 
+    Route::post('submissions/{submission}/answers', [SubmissionController::class, 'saveAnswer'])
+        ->middleware('can:saveAnswer,submission')
+        ->name('submissions.answers.store');
+
     Route::post('submissions/{submission}/submit', [SubmissionController::class, 'submit'])
-        ->middleware('can:update,submission')
+        ->middleware('can:submit,submission')
         ->name('submissions.submit');
 
     // Grading route (Admin, Instructor, Superadmin only)

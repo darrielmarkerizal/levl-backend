@@ -12,36 +12,13 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Modules\Grading\Contracts\Services\GradingServiceInterface;
 
-/**
- * Job to bulk release grades for multiple submissions.
- *
- * This job processes bulk grade release operations in the background,
- * allowing for efficient handling of large batches without blocking
- * the user interface.
- *
- * Requirements: 26.2 - THE System SHALL support bulk grade release for submissions in deferred review mode
- * Requirements: 28.6 - THE System SHALL process updates in background jobs using Laravel queues
- */
 class BulkReleaseGradesJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * The number of times the job may be attempted.
-     */
     public int $tries = 3;
-
-    /**
-     * The number of seconds the job can run before timing out.
-     */
     public int $timeout = 300;
 
-    /**
-     * Create a new job instance.
-     *
-     * @param  array<int>  $submissionIds  Array of submission IDs to release grades for
-     * @param  int|null  $instructorId  The ID of the instructor initiating the release
-     */
     public function __construct(
         public array $submissionIds,
         public ?int $instructorId = null
@@ -49,14 +26,10 @@ class BulkReleaseGradesJob implements ShouldQueue
         $this->onQueue('grading');
     }
 
-    /**
-     * Execute the job.
-     */
     public function handle(GradingServiceInterface $gradingService): void
     {
         if (empty($this->submissionIds)) {
             Log::info('BulkReleaseGradesJob: No submission IDs provided, skipping');
-
             return;
         }
 
@@ -85,9 +58,6 @@ class BulkReleaseGradesJob implements ShouldQueue
         }
     }
 
-    /**
-     * Handle a job failure.
-     */
     public function failed(\Throwable $exception): void
     {
         Log::error('BulkReleaseGradesJob: Job failed after all retries', [
@@ -98,11 +68,6 @@ class BulkReleaseGradesJob implements ShouldQueue
         ]);
     }
 
-    /**
-     * Get the tags that should be assigned to the job.
-     *
-     * @return array<string>
-     */
     public function tags(): array
     {
         return [

@@ -77,6 +77,7 @@ return [
     "submitted" => "Dikumpulkan",
     "graded" => "Dinilai",
     "late" => "Terlambat",
+    "missing" => "Tidak Mengumpulkan",
   ],
 
   "submission_type" => [

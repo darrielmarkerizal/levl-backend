@@ -31,6 +31,7 @@ class UpdateAssignmentRequest extends FormRequest
             'allow_resubmit' => ['nullable', 'boolean'],
             'late_penalty_percent' => ['nullable', 'integer', 'min:0', 'max:100'],
             'tolerance_minutes' => ['nullable', 'integer', 'min:0'],
+            'time_limit_minutes' => ['nullable', 'integer', 'min:1'],
             'max_attempts' => ['nullable', 'integer', 'min:1'],
             'cooldown_minutes' => ['nullable', 'integer', 'min:0'],
             'retake_enabled' => ['nullable', 'boolean'],
