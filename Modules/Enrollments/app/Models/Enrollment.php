@@ -103,6 +103,6 @@ class Enrollment extends Model
      */
     protected static function newFactory()
     {
-        return \Database\Factories\EnrollmentFactory::new();
+        return \Modules\Enrollments\Database\Factories\EnrollmentFactory::new();
     }
 }

@@ -27,26 +27,24 @@ class AssignmentFactory extends Factory
     {
         return [
             'lesson_id' => Lesson::factory(),
-            'assignable_type' => null,
-            'assignable_id' => null,
             'created_by' => User::factory(),
             'title' => fake()->sentence(),
             'description' => fake()->paragraph(),
-            'type' => fake()->randomElement(['essay', 'file_upload', 'quiz', 'project']),
             'submission_type' => fake()->randomElement(['text', 'file', 'mixed']),
             'max_score' => fake()->numberBetween(50, 100),
             'available_from' => now(),
             'deadline_at' => now()->addDays(7),
+            'status' => 'published',
+            'allow_resubmit' => fake()->boolean(60),
+            'late_penalty_percent' => fake()->optional(0.4)->numberBetween(5, 25),
             'tolerance_minutes' => 0,
-            'max_attempts' => null,
+            'max_attempts' => fake()->optional(0.3)->numberBetween(1, 3),
             'cooldown_minutes' => 0,
             'retake_enabled' => false,
-            'review_mode' => ReviewMode::Immediate,
-            'randomization_type' => RandomizationType::Static,
+            'review_mode' => 'immediate',
+            'randomization_type' => 'static',
             'question_bank_count' => null,
-            'status' => 'published',
-            'allow_resubmit' => false,
-            'late_penalty_percent' => 0,
+            'time_limit_minutes' => fake()->optional(0.5)->numberBetween(15, 120),
         ];
     }
 

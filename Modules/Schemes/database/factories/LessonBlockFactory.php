@@ -22,9 +22,9 @@ class LessonBlockFactory extends Factory
     {
         return [
             'lesson_id' => Lesson::factory(),
-            'slug' => fake()->unique()->slug(),
-            'block_type' => fake()->randomElement(['text', 'image', 'video', 'audio', 'code', 'quiz']),
+            'block_type' => fake()->randomElement(['text', 'image', 'file', 'embed']),
             'content' => fake()->paragraphs(2, true),
+            'media_url' => fake()->optional(0.3)->url(),
             'order' => fake()->numberBetween(1, 10),
         ];
     }

@@ -346,6 +346,6 @@ class Course extends Model implements HasMedia
    */
   protected static function newFactory()
   {
-    return \Database\Factories\CourseFactory::new();
+    return \Modules\Schemes\Database\Factories\CourseFactory::new();
   }
 }

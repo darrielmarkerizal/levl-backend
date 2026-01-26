@@ -56,9 +56,11 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class Assignment extends Model implements HasMedia
 {
-    use Searchable, InteractsWithMedia;
+    use Searchable, InteractsWithMedia, HasFactory;
 
     public function registerMediaCollections(): void
     {
@@ -119,6 +121,11 @@ class Assignment extends Model implements HasMedia
         'retake_enabled' => 'boolean',
         'late_penalty_percent' => 'integer',
     ];
+
+    protected static function newFactory()
+    {
+        return \Modules\Learning\Database\Factories\AssignmentFactory::new();
+    }
 
         public function assignable(): MorphTo
     {

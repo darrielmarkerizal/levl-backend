@@ -42,6 +42,11 @@ class Submission extends Model
         'question_set' => 'array',
     ];
 
+    protected static function newFactory()
+    {
+        return \Modules\Learning\Database\Factories\SubmissionFactory::new();
+    }
+
     protected function serializeDate(\DateTimeInterface $date): string
     {
         return $date->format('Y-m-d H:i:s');

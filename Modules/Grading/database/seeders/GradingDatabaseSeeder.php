@@ -8,9 +8,15 @@ class GradingDatabaseSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     * 
+     * Seeds the Grading module with:
+     * 1. Grades for submitted assignments
+     * 2. Appeals with different statuses
      */
     public function run(): void
     {
-        // $this->call([]);
+        $this->call([
+            GradeAndAppealSeeder::class,
+        ]);
     }
 }

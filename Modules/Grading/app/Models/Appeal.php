@@ -31,6 +31,11 @@ class Appeal extends Model
         'decided_at' => 'datetime',
     ];
 
+    protected static function newFactory()
+    {
+        return \Modules\Grading\Database\Factories\AppealFactory::new();
+    }
+
     public function submission(): BelongsTo
     {
         return $this->belongsTo(\Modules\Learning\Models\Submission::class);

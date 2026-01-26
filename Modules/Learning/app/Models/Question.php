@@ -42,6 +42,11 @@ class Question extends Model implements HasMedia
         'allow_multiple_files' => 'boolean',
     ];
 
+    protected static function newFactory()
+    {
+        return \Modules\Learning\Database\Factories\AssignmentQuestionFactory::new();
+    }
+
         public function assignment(): BelongsTo
     {
         return $this->belongsTo(Assignment::class);

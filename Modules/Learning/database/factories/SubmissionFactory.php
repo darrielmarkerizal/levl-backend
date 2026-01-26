@@ -22,20 +22,46 @@ class SubmissionFactory extends Factory
      */
     public function definition(): array
     {
+        $submittedAt = fake()->dateTimeBetween('-3 months', 'now');
+
         return [
             'assignment_id' => Assignment::factory(),
             'user_id' => User::factory(),
             'enrollment_id' => Enrollment::factory(),
-            'answer_text' => fake()->paragraphs(3, true),
-            'status' => 'submitted',
-            'score' => null,
-            'question_set' => null,
-            'submitted_at' => now(),
+            'answer_text' => fake()->optional(0.7)->paragraphs(3, true),
+            'status' => fake()->randomElement(['draft', 'submitted', 'graded', 'late']),
+            'submitted_at' => fake()->boolean(70) ? $submittedAt : null,
             'attempt_number' => 1,
-            'is_late' => false,
-            'is_resubmission' => false,
+            'is_late' => fake()->boolean(20),
+            'is_resubmission' => fake()->boolean(30),
             'previous_submission_id' => null,
+            'score' => fake()->optional(0.5)->randomFloat(2, 0, 100),
+            'question_set' => null,
+            'state' => fake()->optional(0.4)->randomElement(['started', 'in_progress', 'submitted']),
+            'started_at' => fake()->optional(0.8)->dateTimeBetween('-3 months', $submittedAt),
+            'time_expired_at' => null,
+            'auto_submitted_on_timeout' => false,
         ];
+    }
+
+    /**
+     * Submission for assignment.
+     */
+    public function forAssignment(Assignment $assignment): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'assignment_id' => $assignment->id,
+        ]);
+    }
+
+    /**
+     * Submission for user.
+     */
+    public function forUser(User $user): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'user_id' => $user->id,
+        ]);
     }
 
     /**
@@ -46,6 +72,17 @@ class SubmissionFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'status' => 'draft',
             'submitted_at' => null,
+        ]);
+    }
+
+    /**
+     * Graded submission.
+     */
+    public function graded(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => 'graded',
+            'score' => rand(0, 100),
         ]);
     }
 
@@ -65,16 +102,6 @@ class SubmissionFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'status' => 'submitted',
             'submitted_at' => now(),
-        ]);
-    }
-
-    /**
-     * Indicate that the submission is graded.
-     */
-    public function graded(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'status' => 'graded',
         ]);
     }
 

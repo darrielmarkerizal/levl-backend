@@ -107,6 +107,6 @@ class Unit extends Model
      */
     protected static function newFactory()
     {
-        return \Database\Factories\UnitFactory::new();
+        return \Modules\Schemes\Database\Factories\UnitFactory::new();
     }
 }

@@ -115,6 +115,6 @@ class Lesson extends Model
      */
     protected static function newFactory()
     {
-        return \Database\Factories\LessonFactory::new();
+        return \Modules\Schemes\Database\Factories\LessonFactory::new();
     }
 }

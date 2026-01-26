@@ -31,6 +31,11 @@ class Answer extends Model implements HasMedia
         'is_auto_graded' => 'boolean',
     ];
 
+    protected static function newFactory()
+    {
+        return \Modules\Learning\Database\Factories\AnswerFactory::new();
+    }
+
         public function submission(): BelongsTo
     {
         return $this->belongsTo(Submission::class);
