@@ -44,6 +44,11 @@ class SubmissionService implements SubmissionServiceInterface
 
     public function listForAssignment(Assignment $assignment, User $user, array $filters = []): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
+        return $this->listForAssignmentForIndex($assignment, $user, $filters);
+    }
+
+    public function listForAssignmentForIndex(Assignment $assignment, User $user, array $filters = []): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    {
         $perPage = (int) data_get($filters, 'per_page', 15);
         $perPage = max(1, $perPage);
 
@@ -59,7 +64,7 @@ class SubmissionService implements SubmissionServiceInterface
             ->allowedSorts(['submitted_at', 'created_at', 'score', 'status'])
             ->defaultSort('-submitted_at')
             ->where('assignment_id', $assignment->id)
-            ->with(['user', 'grade']);
+            ->with(['user:id,name,email', 'grade:id,submission_id,score,status,released_at']);
 
         if ($user->hasRole('Student')) {
             $query->where('user_id', $user->id);

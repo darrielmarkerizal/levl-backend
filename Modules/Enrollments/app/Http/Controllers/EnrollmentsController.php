@@ -24,10 +24,10 @@ class EnrollmentsController extends Controller
     {
         $user = auth('api')->user();
         $perPage = max(1, (int) $request->query('per_page', 15));
-        
-        $paginator = $this->service->listEnrollments($user, $perPage, $request->all());
-        
-        $paginator->getCollection()->transform(fn($item) => new EnrollmentResource($item));
+
+        $paginator = $this->service->listEnrollmentsForIndex($user, $perPage, $request->all());
+
+        $paginator->getCollection()->transform(fn($item) => new \Modules\Enrollments\Http\Resources\EnrollmentIndexResource($item));
         return $this->paginateResponse($paginator, __('messages.enrollments.list_retrieved'));
     }
 

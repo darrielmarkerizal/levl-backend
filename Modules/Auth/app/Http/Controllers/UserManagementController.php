@@ -23,13 +23,13 @@ class UserManagementController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $users = $this->userManagementService->listUsers(
+        $users = $this->userManagementService->listUsersForIndex(
             $request->user(),
             (int) $request->query('per_page', 15),
             $request->query('search')
         );
 
-        $users->getCollection()->transform(fn($user) => new UserResource($user));
+        $users->getCollection()->transform(fn($user) => new \Modules\Auth\Http\Resources\UserIndexResource($user));
 
         return $this->paginateResponse($users);
     }

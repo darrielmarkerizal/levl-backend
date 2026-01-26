@@ -3793,8 +3793,9 @@
                   "disabled": true
                 },
                 {
-                  "key": "search",
-                  "value": "",
+                  "key": "filter[search]",
+                  "value": "asu",
+                  "uuid": "e9ff3326-abf1-46de-9340-416867cb6c9a",
                   "disabled": true
                 },
                 {

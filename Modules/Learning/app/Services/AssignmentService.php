@@ -66,6 +66,11 @@ class AssignmentService implements AssignmentServiceInterface
 
     public function list(\Modules\Schemes\Models\Course $course, array $filters = []): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
+        return $this->listForIndex($course, $filters);
+    }
+
+    public function listForIndex(\Modules\Schemes\Models\Course $course, array $filters = []): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    {
         $unitSlug = data_get($filters, 'unit_slug');
         $lessonSlug = data_get($filters, 'lesson_slug');
 
@@ -83,7 +88,7 @@ class AssignmentService implements AssignmentServiceInterface
                  throw new \InvalidArgumentException(__('messages.assignments.invalid_scope_hierarchy'));
             }
 
-            return $this->listByLesson($lesson, $filters);
+            return $this->listByLessonForIndex($lesson, $filters);
         }
 
         if ($unitSlug) {
@@ -97,10 +102,10 @@ class AssignmentService implements AssignmentServiceInterface
                   throw new \InvalidArgumentException(__('messages.assignments.invalid_scope_hierarchy'));
              }
 
-             return $this->listByUnit($unit, $filters);
+             return $this->listByUnitForIndex($unit, $filters);
         }
 
-        return $this->listByCourse($course, $filters);
+        return $this->listByCourseForIndex($course, $filters);
     }
 
     public function listByLesson(\Modules\Schemes\Models\Lesson $lesson, array $filters = []): \Illuminate\Contracts\Pagination\LengthAwarePaginator
@@ -113,6 +118,16 @@ class AssignmentService implements AssignmentServiceInterface
             ->paginate($perPage);
     }
 
+    public function listByLessonForIndex(\Modules\Schemes\Models\Lesson $lesson, array $filters = []): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    {
+        $perPage = (int) data_get($filters, 'per_page', 15);
+        $perPage = max(1, $perPage);
+
+        return $this->buildQueryForIndex($filters)
+            ->forLesson($lesson->id)
+            ->paginate($perPage);
+    }
+
     public function listByUnit(\Modules\Schemes\Models\Unit $unit, array $filters = []): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
         $perPage = (int) data_get($filters, 'per_page', 15);
@@ -120,6 +135,26 @@ class AssignmentService implements AssignmentServiceInterface
 
         return $this->buildQuery($filters)
             ->forUnit($unit->id)
+            ->paginate($perPage);
+    }
+
+    public function listByUnitForIndex(\Modules\Schemes\Models\Unit $unit, array $filters = []): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    {
+        $perPage = (int) data_get($filters, 'per_page', 15);
+        $perPage = max(1, $perPage);
+
+        return $this->buildQueryForIndex($filters)
+            ->forUnit($unit->id)
+            ->paginate($perPage);
+    }
+
+    public function listByCourseForIndex(\Modules\Schemes\Models\Course $course, array $filters = []): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    {
+        $perPage = (int) data_get($filters, 'per_page', 15);
+        $perPage = max(1, $perPage);
+
+        return $this->buildQueryForIndex($filters)
+            ->forCourse($course->id)
             ->paginate($perPage);
     }
 
@@ -195,6 +230,30 @@ class AssignmentService implements AssignmentServiceInterface
                 AllowedFilter::exact('submission_type'),
             ])
             ->allowedIncludes(['questions', 'prerequisites', 'overrides', 'creator', 'lesson', 'assignable'])
+            ->allowedSorts(['id', 'title', 'created_at', 'updated_at', 'deadline_at', 'available_from'])
+            ->defaultSort('-created_at');
+    }
+
+    private function buildQueryForIndex(array $payload = []): QueryBuilder
+    {
+        $searchQuery = data_get($payload, 'search');
+        $filters = data_get($payload, 'filter', []);
+
+        $builder = QueryBuilder::for(
+            Assignment::with(['creator:id,name,email', 'lesson:id,unit_id,title,slug', 'lesson.unit:id,course_id,title,slug', 'assignable:id,title,slug']),
+            $this->buildQueryBuilderRequest($filters)
+        );
+
+        if ($searchQuery && trim((string) $searchQuery) !== '') {
+            $ids = Assignment::search($searchQuery)->keys()->toArray();
+            $builder->whereIn('id', $ids ?: [0]);
+        }
+
+        return $builder
+            ->allowedFilters([
+                AllowedFilter::exact('status'),
+                AllowedFilter::exact('submission_type'),
+            ])
             ->allowedSorts(['id', 'title', 'created_at', 'updated_at', 'deadline_at', 'available_from'])
             ->defaultSort('-created_at');
     }

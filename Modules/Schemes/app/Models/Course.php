@@ -154,6 +154,53 @@ class Course extends Model implements HasMedia
     return $media?->getUrl("large");
   }
 
+  /**
+   * Get thumbnail URL efficiently when media is already loaded
+   */
+  public function getThumbnailUrlEfficient(): string
+  {
+    if ($this->relationLoaded('media')) {
+      $thumbnailMedia = $this->media->where('collection_name', 'thumbnail')->first();
+      return $thumbnailMedia ? $thumbnailMedia->getUrl() : '';
+    }
+    return $this->getThumbnailUrlAttribute() ?? '';
+  }
+
+  /**
+   * Get banner URL efficiently when media is already loaded
+   */
+  public function getBannerUrlEfficient(): string
+  {
+    if ($this->relationLoaded('media')) {
+      $bannerMedia = $this->media->where('collection_name', 'banner')->first();
+      return $bannerMedia ? $bannerMedia->getUrl() : '';
+    }
+    return $this->getBannerUrlAttribute() ?? '';
+  }
+
+  /**
+   * Get media URLs without triggering additional queries
+   * This method fetches media URLs efficiently by using a single query
+   */
+  /**
+   * Scope to add media URLs to the query results
+   */
+  public function scopeWithMediaUrls($query)
+  {
+    return $query->addSelect([
+      'thumbnail_url' => \Spatie\MediaLibrary\MediaCollections\Models\Media::selectRaw('CONCAT("/storage/", directory, "/", file_name)')
+        ->whereColumn('model_id', 'courses.id')
+        ->where('model_type', static::class)
+        ->where('collection_name', 'thumbnail')
+        ->limit(1),
+      'banner_url' => \Spatie\MediaLibrary\MediaCollections\Models\Media::selectRaw('CONCAT("/storage/", directory, "/", file_name)')
+        ->whereColumn('model_id', 'courses.id')
+        ->where('model_type', static::class)
+        ->where('collection_name', 'banner')
+        ->limit(1),
+    ]);
+  }
+
   public function tagPivot(): HasMany
   {
     return $this->hasMany(CourseTag::class, "course_id");

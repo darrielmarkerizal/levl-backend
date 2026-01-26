@@ -71,6 +71,42 @@ class EnrollmentService implements EnrollmentServiceInterface
             ->paginate($perPage);
     }
 
+    public function paginateByCourseForIndex(int $courseId, int $perPage = 15, array $filters = []): LengthAwarePaginator
+    {
+        $perPage = max(1, $perPage);
+        $searchQuery = $filters['search'] ?? null;
+
+        $builder = QueryBuilder::for(Enrollment::class)
+            ->with(['user:id,name,email', 'course:id,title,slug,code'])
+            ->where('course_id', $courseId);
+
+        if ($searchQuery && trim((string) $searchQuery) !== '') {
+            $ids = Enrollment::search($searchQuery)->take(1000)->keys()->toArray();
+            $builder->whereIn('id', $ids ?: [0]);
+        }
+
+        $prioritySort = AllowedSort::callback('priority', function ($query, $descending) {
+            $query->orderByRaw("CASE WHEN status = 'pending' THEN 1 ELSE 2 END")
+                ->orderBy('created_at', 'desc');
+        });
+
+        return $builder
+            ->allowedFilters([
+                AllowedFilter::exact('status'),
+                AllowedFilter::exact('user_id'),
+                AllowedFilter::callback('enrolled_from', fn ($q, $value) => $q->whereDate('enrolled_at', '>=', $value)),
+                AllowedFilter::callback('enrolled_to', fn ($q, $value) => $q->whereDate('enrolled_at', '<=', $value)),
+            ])
+            ->allowedSorts([
+                'enrolled_at',
+                'completed_at',
+                'created_at',
+                $prioritySort,
+            ])
+            ->defaultSort($prioritySort)
+            ->paginate($perPage);
+    }
+
     public function paginateByCourseIds(array $courseIds, int $perPage = 15, array $filters = []): LengthAwarePaginator
     {
         $perPage = max(1, $perPage);
@@ -116,6 +152,50 @@ class EnrollmentService implements EnrollmentServiceInterface
             ->paginate($perPage);
     }
 
+    public function paginateByCourseIdsForIndex(array $courseIds, int $perPage = 15, array $filters = []): LengthAwarePaginator
+    {
+        $perPage = max(1, $perPage);
+        $searchQuery = $filters['search'] ?? null;
+
+        $builder = QueryBuilder::for(Enrollment::class)
+            ->with(['user:id,name,email', 'course:id,title,slug,code'])
+            ->whereIn('course_id', $courseIds);
+
+        if ($searchQuery && trim((string) $searchQuery) !== '') {
+            $ids = Enrollment::search($searchQuery)->take(1000)->keys()->toArray();
+            $builder->whereIn('id', $ids ?: [0]);
+        }
+
+        $prioritySort = AllowedSort::callback('priority', function ($query, $descending) {
+            $query->orderByRaw("CASE WHEN status = 'pending' THEN 1 ELSE 2 END")
+                ->orderBy('created_at', 'desc');
+        });
+
+        return $builder
+            ->allowedFilters([
+                AllowedFilter::exact('status'),
+                AllowedFilter::exact('user_id'),
+                AllowedFilter::callback('course_slug', function ($query, $value) {
+                    $course = \Modules\Schemes\Models\Course::where('slug', $value)->first();
+                    if ($course) {
+                        $query->where('course_id', $course->id);
+                    } else {
+                        $query->whereRaw('1 = 0');
+                    }
+                }),
+                AllowedFilter::callback('enrolled_from', fn ($q, $value) => $q->whereDate('enrolled_at', '>=', $value)),
+                AllowedFilter::callback('enrolled_to', fn ($q, $value) => $q->whereDate('enrolled_at', '<=', $value)),
+            ])
+            ->allowedSorts([
+                'enrolled_at',
+                'completed_at',
+                'created_at',
+                $prioritySort,
+            ])
+            ->defaultSort($prioritySort)
+            ->paginate($perPage);
+    }
+
     public function paginateByUser(int $userId, int $perPage = 15, array $filters = []): LengthAwarePaginator
     {
         $perPage = max(1, $perPage);
@@ -145,6 +225,39 @@ class EnrollmentService implements EnrollmentServiceInterface
                 AllowedFilter::callback('enrolled_to', fn ($q, $value) => $q->whereDate('enrolled_at', '<=', $value)),
             ])
             ->allowedIncludes(['user', 'course'])
+            ->allowedSorts(['enrolled_at', 'completed_at', 'created_at'])
+            ->defaultSort('-enrolled_at')
+            ->paginate($perPage);
+    }
+
+    public function paginateByUserForIndex(int $userId, int $perPage = 15, array $filters = []): LengthAwarePaginator
+    {
+        $perPage = max(1, $perPage);
+        $searchQuery = $filters['search'] ?? null;
+
+        $builder = QueryBuilder::for(Enrollment::class)
+            ->with(['user:id,name,email', 'course:id,title,slug,code'])
+            ->where('user_id', $userId);
+
+        if ($searchQuery && trim((string) $searchQuery) !== '') {
+            $ids = Enrollment::search($searchQuery)->take(1000)->keys()->toArray();
+            $builder->whereIn('id', $ids ?: [0]);
+        }
+
+        return $builder
+            ->allowedFilters([
+                AllowedFilter::exact('status'),
+                AllowedFilter::callback('course_slug', function ($query, $value) {
+                    $course = \Modules\Schemes\Models\Course::where('slug', $value)->first();
+                    if ($course) {
+                        $query->where('course_id', $course->id);
+                    } else {
+                        $query->whereRaw('1 = 0');
+                    }
+                }),
+                AllowedFilter::callback('enrolled_from', fn ($q, $value) => $q->whereDate('enrolled_at', '>=', $value)),
+                AllowedFilter::callback('enrolled_to', fn ($q, $value) => $q->whereDate('enrolled_at', '<=', $value)),
+            ])
             ->allowedSorts(['enrolled_at', 'completed_at', 'created_at'])
             ->defaultSort('-enrolled_at')
             ->paginate($perPage);
@@ -194,6 +307,49 @@ class EnrollmentService implements EnrollmentServiceInterface
             ->paginate($perPage);
     }
 
+    public function paginateAllForIndex(int $perPage = 15, array $filters = []): LengthAwarePaginator
+    {
+        $perPage = max(1, $perPage);
+        $searchQuery = $filters['search'] ?? null;
+
+        $builder = QueryBuilder::for(Enrollment::class)
+            ->with(['user:id,name,email', 'course:id,title,slug,code']);
+
+        if ($searchQuery && trim((string) $searchQuery) !== '') {
+            $ids = Enrollment::search($searchQuery)->take(1000)->keys()->toArray();
+            $builder->whereIn('id', $ids ?: [0]);
+        }
+
+        $prioritySort = AllowedSort::callback('priority', function ($query, $descending) {
+            $query->orderByRaw("CASE WHEN status = 'pending' THEN 1 ELSE 2 END")
+                ->orderBy('created_at', 'desc');
+        });
+
+        return $builder
+            ->allowedFilters([
+                AllowedFilter::exact('status'),
+                AllowedFilter::exact('user_id'),
+                AllowedFilter::callback('course_slug', function ($query, $value) {
+                    $course = \Modules\Schemes\Models\Course::where('slug', $value)->first();
+                    if ($course) {
+                        $query->where('course_id', $course->id);
+                    } else {
+                        $query->whereRaw('1 = 0');
+                    }
+                }),
+                AllowedFilter::callback('enrolled_from', fn ($q, $value) => $q->whereDate('enrolled_at', '>=', $value)),
+                AllowedFilter::callback('enrolled_to', fn ($q, $value) => $q->whereDate('enrolled_at', '<=', $value)),
+            ])
+            ->allowedSorts([
+                'enrolled_at',
+                'completed_at',
+                'created_at',
+                $prioritySort,
+            ])
+            ->defaultSort($prioritySort)
+            ->paginate($perPage);
+    }
+
     public function getManagedEnrollments(User $user, int $perPage = 15, ?string $courseSlug = null, array $filters = []): array
     {
         $courses = Course::query()
@@ -220,6 +376,40 @@ class EnrollmentService implements EnrollmentServiceInterface
             $paginator = $this->paginateByCourse($course->id, $perPage, $filters);
         } else {
             $paginator = $this->paginateByCourseIds($courseIds, $perPage, $filters);
+        }
+
+        return [
+            'found' => true,
+            'paginator' => $paginator,
+        ];
+    }
+
+    public function getManagedEnrollmentsForIndex(User $user, int $perPage = 15, ?string $courseSlug = null, array $filters = []): array
+    {
+        $courses = Course::query()
+            ->select(['id', 'slug', 'title'])
+            ->where(function ($query) use ($user) {
+                $query
+                    ->where('instructor_id', $user->id)
+                    ->orWhereHas('admins', function ($adminQuery) use ($user) {
+                        $adminQuery->where('user_id', $user->id);
+                    });
+            })
+            ->get();
+
+        $courseIds = $courses->pluck('id')->all();
+
+        if ($courseSlug) {
+            $course = $courses->firstWhere('slug', $courseSlug);
+            if (! $course) {
+                return [
+                    'found' => false,
+                    'paginator' => null,
+                ];
+            }
+            $paginator = $this->paginateByCourseForIndex($course->id, $perPage, $filters);
+        } else {
+            $paginator = $this->paginateByCourseIdsForIndex($courseIds, $perPage, $filters);
         }
 
         return [
@@ -457,6 +647,30 @@ class EnrollmentService implements EnrollmentServiceInterface
         }
 
         return $this->paginateByUser($user->id, $perPage, $filters);
+    }
+
+    public function listEnrollmentsForIndex(User $user, int $perPage, array $filters = []): LengthAwarePaginator
+    {
+        $courseSlug = $filters['filter']['course_slug'] ?? $filters['course_slug'] ?? null;
+
+        if ($user->hasRole('Superadmin')) {
+            return $this->paginateAllForIndex($perPage, $filters);
+        }
+
+        if ($user->hasRole('Admin') || $user->hasRole('Instructor')) {
+            $result = $this->getManagedEnrollmentsForIndex($user, $perPage, $courseSlug, $filters);
+
+            if (! $result['found']) {
+                throw new BusinessException(
+                    __('messages.enrollments.course_not_managed'),
+                    []
+                );
+            }
+
+            return $result['paginator'];
+        }
+
+        return $this->paginateByUserForIndex($user->id, $perPage, $filters);
     }
 
     public function findEnrollmentForAction(Course $course, User $user, array $data): Enrollment

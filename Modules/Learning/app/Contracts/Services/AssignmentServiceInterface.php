@@ -15,11 +15,15 @@ interface AssignmentServiceInterface
 
     public function list(\Modules\Schemes\Models\Course $course, array $filters = []);
 
+    public function listForIndex(\Modules\Schemes\Models\Course $course, array $filters = []);
+
     public function listByLesson(Lesson $lesson, array $filters = []);
 
     public function listByUnit(\Modules\Schemes\Models\Unit $unit, array $filters = []);
 
     public function listByCourse(\Modules\Schemes\Models\Course $course, array $filters = []);
+
+    public function listByCourseForIndex(\Modules\Schemes\Models\Course $course, array $filters = []);
 
     public function listIncomplete(\Modules\Schemes\Models\Course $course, int $studentId, array $filters = []);
 

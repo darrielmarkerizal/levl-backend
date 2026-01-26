@@ -39,6 +39,14 @@ class CourseService implements CourseServiceInterface
         return $query->paginate($perPage);
     }
 
+    public function paginateForIndex(array $filters = [], int $perPage = 15): LengthAwarePaginator
+    {
+        $perPage = max(1, $perPage);
+        $query = $this->buildQueryForIndex($filters);
+
+        return $query->paginate($perPage);
+    }
+
     public function list(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
         if (data_get($filters, 'status') === 'published') {
@@ -48,18 +56,39 @@ class CourseService implements CourseServiceInterface
         return $this->paginate($filters, $perPage);
     }
 
+    public function listForIndex(array $filters = [], int $perPage = 15): LengthAwarePaginator
+    {
+        if (data_get($filters, 'status') === 'published') {
+            return $this->listPublicForIndex($perPage, $filters);
+        }
+
+        return $this->paginateForIndex($filters, $perPage);
+    }
+
     public function listPublic(int $perPage = 15, array $filters = []): LengthAwarePaginator
     {
         $perPage = max(1, $perPage);
         $page = request()->get('page', 1);
 
-        
+
         return $this->cacheService->getPublicCourses($page, $perPage, $filters, function () use ($filters, $perPage) {
             return $this->buildQuery($filters)
                 ->where('status', 'published')
                 ->paginate($perPage);
         });
 
+    }
+
+    public function listPublicForIndex(int $perPage = 15, array $filters = []): LengthAwarePaginator
+    {
+        $perPage = max(1, $perPage);
+        $page = request()->get('page', 1);
+
+        return $this->cacheService->getPublicCoursesForIndex($page, $perPage, $filters, function () use ($filters, $perPage) {
+            return $this->buildQueryForIndex($filters)
+                ->where('status', 'published')
+                ->paginate($perPage);
+        });
     }
 
     private function buildQuery(array $filters = []): QueryBuilder
@@ -93,6 +122,39 @@ class CourseService implements CourseServiceInterface
                 AllowedFilter::exact('category_id'),
             ])
             ->allowedIncludes(['tags', 'category', 'instructor', 'units', 'admins'])
+            ->allowedSorts(['id', 'code', 'title', 'created_at', 'updated_at', 'published_at'])
+            ->defaultSort('title');
+    }
+
+    private function buildQueryForIndex(array $filters = []): QueryBuilder
+    {
+        $builder = QueryBuilder::for(
+            Course::with([
+                'admins:id,name,username,email,status,account_status',  // Only load basic admin info
+                'media:id,model_type,model_id,collection_name,file_name,disk' // Load only essential media fields that exist
+            ])->withCount('admins'), // Load admin count instead of full details
+            $this->buildQueryBuilderRequest($filters)
+        );
+
+        // Only apply tag filter, skip search functionality for performance
+        if ($tagFilter = data_get($filters, 'tag')) {
+            $tags = ArrayParser::parseFilter($tagFilter);
+            foreach ($tags as $tagValue) {
+                $value = trim((string) $tagValue);
+                if ($value === '') continue;
+                $slug = Str::slug($value);
+                $builder->whereHas('tags', fn ($q) => $q->where(fn ($iq) => $iq->where('slug', $slug)->orWhere('slug', $value)->orWhereRaw('LOWER(name) = ?', [mb_strtolower($value)])));
+            }
+        }
+
+        return $builder
+            ->allowedFilters([
+                AllowedFilter::exact('status'),
+                AllowedFilter::exact('level_tag'),
+                AllowedFilter::exact('type'),
+                AllowedFilter::exact('category_id'),
+            ])
+            ->allowedIncludes(['tags']) // Only allow basic includes for index
             ->allowedSorts(['id', 'code', 'title', 'created_at', 'updated_at', 'published_at'])
             ->defaultSort('title');
     }

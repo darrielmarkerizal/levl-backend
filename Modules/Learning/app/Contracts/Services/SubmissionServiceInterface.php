@@ -15,6 +15,8 @@ interface SubmissionServiceInterface
 {
     public function listForAssignment(Assignment $assignment, User $user, array $filters = []): LengthAwarePaginator;
 
+    public function listForAssignmentForIndex(Assignment $assignment, User $user, array $filters = []): LengthAwarePaginator;
+
     public function listByAssignment(Assignment $assignment, array $filters = []);
 
     public function create(Assignment $assignment, int $userId, array $data): Submission;

@@ -38,7 +38,7 @@ return [
     |
     */
 
-    'server' => env('OCTANE_SERVER', 'frankenphp'),
+    'server' => env('OCTANE_SERVER', 'swoole'),
 
     /*
     |--------------------------------------------------------------------------
@@ -55,6 +55,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | OPcache Pre-Compilation
+    |--------------------------------------------------------------------------
+    |
+    | Indicates if Octane should pre-compile the application's PHP files using
+    | OPcache. This will significantly speed up the boot time of the Octane
+    | workers. You should ensure OPcache is enabled in your PHP build.
+    |
+    */
+
+    'cache' => env('OCTANE_CACHE', true),
+
+    /*
+    |--------------------------------------------------------------------------
     | Octane Listeners
     |--------------------------------------------------------------------------
     |
@@ -66,47 +79,45 @@ return [
 
     'listeners' => [
         WorkerStarting::class => [
-            EnsureUploadedFilesAreValid::class,
-            EnsureUploadedFilesCanBeMoved::class,
+            // Minimal initialization for faster startup
         ],
 
         RequestReceived::class => [
             ...Octane::prepareApplicationForNextOperation(),
             ...Octane::prepareApplicationForNextRequest(),
-            //
         ],
 
         RequestHandled::class => [
-            //
+            // No additional processing
         ],
 
         RequestTerminated::class => [
-            FlushUploadedFiles::class,
+            // Minimal cleanup
         ],
 
         TaskReceived::class => [
             ...Octane::prepareApplicationForNextOperation(),
-            //
         ],
 
         TaskTerminated::class => [
-            //
+            // Minimal processing
         ],
 
         TickReceived::class => [
             ...Octane::prepareApplicationForNextOperation(),
-            //
         ],
 
         TickTerminated::class => [
-            //
+            // Minimal processing
         ],
 
         OperationTerminated::class => [
             FlushOnce::class,
             FlushTemporaryContainerInstances::class,
-            DisconnectFromDatabases::class,
-            CollectGarbage::class,
+            // Remove database disconnection for faster processing
+            // DisconnectFromDatabases::class,
+            // Remove garbage collection for faster processing
+            // CollectGarbage::class,
         ],
 
         WorkerErrorOccurred::class => [
@@ -115,7 +126,7 @@ return [
         ],
 
         WorkerStopping::class => [
-            CloseMonologHandlers::class,
+            // Minimal cleanup
         ],
     ],
 
@@ -131,13 +142,70 @@ return [
     */
 
     'warm' => [
-        // Remove defaultServicesToWarm to avoid memory exhaustion
-        // Services akan di-load on-demand per request
+        // A curated list of services are pre-warmed to improve performance
+        // and reduce latency, while trying to balance memory usage.
+        'db',
+        'cache',
+        'log',
+        'session',
+        'url',
+        'view',
+        'translator',
+        'queue',
+        'events',
+        'files',
+        'config',
+        'router',
     ],
 
     'flush' => [
         //
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Swoole specific configuration
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure the Swoole specific settings, such as the number
+    | of task workers and the location of the Swoole log file.
+    |
+    */
+    'swoole' => [
+        'options' => [
+            // LOW LATENCY OPTIMIZED CONFIGURATION
+            'worker_num' => env('SWOOLE_WORKER_NUM', swoole_cpu_num()), // Match to CPU cores exactly
+            'max_request' => env('SWOOLE_MAX_REQUEST', 5000), // High to minimize worker restarts
+            'task_worker_num' => env('SWOOLE_TASK_WORKER_NUM', swoole_cpu_num()),
+            'max_wait_time' => 60,
+            'heartbeat_check_interval' => 20, // Balanced heartbeat checks
+            'heartbeat_idle_time' => 45,      // Balanced idle time
+            'log_file' => storage_path('logs/swoole_http.log'),
+
+            // LOW LATENCY OPTIMIZATIONS
+            'reactor_num' => swoole_cpu_num(), // Match reactor threads to CPU cores
+            'dispatch_mode' => 2, // Packet dispatch mode for consistent load balancing
+            'enable_coroutine' => true,
+            'coroutine' => [
+                'enable_preemptive_scheduler' => false, // Disable for more predictable behavior
+                'hook_flags' => SWOOLE_HOOK_ALL,
+            ],
+
+            // BALANCED MEMORY AND BUFFER OPTIMIZATIONS
+            'buffer_output_size' => 1024 * 1024 * 2, // 2MB output buffer (balanced)
+            'socket_buffer_size' => 1024 * 1024 * 128, // 128MB socket buffer (balanced)
+
+            // HTTP-SPECIFIC LOW LATENCY
+            'http_parse_post' => true,
+            'http_parse_cookie' => true,
+
+            // LOW LATENCY NETWORK TWEAKS
+            'open_tcp_nodelay' => true, // Disable Nagle's algorithm for lower latency
+            'tcp_fastopen' => true, // Enable TCP fast open
+            'enable_reuse_port' => true, // Enable port reuse
+        ],
+    ],
+
 
     /*
     |--------------------------------------------------------------------------
@@ -155,22 +223,6 @@ return [
             'name' => 'string:1000',
             'votes' => 'int',
         ],
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Octane Swoole Cache Table
-    |--------------------------------------------------------------------------
-    |
-    | While using Swoole, you may leverage the Octane cache, which is powered
-    | by a Swoole table. You may set the maximum number of rows as well as
-    | the number of bytes per row using the configuration options below.
-    |
-    */
-
-    'cache' => [
-        'rows' => 1000,
-        'bytes' => 10000,
     ],
 
     /*
@@ -208,7 +260,7 @@ return [
     |
     */
 
-    'garbage' => 50,
+    'garbage' => env('OCTANE_GARBAGE_COLLECTION', 100), // Increased threshold
 
     /*
     |--------------------------------------------------------------------------

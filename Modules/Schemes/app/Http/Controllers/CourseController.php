@@ -25,11 +25,11 @@ class CourseController extends Controller
 
     public function index(Request $request)
     {
-        $paginator = $this->service->list(
+        $paginator = $this->service->listForIndex(
             $request->query('filter', []),
             (int) $request->query('per_page', 15)
         );
-        $paginator->getCollection()->transform(fn($course) => new CourseResource($course));
+        $paginator->getCollection()->transform(fn($course) => new \Modules\Schemes\Http\Resources\CourseIndexResource($course));
         return $this->paginateResponse($paginator, 'messages.courses.list_retrieved');
     }
 

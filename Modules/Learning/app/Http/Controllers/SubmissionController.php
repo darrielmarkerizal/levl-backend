@@ -39,8 +39,8 @@ class SubmissionController extends Controller
     public function index(Request $request, Assignment $assignment): JsonResponse
     {
         $this->authorize('viewAny', Submission::class);
-        $paginator = $this->service->listForAssignment($assignment, auth('api')->user(), $request->all());
-        $paginator->getCollection()->transform(fn($item) => new SubmissionResource($item));
+        $paginator = $this->service->listForAssignmentForIndex($assignment, auth('api')->user(), $request->all());
+        $paginator->getCollection()->transform(fn($item) => new \Modules\Learning\Http\Resources\SubmissionIndexResource($item));
 
         return $this->paginateResponse($paginator, 'messages.submissions.list_retrieved');
     }

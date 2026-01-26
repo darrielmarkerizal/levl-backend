@@ -35,8 +35,8 @@ class AssignmentController extends Controller
 
     public function index(Request $request, \Modules\Schemes\Models\Course $course): JsonResponse
     {
-        $paginator = $this->assignmentService->list($course, $request->all());
-        $paginator->getCollection()->transform(fn($item) => new AssignmentResource($item));
+        $paginator = $this->assignmentService->listForIndex($course, $request->all());
+        $paginator->getCollection()->transform(fn($item) => new \Modules\Learning\Http\Resources\AssignmentIndexResource($item));
 
         return $this->paginateResponse($paginator, 'messages.assignments.list_retrieved');
     }

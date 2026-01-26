@@ -37,11 +37,19 @@ class SchemesCacheService
     
     public function getPublicCourses(int $page, int $perPage, array $filters, callable $callback): LengthAwarePaginator
     {
-        
+
         $filterKey = md5(json_encode($filters));
-        
+
         return Cache::tags(['schemes', 'courses', 'listing'])
             ->remember("courses.public.{$page}.{$perPage}.{$filterKey}", self::TTL_LISTING, $callback);
+    }
+
+    public function getPublicCoursesForIndex(int $page, int $perPage, array $filters, callable $callback): LengthAwarePaginator
+    {
+        $filterKey = md5(json_encode($filters));
+
+        return Cache::tags(['schemes', 'courses', 'listing'])
+            ->remember("courses.public.index.{$page}.{$perPage}.{$filterKey}", self::TTL_LISTING, $callback);
     }
     
     

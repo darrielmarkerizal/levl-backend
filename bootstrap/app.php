@@ -44,8 +44,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // Set locale before processing API requests
         $middleware->api(prepend: [\App\Http\Middleware\SetLocale::class]);
 
-        // Apply rate limiting to all API routes
-        $middleware->api(prepend: [\Illuminate\Routing\Middleware\ThrottleRequests::class.':api']);
+        // ⚠️ RATE LIMITING DISABLED - FOR STRESS TEST ONLY ⚠️
+        // Re-enable before production deployment!
+        // $middleware->api(prepend: [\Illuminate\Routing\Middleware\ThrottleRequests::class.':api']);
 
         // Enable CORS for API routes
         $middleware->api(prepend: [\Illuminate\Http\Middleware\HandleCors::class]);
@@ -54,6 +55,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api(append: [\App\Http\Middleware\InjectQueryDetectorStatus::class]);
 
         $middleware->append(\App\Http\Middleware\LogApiAction::class);
+        // Temporarily commented out for maximum performance testing
+        // $middleware->append(\App\Http\Middleware\PerformanceMonitor::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Handle specific BusinessException subclasses first

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Modules\User\Models\User;
+use Modules\Auth\Models\User;
 
 class OtpCode extends Model
 {
@@ -105,7 +105,7 @@ class OtpCode extends Model
         return $query->where('purpose', $purpose);
     }
 
-    public function scopeForUser(Builder $query, int|User $user): Builder
+    public function scopeForUser(Builder $query, User|int $user): Builder
     {
         $userId = $user instanceof User ? $user->id : $user;
 

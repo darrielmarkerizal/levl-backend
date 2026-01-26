@@ -30,21 +30,24 @@ class UserManagementService implements UserManagementServiceInterface
 
     public function listUsers(User $authUser, int $perPage = 15, ?string $search = null): LengthAwarePaginator
     {
-        
+        return $this->listUsersForIndex($authUser, $perPage, $search);
+    }
+
+    public function listUsersForIndex(User $authUser, int $perPage = 15, ?string $search = null): LengthAwarePaginator
+    {
         if (!$authUser->can('viewAny', User::class)) {
             throw new AuthorizationException(__('messages.unauthorized'));
         }
 
         $query = QueryBuilder::for(User::class)
             ->select(['id', 'name', 'email', 'username', 'status', 'account_status', 'created_at', 'email_verified_at', 'is_password_set'])
-            ->with(['roles', 'media']);
+            ->with(['roles:id,name,guard_name', 'media:id,model_type,model_id,collection_name,file_name,disk']);
 
         if ($search && trim($search) !== '') {
             $ids = User::search($search)->keys()->toArray();
             $query->whereIn('id', $ids);
         }
 
-        
         if ($authUser->hasRole('Admin') && !$authUser->hasRole('Superadmin')) {
             $managedCourseIds = CourseAdmin::query()
                 ->where('user_id', $authUser->id)
@@ -52,11 +55,9 @@ class UserManagementService implements UserManagementServiceInterface
                 ->unique();
 
             $query->where(function (Builder $q) use ($managedCourseIds) {
-                
                 $q->whereHas('roles', function ($roleQuery) {
                     $roleQuery->where('name', 'Admin');
                 })
-                
                 ->orWhere(function ($subQuery) use ($managedCourseIds) {
                     $subQuery->whereHas('roles', function ($roleQuery) {
                         $roleQuery->whereIn('name', ['Instructor', 'Student']);

@@ -40,6 +40,8 @@ interface EnrollmentServiceInterface
 
     public function listEnrollments(User $user, int $perPage, array $filters = []): LengthAwarePaginator;
 
+    public function listEnrollmentsForIndex(User $user, int $perPage, array $filters = []): LengthAwarePaginator;
+
     public function getManagedEnrollments(User $user, int $perPage, ?string $courseSlug, array $filters = []): array;
 
     public function findEnrollmentForAction(Course $course, User $user, array $data): Enrollment;
