@@ -39,9 +39,6 @@ jobs:
       - name: Validate composer.json
         run: composer validate --strict
 
-      # Tests removed - run locally only
-      # To run tests locally: php artisan test
-
   deploy:
     name: Deploy to VPS
     needs: validate
@@ -58,6 +55,8 @@ jobs:
           host: ${{ secrets.DEPLOY_SERVER }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          timeout: 3600
+          command_timeout: 3600
           script: |
             cd ${{ secrets.DEPLOY_PATH }}
             git reset --hard HEAD
