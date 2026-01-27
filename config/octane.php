@@ -174,9 +174,9 @@ return [
     'swoole' => [
         'options' => [
             // LOW LATENCY OPTIMIZED CONFIGURATION
-            'worker_num' => env('SWOOLE_WORKER_NUM', swoole_cpu_num()), // Match to CPU cores exactly
+            'worker_num' => env('SWOOLE_WORKER_NUM', (function_exists('swoole_cpu_num') ? swoole_cpu_num() : 4)),
             'max_request' => env('SWOOLE_MAX_REQUEST', 5000), // High to minimize worker restarts
-            'task_worker_num' => env('SWOOLE_TASK_WORKER_NUM', swoole_cpu_num()),
+            'task_worker_num' => env('SWOOLE_TASK_WORKER_NUM', (function_exists('swoole_cpu_num') ? swoole_cpu_num() : 4)),
             'max_wait_time' => 60,
             'heartbeat_check_interval' => 20, // Balanced heartbeat checks
             'heartbeat_idle_time' => 45,      // Balanced idle time
