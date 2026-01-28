@@ -139,19 +139,17 @@ class UserSeeder extends Seeder
                 'email_verified_at' => $demoUser['verified'] ? now() : null,
                 'is_password_set' => true,
                 'account_status' => 'active',
-                'phone' => fake()->phoneNumber(),
-                'bio' => fake()->paragraph(),
+                'phone' => '+62812' . rand(10000000, 99999999),
+                'bio' => 'Demo user for testing purposes.',
             ]);
 
-            // Assign role
             $user->assignRole($demoUser['role']);
 
-            // ✅ Batch privacy settings
             $privacySettings[] = [
                 'user_id' => $user->id,
                 'profile_visibility' => 'public',
-                'show_email' => fake()->boolean(),
-                'show_phone' => fake()->boolean(),
+                'show_email' => rand(0, 1) === 1,
+                'show_phone' => rand(0, 1) === 1,
                 'show_activity_history' => true,
                 'show_achievements' => true,
                 'show_statistics' => true,
@@ -218,7 +216,7 @@ class UserSeeder extends Seeder
                 ->state([
                     'status' => $status->value,
                     'email_verified_at' => $verified ? now()->subDays(rand(1, 365)) : null,
-                    'is_password_set' => $role !== 'Student' ? fake()->boolean(80) : true,
+                    'is_password_set' => $role !== 'Student' ? rand(1, 100) <= 80 : true,
                 ])
                 ->raw();
 
@@ -244,23 +242,24 @@ class UserSeeder extends Seeder
             }
         }
 
-        $privacySettings = collect($users)->map(function ($user) use ($role) {
+        $createdAt = now()->toDateTimeString();
+        $privacySettings = collect($users)->map(function ($user) use ($role, $createdAt) {
             $privacyVisibility = match (true) {
-                $role === 'Student' && fake()->boolean(60) => 'private',
-                $role === 'Student' && fake()->boolean(50) => 'friends_only',
+                $role === 'Student' && rand(1, 100) <= 60 => 'private',
+                $role === 'Student' && rand(1, 100) <= 50 => 'friends_only',
                 default => 'public',
             };
 
             return [
                 'user_id' => $user->id,
                 'profile_visibility' => $privacyVisibility,
-                'show_email' => fake()->boolean(),
-                'show_phone' => fake()->boolean(),
+                'show_email' => rand(0, 1) === 1,
+                'show_phone' => rand(0, 1) === 1,
                 'show_activity_history' => true,
                 'show_achievements' => true,
                 'show_statistics' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'created_at' => $createdAt,
+                'updated_at' => $createdAt,
             ];
         })->toArray();
 
@@ -274,7 +273,6 @@ class UserSeeder extends Seeder
      */
     private function createUserActivitiesBatch($users, UserStatus $status): void
     {
-        // Skip if user_activities table doesn't exist
         if (!\Illuminate\Support\Facades\Schema::hasTable('user_activities')) {
             return;
         }
@@ -292,13 +290,18 @@ class UserSeeder extends Seeder
                 UserActivity::TYPE_BADGE_EARNED,
                 UserActivity::TYPE_CERTIFICATE_EARNED,
             ];
+            
+            $relatedTypes = [null, 'Course', 'Lesson', 'Assignment'];
+            $pregenTitles = ['Enrolled in course', 'Completed lesson', 'Submitted assignment', 'Earned badge', 'Achieved milestone'];
+            $pregenDescriptions = ['Progress made', 'New achievement unlocked', 'Course completed successfully', 'Badge earned', 'Activity recorded'];
+            $createdAt = now()->toDateTimeString();
 
             $activities = [];
             foreach ($users as $user) {
                 $activityCount = match ($status) {
-                    UserStatus::Active => rand(10, 30),
+                    UserStatus::Active => rand(5, 10),
                     UserStatus::Pending => 0,
-                    UserStatus::Inactive => rand(2, 5),
+                    UserStatus::Inactive => rand(1, 3),
                     UserStatus::Banned => 1,
                     default => 0,
                 };
@@ -306,25 +309,29 @@ class UserSeeder extends Seeder
                 for ($i = 0; $i < $activityCount; $i++) {
                     $activities[] = [
                         'user_id' => $user->id,
-                        'activity_type' => fake()->randomElement($activityTypes),
+                        'activity_type' => $activityTypes[array_rand($activityTypes)],
                         'activity_data' => json_encode([
-                            'title' => fake()->sentence(),
-                            'description' => fake()->paragraph(),
-                            'points' => fake()->numberBetween(10, 100),
+                            'title' => $pregenTitles[array_rand($pregenTitles)],
+                            'description' => $pregenDescriptions[array_rand($pregenDescriptions)],
+                            'points' => rand(10, 100),
                         ]),
-                        'related_type' => fake()->randomElement([null, 'Course', 'Lesson', 'Assignment']),
-                        'related_id' => fake()->boolean(60) ? fake()->numberBetween(1, 100) : null,
-                        'created_at' => now()->subDays(rand(1, 90)),
+                        'related_type' => $relatedTypes[array_rand($relatedTypes)],
+                        'related_id' => rand(0, 1) ? rand(1, 100) : null,
+                        'created_at' => $createdAt,
                     ];
+                }
+                
+                if (count($activities) >= 500) {
+                    \Illuminate\Support\Facades\DB::table('user_activities')->insertOrIgnore($activities);
+                    $activities = [];
+                    gc_collect_cycles();
                 }
             }
 
-            // ✅ Batch insert instead of individual creates
             if (!empty($activities)) {
                 \Illuminate\Support\Facades\DB::table('user_activities')->insertOrIgnore($activities);
             }
         } catch (\Exception $e) {
-            // Silently skip if table operations fail
         }
     }
 }

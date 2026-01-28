@@ -3,240 +3,220 @@
 namespace Modules\Learning\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Modules\Auth\Models\User;
-use Modules\Learning\Models\Assignment;
-use Modules\Learning\Models\Question;
-use Modules\Learning\Models\Submission;
-use Modules\Learning\Models\Answer;
 use Modules\Learning\Enums\QuestionType;
 use Modules\Learning\Enums\SubmissionState;
 use Modules\Learning\Enums\SubmissionStatus;
 
 class QuestionOptionAnswerSubmissionSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * Creates comprehensive question, option, answer, and submission data:
-     * - Questions with different types (multiple choice, essay, etc.)
-     * - Options for multiple choice questions
-     * - Answers for submissions
-     * - Submissions in various states
-     */
+    private array $pregenSentences = [];
+    private array $pregenWords = [];
+    private array $pregenParagraphs = [];
+    private array $pregenUuids = [];
+    private string $createdAt;
+
     public function run(): void
     {
         \DB::connection()->disableQueryLog();
+        ini_set('memory_limit', '1536M');
         
         echo "Seeding questions, options, answers, and submissions...\n";
 
-        // Check if we have users and assignments to link to
-        $users = User::all();
-        $assignments = Assignment::all();
+        $this->pregenerateFakeData();
+        $this->createdAt = now()->toDateTimeString();
 
-        if ($users->isEmpty()) {
+        $userCount = \DB::table('users')->count();
+        $assignmentCount = \DB::table('assignments')->count();
+
+        if ($userCount === 0) {
             echo "⚠️  No users found. Please run user seeders first.\n";
             return;
         }
 
-        if ($assignments->isEmpty()) {
+        if ($assignmentCount === 0) {
             echo "⚠️  No assignments found. Please run assignment seeders first.\n";
             return;
         }
 
-        // Define question types to use
         $questionTypes = [
-            QuestionType::MultipleChoice,
-            QuestionType::Essay,
-            QuestionType::Checkbox,
-            QuestionType::FileUpload,
+            QuestionType::MultipleChoice->value,
+            QuestionType::Essay->value,
+            QuestionType::Checkbox->value,
+            QuestionType::FileUpload->value,
         ];
 
-        // Create questions for assignments
-        $questionCount = 0;
-        $optionCount = 0;
-        $answerCount = 0;
-        $submissionCount = 0;
-        $answers = []; // Array to store answers for batch insertion
+        $submissionStates = [
+            SubmissionState::InProgress->value,
+            SubmissionState::Submitted->value,
+            SubmissionState::AutoGraded->value,
+            SubmissionState::PendingManualGrading->value,
+            SubmissionState::Graded->value,
+            SubmissionState::Released->value,
+        ];
 
-        foreach ($assignments as $assignment) {
-            // Create 3-8 questions per assignment
-            $numQuestions = rand(3, 8);
+        $userIds = \DB::table('users')->limit(50)->pluck('id')->toArray();
+        
+        $questionCount = 0;
+        $submissionCount = 0;
+        $answerCount = 0;
+        $processedAssignments = 0;
+
+        foreach (\DB::table('assignments')->select('id', 'title')->orderBy('id')->cursor() as $assignment) {
+            $processedAssignments++;
+            
+            if (rand(1, 100) > 20) continue;
+            
+            $numQuestions = rand(2, 3);
+            $questionIds = [];
 
             for ($i = 0; $i < $numQuestions; $i++) {
                 $questionType = $questionTypes[array_rand($questionTypes)];
-
-                // Prepare question data based on type
+                $maxScore = [10, 20, 25, 50][rand(0, 3)];
+                
                 $questionData = [
                     'assignment_id' => $assignment->id,
                     'type' => $questionType,
-                    'content' => fake()->sentence(10),
-                    'weight' => fake()->randomFloat(2, 0.5, 5),
+                    'content' => $this->pregenSentences[array_rand($this->pregenSentences)],
+                    'weight' => rand(10, 50) / 10,
                     'order' => $i + 1,
-                    'max_score' => fake()->randomElement([10, 20, 25, 50, 100]),
-                    'created_at' => now(),
-                    'updated_at' => now(),
+                    'max_score' => $maxScore,
+                    'options' => null,
+                    'answer_key' => null,
+                    'max_file_size' => null,
+                    'allowed_file_types' => null,
+                    'allow_multiple_files' => false,
+                    'created_at' => $this->createdAt,
+                    'updated_at' => $this->createdAt,
                 ];
 
-                // Add type-specific fields
+                $options = null;
                 switch ($questionType) {
-                    case QuestionType::MultipleChoice:
-                    case QuestionType::Checkbox:
+                    case QuestionType::MultipleChoice->value:
+                    case QuestionType::Checkbox->value:
                         $options = [
-                            ['id' => fake()->uuid(), 'label' => fake()->sentence(3)],
-                            ['id' => fake()->uuid(), 'label' => fake()->sentence(3)],
-                            ['id' => fake()->uuid(), 'label' => fake()->sentence(3)],
-                            ['id' => fake()->uuid(), 'label' => fake()->sentence(3)],
+                            ['id' => $this->pregenUuids[array_rand($this->pregenUuids)], 'label' => $this->pregenWords[array_rand($this->pregenWords)]],
+                            ['id' => $this->pregenUuids[array_rand($this->pregenUuids)], 'label' => $this->pregenWords[array_rand($this->pregenWords)]],
+                            ['id' => $this->pregenUuids[array_rand($this->pregenUuids)], 'label' => $this->pregenWords[array_rand($this->pregenWords)]],
+                            ['id' => $this->pregenUuids[array_rand($this->pregenUuids)], 'label' => $this->pregenWords[array_rand($this->pregenWords)]],
                         ];
-
-                        $questionData['options'] = $options;
-                        $questionData['answer_key'] = ['correct_option' => 0]; // Index of correct option
+                        $questionData['options'] = json_encode($options);
+                        $questionData['answer_key'] = json_encode(['correct_option' => 0]);
                         break;
 
-                    case QuestionType::Essay:
-                        $questionData['answer_key'] = ['acceptable_answers' => [
-                            fake()->word(),
-                            fake()->word(),
-                            fake()->word(),
-                        ]];
+                    case QuestionType::Essay->value:
+                        $questionData['answer_key'] = json_encode(['acceptable_answers' => [
+                            $this->pregenWords[array_rand($this->pregenWords)],
+                            $this->pregenWords[array_rand($this->pregenWords)],
+                        ]]);
                         break;
 
-                    case QuestionType::FileUpload:
-                        $questionData['max_file_size'] = 10000000; // 10MB
-                        $questionData['allowed_file_types'] = ['pdf', 'docx', 'txt', 'png', 'jpg'];
-                        $questionData['allow_multiple_files'] = fake()->boolean(30);
-                        break;
-
-                    default:
-                        // For other types, we might not need specific fields
+                    case QuestionType::FileUpload->value:
+                        $questionData['max_file_size'] = 10000000;
+                        $questionData['allowed_file_types'] = json_encode(['pdf', 'docx']);
+                        $questionData['allow_multiple_files'] = rand(0, 1) === 1;
                         break;
                 }
 
-                $question = Question::create($questionData);
+                $questionId = \DB::table('assignment_questions')->insertGetId($questionData);
+                $questionIds[] = ['id' => $questionId, 'type' => $questionType, 'options' => $options, 'maxScore' => $maxScore];
                 $questionCount++;
+            }
 
-                // Create submissions for this assignment
-                $numSubmissions = rand(5, 20); // Create 5-20 submissions per assignment
+            $selectedUsers = array_slice($userIds, 0, min(3, count($userIds)));
 
-                foreach ($users->random(rand(5, min(20, $users->count()))) as $user) {
-                    // Create submission
-                    $submissionState = fake()->randomElement([
-                        SubmissionState::InProgress,
-                        SubmissionState::Submitted,
-                        SubmissionState::AutoGraded,
-                        SubmissionState::PendingManualGrading,
-                        SubmissionState::Graded,
-                        SubmissionState::Released
-                    ]);
+            foreach ($selectedUsers as $userId) {
+                $stateIdx = array_rand($submissionStates);
+                $state = $submissionStates[$stateIdx];
+                
+                $status = match ($state) {
+                    SubmissionState::InProgress->value => SubmissionStatus::Draft->value,
+                    SubmissionState::Submitted->value => SubmissionStatus::Submitted->value,
+                    default => SubmissionStatus::Graded->value,
+                };
 
-                    $submissionStatus = match ($submissionState) {
-                        SubmissionState::InProgress => SubmissionStatus::Draft,
-                        SubmissionState::Submitted => SubmissionStatus::Submitted,
-                        SubmissionState::AutoGraded,
-                        SubmissionState::PendingManualGrading,
-                        SubmissionState::Graded,
-                        SubmissionState::Released => SubmissionStatus::Graded,
-                        default => SubmissionStatus::Draft,
-                    };
+                $submissionId = \DB::table('submissions')->insertGetId([
+                    'assignment_id' => $assignment->id,
+                    'user_id' => $userId,
+                    'status' => $status,
+                    'state' => $state,
+                    'submitted_at' => $state !== SubmissionState::InProgress->value ? $this->createdAt : null,
+                    'attempt_number' => rand(1, 3),
+                    'is_late' => rand(1, 100) <= 15,
+                    'created_at' => $this->createdAt,
+                    'updated_at' => $this->createdAt,
+                ]);
+                $submissionCount++;
 
-                    $submittedAt = null;
-                    if ($submissionState !== SubmissionState::InProgress) {
-                        $submittedAt = now()->subDays(rand(1, 30));
-                    }
-
-                    $submission = Submission::create([
-                        'assignment_id' => $assignment->id,
-                        'user_id' => $user->id,
-                        'status' => $submissionStatus,
-                        'state' => $submissionState,
-                        'submitted_at' => $submittedAt,
-                        'attempt_number' => rand(1, 3),
-                        'is_late' => fake()->boolean(15), // 15% are late
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
-                    $submissionCount++;
-
-                    // Prepare answer data for later insertion
+                foreach ($questionIds as $q) {
                     $answerData = [
-                        'submission_id' => $submission->id,
-                        'question_id' => $question->id,
+                        'submission_id' => $submissionId,
+                        'question_id' => $q['id'],
                         'content' => null,
                         'selected_options' => null,
                         'file_paths' => null,
                         'score' => null,
-                        'is_auto_graded' => false, // Set a default value
+                        'is_auto_graded' => false,
                         'feedback' => null,
-                        'created_at' => now(),
-                        'updated_at' => now(),
+                        'created_at' => $this->createdAt,
+                        'updated_at' => $this->createdAt,
                     ];
 
-                    // Add content based on question type
-                    switch ($questionType) {
-                        case QuestionType::MultipleChoice:
-                        case QuestionType::Checkbox:
-                            $selectedOptionIndex = rand(0, count($options) - 1);
-                            $answerData['selected_options'] = json_encode([$options[$selectedOptionIndex]['id']]);
-                            // These are auto-gradable question types, so set is_auto_graded to true
-                            if ($answerData['score'] !== null) {
-                                $answerData['is_auto_graded'] = true;
+                    switch ($q['type']) {
+                        case QuestionType::MultipleChoice->value:
+                        case QuestionType::Checkbox->value:
+                            if ($q['options']) {
+                                $answerData['selected_options'] = json_encode([$q['options'][rand(0, 3)]['id']]);
                             }
                             break;
 
-                        case QuestionType::Essay:
-                            $answerData['content'] = fake()->paragraph(rand(1, 5));
+                        case QuestionType::Essay->value:
+                            $answerData['content'] = $this->pregenParagraphs[array_rand($this->pregenParagraphs)];
                             break;
 
-                        case QuestionType::FileUpload:
-                            $answerData['file_paths'] = json_encode([
-                                fake()->word() . '.pdf',
-                                fake()->word() . '.docx',
-                            ]);
-                            break;
-
-                        default:
-                            $answerData['content'] = fake()->paragraph();
+                        case QuestionType::FileUpload->value:
+                            $answerData['file_paths'] = json_encode([$this->pregenWords[array_rand($this->pregenWords)] . '.pdf']);
                             break;
                     }
 
-                    // Add scoring if the submission is graded
-                    if (in_array($submissionState, [
-                        SubmissionState::AutoGraded,
-                        SubmissionState::Graded,
-                        SubmissionState::Released
-                    ])) {
-                        $answerData['score'] = rand(0, (int)$question->max_score);
-                        $answerData['is_auto_graded'] = fake()->boolean(70); // 70% auto-graded
-                        $answerData['feedback'] = fake()->optional(0.6)->paragraph();
+                    if (in_array($state, [SubmissionState::AutoGraded->value, SubmissionState::Graded->value, SubmissionState::Released->value])) {
+                        $answerData['score'] = rand(0, $q['maxScore']);
+                        $answerData['is_auto_graded'] = rand(1, 100) <= 70;
                     }
 
-                    // Store in temporary array for batch insertion
-                    $answers[] = $answerData;
+                    \DB::table('answers')->insertOrIgnore($answerData);
                     $answerCount++;
-
-                    // Batch insert answers periodically to avoid parameter limits
-                    if (count($answers) >= 1000) {
-                        Answer::insert($answers);
-                        $answers = []; // Reset the array
-                    }
                 }
             }
-
-            echo "Processed assignment: {$assignment->title}. Questions: $questionCount, Submissions: $submissionCount, Answers: $answerCount\n";
             
-            if ($questionCount % 5000 === 0) {
+            if ($processedAssignments % 50 === 0) {
                 gc_collect_cycles();
+                echo "Processed $processedAssignments assignments. Q: $questionCount, S: $submissionCount, A: $answerCount\n";
             }
-        }
-
-        // Insert any remaining answers
-        if (!empty($answers)) {
-            Answer::insert($answers);
         }
 
         echo "✅ Question, option, answer, and submission seeding completed!\n";
         echo "Created $questionCount questions, $submissionCount submissions, and $answerCount answers\n";
         
+        $this->pregenSentences = [];
+        $this->pregenWords = [];
+        $this->pregenParagraphs = [];
+        $this->pregenUuids = [];
+        
         gc_collect_cycles();
         \DB::connection()->enableQueryLog();
+    }
+    
+    private function pregenerateFakeData(): void
+    {
+        $faker = \Faker\Factory::create('id_ID');
+        
+        for ($i = 0; $i < 100; $i++) {
+            $this->pregenSentences[] = $faker->sentence(8);
+            $this->pregenWords[] = $faker->word();
+            $this->pregenParagraphs[] = $faker->paragraph(1);
+            $this->pregenUuids[] = $faker->uuid();
+        }
+        
+        unset($faker);
     }
 }

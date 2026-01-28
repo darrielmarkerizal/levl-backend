@@ -1,75 +1,84 @@
-public function run(): void
+<?php
+
+namespace Modules\Learning\Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+
+class SubmissionFileSeeder extends Seeder
 {
-    DB::connection()->disableQueryLog();
-    
-    echo "Seeding submission files...\n";
+    public function run(): void
+    {
+        DB::connection()->disableQueryLog();
 
-    $fileUploadAssignmentIds = DB::table('assignment_questions')
-        ->where('type', 'file_upload')
-        ->pluck('assignment_id')
-        ->unique()
-        ->toArray();
+        echo "Seeding submission files...\n";
 
-    if (empty($fileUploadAssignmentIds)) {
-        echo "⚠️  No assignments with file upload questions found.\n";
-        return;
-    }
+        $fileUploadAssignmentIds = DB::table('assignment_questions')
+            ->where('type', 'file_upload')
+            ->pluck('assignment_id')
+            ->unique()
+            ->toArray();
 
-    echo "   📁 Found " . count($fileUploadAssignmentIds) . " assignments\n";
+        if (empty($fileUploadAssignmentIds)) {
+            echo "⚠️  No assignments with file upload questions found.\n";
+            return;
+        }
 
-    $totalSubmissions = DB::table('submissions')
-        ->whereIn('assignment_id', $fileUploadAssignmentIds)
-        ->count();
+        echo "   📁 Found " . count($fileUploadAssignmentIds) . " assignments\n";
 
-    if ($totalSubmissions === 0) {
-        echo "⚠️  No submissions found.\n";
-        return;
-    }
+        $totalSubmissions = DB::table('submissions')
+            ->whereIn('assignment_id', $fileUploadAssignmentIds)
+            ->count();
 
-    echo "   📋 Processing $totalSubmissions submissions...\n";
+        if ($totalSubmissions === 0) {
+            echo "⚠️  No submissions found.\n";
+            return;
+        }
 
-    $fileCount = 0;
-    $processed = 0;
-    $filesToInsert = [];
-    $batchSize = 500;
+        echo "   📋 Processing $totalSubmissions submissions...\n";
 
-    // Use cursor for minimal memory footprint
-    foreach (DB::table('submissions')
-        ->whereIn('assignment_id', $fileUploadAssignmentIds)
-        ->orderBy('id')
-        ->cursor() as $submission) {
-        
-        if (rand(1, 100) > 60) {
+        $fileCount = 0;
+        $processed = 0;
+        $filesToInsert = [];
+        $batchSize = 500;
+
+        foreach (DB::table('submissions')
+            ->whereIn('assignment_id', $fileUploadAssignmentIds)
+            ->orderBy('id')
+            ->cursor() as $submission) {
+
+            if (rand(1, 100) > 60) {
+                $processed++;
+                continue;
+            }
+
+            $numFiles = rand(1, 3);
+            for ($i = 0; $i < $numFiles; $i++) {
+                $filesToInsert[] = [
+                    'submission_id' => $submission->id,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+                $fileCount++;
+            }
+
+            if (count($filesToInsert) >= $batchSize) {
+                DB::table('submission_files')->insertOrIgnore($filesToInsert);
+                $filesToInsert = [];
+            }
+
             $processed++;
-            continue;
+            if ($processed % 5000 === 0) {
+                echo "      ✓ $processed/$totalSubmissions ($fileCount files)\n";
+                gc_collect_cycles();
+            }
         }
 
-        $numFiles = rand(1, 3);
-        for ($i = 0; $i < $numFiles; $i++) {
-            $filesToInsert[] = [
-                'submission_id' => $submission->id,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
-            $fileCount++;
-        }
-
-        if (count($filesToInsert) >= $batchSize) {
+        if (!empty($filesToInsert)) {
             DB::table('submission_files')->insertOrIgnore($filesToInsert);
-            $filesToInsert = [];
         }
 
-        $processed++;
-        if ($processed % 5000 === 0) {
-            echo "      ✓ $processed/$totalSubmissions ($fileCount files)\n";
-            gc_collect_cycles();
-        }
+        echo "✅ Created $fileCount submission files\n";
+        DB::connection()->enableQueryLog();
     }
-
-    if (!empty($filesToInsert)) {
-        DB::table('submission_files')->insertOrIgnore($filesToInsert);
-    }
-
-    echo "✅ Created $fileCount submission files\n";
-    DB::connection()->enableQueryLog();
 }

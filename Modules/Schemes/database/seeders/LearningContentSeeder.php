@@ -13,23 +13,24 @@ use Modules\Schemes\Models\LessonBlock;
 
 class LearningContentSeeder extends Seeder
 {
-    private const UNITS_PER_COURSE = [5, 8];
-    private const LESSONS_PER_UNIT = [8, 15];
-    private const BLOCKS_PER_LESSON = [5, 12];
+    private const UNITS_PER_COURSE = [2, 4];
+    private const LESSONS_PER_UNIT = [3, 6];
+    private const BLOCKS_PER_LESSON = [3, 5];
+    private const MAX_COURSES = 20;
 
     public function run(): void
     {
         $this->command->info("\n📖 Creating learning content hierarchy...");
         $this->command->info("   Course → Unit → Lesson → Lesson Block");
 
-        $courses = Course::where('status', 'published')->get();
+        $courses = Course::where('status', 'published')->limit(self::MAX_COURSES)->get();
 
         if ($courses->isEmpty()) {
             $this->command->warn("  ⚠️  No published courses found. Please run CourseSeeder first.");
             return;
         }
 
-        $this->command->info("\n  📚 Processing {$courses->count()} published courses...");
+        $this->command->info("\n  📚 Processing {$courses->count()} published courses (limited to " . self::MAX_COURSES . ")...");
 
         $totalUnits = 0;
         $totalLessons = 0;

@@ -20,11 +20,11 @@ class ProfileSeeder extends Seeder
     public function run(): void
     {
         \DB::connection()->disableQueryLog();
+        ini_set('memory_limit', '1536M');
         
         echo "Seeding profile data for all users...\n";
 
-        // ✅ Eager load relationships to avoid N+1
-        $users = User::with('privacySettings', 'enrollments', 'roles')
+        $users = User::with('privacySettings', 'roles')
             ->whereNull('deleted_at')
             ->get();
 
@@ -34,45 +34,50 @@ class ProfileSeeder extends Seeder
         }
 
         $privacyCount = 0;
-        $activityCount = 0;
+        $createdAt = now()->toDateTimeString();
+        $visibilities = [
+            ProfilePrivacySetting::VISIBILITY_PUBLIC,
+            ProfilePrivacySetting::VISIBILITY_PRIVATE,
+        ];
 
-        // ✅ Batch create missing privacy settings
         $privacySettings = [];
         foreach ($users as $user) {
             if (!$user->privacySettings) {
-                $visibility = match (true) {
-                    $user->roles->whereIn('name', ['Superadmin', 'Admin', 'Instructor'])->count() > 0 => ProfilePrivacySetting::VISIBILITY_PUBLIC,
-                    $user->hasRole('Student') => fake()->randomElement([
-                        ProfilePrivacySetting::VISIBILITY_PUBLIC,
-                        ProfilePrivacySetting::VISIBILITY_PRIVATE,
-                    ]),
-                    default => ProfilePrivacySetting::VISIBILITY_PUBLIC,
-                };
+                $isAdmin = $user->roles->whereIn('name', ['Superadmin', 'Admin', 'Instructor'])->count() > 0;
+                $visibility = $isAdmin 
+                    ? ProfilePrivacySetting::VISIBILITY_PUBLIC 
+                    : $visibilities[array_rand($visibilities)];
 
                 $privacySettings[] = [
                     'user_id' => $user->id,
                     'profile_visibility' => $visibility,
-                    'show_email' => fake()->boolean(20),
-                    'show_phone' => fake()->boolean(10),
+                    'show_email' => rand(1, 100) <= 20,
+                    'show_phone' => rand(1, 100) <= 10,
                     'show_activity_history' => true,
                     'show_achievements' => true,
                     'show_statistics' => true,
-                    'created_at' => now(),
-                    'updated_at' => now(),
+                    'created_at' => $createdAt,
+                    'updated_at' => $createdAt,
                 ];
                 $privacyCount++;
+                
+                if (count($privacySettings) >= 200) {
+                    \Illuminate\Support\Facades\DB::table('profile_privacy_settings')->insertOrIgnore($privacySettings);
+                    $privacySettings = [];
+                    gc_collect_cycles();
+                }
             }
         }
 
-        // ✅ Batch insert privacy settings
         if (!empty($privacySettings)) {
             \Illuminate\Support\Facades\DB::table('profile_privacy_settings')->insertOrIgnore($privacySettings);
         }
 
-        // ✅ Create user activities in batch for active users
-        $activityCount = $this->createUserActivitiesBatch(
-            $users->filter(fn ($user) => $user->status === 'active')
-        );
+        $activeUserIds = $users->filter(fn ($user) => $user->status === 'active')->pluck('id')->toArray();
+        unset($users);
+        gc_collect_cycles();
+
+        $activityCount = $this->createUserActivitiesBatch($activeUserIds);
 
         echo "✅ Created $privacyCount privacy settings\n";
         echo "✅ Created $activityCount user activities\n";
@@ -85,14 +90,13 @@ class ProfileSeeder extends Seeder
     /**
      * Batch create user activities for active users
      */
-    private function createUserActivitiesBatch($users): int
+private function createUserActivitiesBatch(array $userIds): int
     {
-        // Skip if user_activities table doesn't exist
         if (!\Illuminate\Support\Facades\Schema::hasTable('user_activities')) {
             return 0;
         }
 
-        if ($users->isEmpty()) {
+        if (empty($userIds)) {
             return 0;
         }
 
@@ -105,37 +109,41 @@ class ProfileSeeder extends Seeder
                 UserActivity::TYPE_BADGE_EARNED,
                 UserActivity::TYPE_CERTIFICATE_EARNED,
             ];
+            
+            $relatedTypes = [null, 'Course', 'Lesson', 'Quiz', 'Assignment'];
+            $pregenTitles = ['Enrolled in course', 'Completed lesson', 'Submitted assignment', 'Earned badge', 'Achieved milestone', 'Started quiz', 'Finished module'];
+            $pregenDescriptions = ['Progress made', 'New achievement', 'Course completed', 'Badge earned', 'Activity recorded', 'Learning milestone'];
+            $createdAt = now()->toDateTimeString();
 
             $activities = [];
             $totalCount = 0;
 
-            foreach ($users as $user) {
-                // Students get more activities if they have enrollments
-                if ($user->hasRole('Student')) {
-                    $enrollmentCount = $user->enrollments->count();
-                    $numActivities = $enrollmentCount > 0 ? fake()->numberBetween(10, 30) : fake()->numberBetween(0, 5);
-                } else {
-                    $numActivities = fake()->numberBetween(5, 20);
-                }
+            foreach ($userIds as $userId) {
+                $numActivities = rand(3, 8);
 
                 for ($i = 0; $i < $numActivities; $i++) {
                     $activities[] = [
-                        'user_id' => $user->id,
-                        'activity_type' => fake()->randomElement($activityTypes),
+                        'user_id' => $userId,
+                        'activity_type' => $activityTypes[array_rand($activityTypes)],
                         'activity_data' => json_encode([
-                            'title' => fake()->sentence(),
-                            'description' => fake()->paragraph(),
-                            'points' => fake()->numberBetween(10, 100),
+                            'title' => $pregenTitles[array_rand($pregenTitles)],
+                            'description' => $pregenDescriptions[array_rand($pregenDescriptions)],
+                            'points' => rand(10, 100),
                         ]),
-                        'related_type' => fake()->randomElement([null, 'Course', 'Lesson', 'Quiz', 'Assignment']),
-                        'related_id' => fake()->boolean(60) ? fake()->numberBetween(1, 100) : null,
-                        'created_at' => now()->subDays(rand(1, 90)),
+                        'related_type' => $relatedTypes[array_rand($relatedTypes)],
+                        'related_id' => rand(0, 1) ? rand(1, 100) : null,
+                        'created_at' => $createdAt,
                     ];
                     $totalCount++;
                 }
+                
+                if (count($activities) >= 500) {
+                    \Illuminate\Support\Facades\DB::table('user_activities')->insertOrIgnore($activities);
+                    $activities = [];
+                    gc_collect_cycles();
+                }
             }
 
-            // ✅ Batch insert instead of individual creates
             if (!empty($activities)) {
                 \Illuminate\Support\Facades\DB::table('user_activities')->insertOrIgnore($activities);
             }

@@ -3,30 +3,26 @@
 namespace Modules\Learning\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Modules\Auth\Models\User;
-use Modules\Enrollments\Models\Enrollment;
-use Modules\Learning\Models\Assignment;
-use Modules\Learning\Models\Submission;
-use Modules\Schemes\Models\Lesson;
 
 class AssignmentAndSubmissionSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     * 
-     * Creates comprehensive assignment and submission data:
-     * - 5-8 assignments per lesson
-     * - 50-70% students submit assignments
-     * - Multiple submissions per student (resubmissions)
-     * - Various submission statuses (draft, submitted, graded)
-     */
+    private array $pregenTitles = [];
+    private array $pregenDescriptions = [];
+    private array $pregenAnswers = [];
+    private string $createdAt;
+    private string $deadlineAt;
+
     public function run(): void
     {
         \DB::connection()->disableQueryLog();
+        ini_set('memory_limit', '1536M');
         
         echo "Seeding assignments and submissions...\n";
 
-        // ✅ Use raw SQL for counts (minimal memory)
+        $this->pregenerateFakeData();
+        $this->createdAt = now()->toDateTimeString();
+        $this->deadlineAt = now()->addDays(14)->toDateTimeString();
+
         $lessonCount = \DB::table('lessons')->count();
         $instructorIds = \DB::table('users')
             ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
@@ -47,26 +43,30 @@ class AssignmentAndSubmissionSeeder extends Seeder
 
         echo "Creating assignments for $lessonCount lessons...\n";
         
-        // ✅ STEP 1: Create assignments using cursor (memory efficient)
         $assignmentCount = 0;
         $assignments = [];
-        $assignmentBatchSize = 300; // Smaller batch
+        $assignmentBatchSize = 100;
+        $processedLessons = 0;
 
-        foreach (\DB::table('lessons')->orderBy('id')->cursor() as $lesson) {
-            $assignmentsPerLesson = rand(3, 5); // REDUCED from 5-8 to 3-5
+        foreach (\DB::table('lessons')->select('id')->orderBy('id')->cursor() as $lesson) {
+            $processedLessons++;
+            
+            if (rand(1, 100) > 60) continue;
+            
+            $assignmentsPerLesson = rand(1, 2);
             $instructorId = $instructorIds[array_rand($instructorIds)];
 
             for ($i = 0; $i < $assignmentsPerLesson; $i++) {
                 $assignments[] = [
                     'lesson_id' => $lesson->id,
-                    'title' => fake()->sentence(4),
-                    'description' => fake()->text(100),
+                    'title' => $this->pregenTitles[array_rand($this->pregenTitles)],
+                    'description' => $this->pregenDescriptions[array_rand($this->pregenDescriptions)],
                     'created_by' => $instructorId,
                     'max_score' => rand(50, 100),
-                    'deadline_at' => now()->addDays(rand(7, 30)),
+                    'deadline_at' => $this->deadlineAt,
                     'status' => 'published',
-                    'created_at' => now(),
-                    'updated_at' => now(),
+                    'created_at' => $this->createdAt,
+                    'updated_at' => $this->createdAt,
                 ];
                 $assignmentCount++;
                 
@@ -75,12 +75,16 @@ class AssignmentAndSubmissionSeeder extends Seeder
                     $assignments = null;
                     unset($assignments);
                     $assignments = [];
+                    gc_collect_cycles();
                     
-                    if ($assignmentCount % 3000 === 0) {
-                        gc_collect_cycles();
+                    if ($assignmentCount % 1000 === 0) {
                         echo "   ✓ Created $assignmentCount assignments\n";
                     }
                 }
+            }
+            
+            if ($processedLessons % 500 === 0) {
+                gc_collect_cycles();
             }
         }
 
@@ -92,52 +96,53 @@ class AssignmentAndSubmissionSeeder extends Seeder
         echo "✅ Created $assignmentCount assignments\n";
         gc_collect_cycles();
 
-        // ✅ STEP 2: Create submissions using cursor (maximum memory efficiency)
         echo "Creating submissions...\n";
         $submissionCount = 0;
         $submissions = [];
-        $submissionBatchSize = 200; // Even smaller batch
-        $processedAssignments = 0;
-        
-        // Pre-generate answer templates to reduce Faker overhead
-        $answerTemplates = [
-            'Answer submitted for review.',
-            'Completed assignment as per instructions.',
-            'Solution provided 150; // Smaller batch
+        $submissionBatchSize = 30;
         $processedAssignments = 0;
 
-        // Use cursor instead of chunk to avoid memory buildup
-        foreach (\DB::table('assignments')->orderBy('id')->cursor() as $assignment) {
+        $assignmentCourseMap = \DB::table('assignments')
+            ->join('lessons', 'assignments.lesson_id', '=', 'lessons.id')
+            ->join('units', 'lessons.unit_id', '=', 'units.id')
+            ->select('assignments.id', 'assignments.max_score', 'units.course_id')
+            ->get()
+            ->keyBy('id')
+            ->toArray();
+
+        $courseEnrollments = [];
+        foreach (\DB::table('enrollments')->where('status', 'active')->get(['user_id', 'id', 'course_id']) as $e) {
+            if (!isset($courseEnrollments[$e->course_id])) {
+                $courseEnrollments[$e->course_id] = [];
+            }
+            $courseEnrollments[$e->course_id][$e->user_id] = $e->id;
+        }
+
+        $assignmentIds = array_keys($assignmentCourseMap);
+        shuffle($assignmentIds);
+        $assignmentIds = array_slice($assignmentIds, 0, (int)(count($assignmentIds) * 0.15));
+
+        echo "Processing " . count($assignmentIds) . " assignments (15% of total)...\n";
+
+        foreach ($assignmentIds as $assignmentId) {
             $processedAssignments++;
             
-            // Get course_id via raw SQL join (single value query)
-            $courseId = \DB::table('lessons')
-                ->join('units', 'lessons.unit_id', '=', 'units.id')
-                ->where('lessons.id', $assignment->lesson_id)
-                ->value('units.course_id');
+            $assignmentData = $assignmentCourseMap[$assignmentId] ?? null;
+            if (!$assignmentData) continue;
             
-            if (!$courseId) continue;
+            $courseId = $assignmentData->course_id;
+            $maxScore = $assignmentData->max_score;
             
-            // Get LIMITED enrollments for this course (max 20 per assignment)
-            $enrollmentIds = \DB::table('enrollments')
-                ->where('course_id', $courseId)
-                ->where('status', 'active')
-                ->inRandomOrder()
-                ->limit(20) // REDUCED to 20 students max
-                ->pluck('id', 'user_id')
-                ->toArray();
+            $enrollmentData = $courseEnrollments[$courseId] ?? [];
+            if (empty($enrollmentData)) continue;
             
-            if (empty($enrollmentIds)) {
-                unset($enrollmentIds);
-                continue;
-            }
+            $enrollmentKeys = array_keys($enrollmentData);
+            shuffle($enrollmentKeys);
+            $selectedUsers = array_slice($enrollmentKeys, 0, min(3, count($enrollmentKeys)));
             
-            // 40-60% submission rate (REDUCED)
-            $submissionRate = rand(40, 60);
-            $toSubmit = (int) (count($enrollmentIds) * $submissionRate / 100);
-            $selectedEnrollments = array_slice($enrollmentIds, 0, max(1, $toSubmit), true);
-            
-            foreach ($selectedEnrollments as $userId => $enrollmentId) {
+            foreach ($selectedUsers as $userId) {
+                $enrollmentId = $enrollmentData[$userId];
+                
                 $statusRandom = rand(1, 100);
                 $status = match (true) {
                     $statusRandom <= 30 => 'submitted',
@@ -146,46 +151,65 @@ class AssignmentAndSubmissionSeeder extends Seeder
                 };
                 
                 $submissions[] = [
-                    'assignment_id' => $assignment->id,
+                    'assignment_id' => $assignmentId,
                     'user_id' => $userId,
                     'enrollment_id' => $enrollmentId,
-                    'answer_text' => fake()->text(100),
+                    'answer_text' => $this->pregenAnswers[array_rand($this->pregenAnswers)],
                     'status' => $status,
-                    'score' => $status === 'graded' ? rand(0, $assignment->max_score) : null,
-                    'submitted_at' => $status !== 'draft' ? now()->subDays(rand(1, 30)) : null,
-                    'created_at' => now(),
-                    'updated_at' => now(),
+                    'score' => $status === 'graded' ? rand(0, $maxScore) : null,
+                    'submitted_at' => $status !== 'draft' ? $this->createdAt : null,
+                    'created_at' => $this->createdAt,
+                    'updated_at' => $this->createdAt,
                 ];
                 $submissionCount++;
                 
                 if (count($submissions) >= $submissionBatchSize) {
                     \DB::table('submissions')->insertOrIgnore($submissions);
-                    
-                    // Explicit memory cleanup
                     $submissions = null;
                     unset($submissions);
                     $submissions = [];
+                    gc_collect_cycles();
                     
-                    // More aggressive GC
-                    if ($submissionCount % 300 === 0) {
-                        gc_collect_cycles();
+                    if ($submissionCount % 500 === 0) {
                         echo "  ✅ Inserted $submissionCount submissions\n";
                     }
                 }
             }
             
-            // Explicit cleanup
-            unset($enrollmentIds, $selectedEnrollments);
-            
-            // GC every 20 assignments (more aggressive)
-            if ($processedAssignments % 20
+            if ($processedAssignments % 50 === 0) {
+                gc_collect_cycles();
+            }
+        }
+        
+        unset($assignmentCourseMap, $courseEnrollments, $assignmentIds);
+
+        if (!empty($submissions)) {
+            \DB::table('submissions')->insertOrIgnore($submissions);
             unset($submissions);
         }
 
         echo "✅ Assignment and submission seeding completed!\n";
         echo "Created $assignmentCount assignments with $submissionCount submissions\n";
         
+        $this->pregenTitles = [];
+        $this->pregenDescriptions = [];
+        $this->pregenAnswers = [];
+        
         gc_collect_cycles();
         \DB::connection()->enableQueryLog();
     }
+
+    private function pregenerateFakeData(): void
+    {
+        $faker = \Faker\Factory::create('id_ID');
+        
+        for ($i = 0; $i < 100; $i++) {
+            $this->pregenTitles[] = $faker->sentence(3);
+            $this->pregenDescriptions[] = $faker->text(80);
+            $this->pregenAnswers[] = $faker->paragraph(1);
+        }
+        
+        unset($faker);
+    }
 }
+

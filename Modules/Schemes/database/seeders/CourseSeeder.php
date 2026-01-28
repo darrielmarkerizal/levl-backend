@@ -37,10 +37,10 @@ class CourseSeeder extends Seeder
             return;
         }
 
-        // Create 50 courses
-        echo "Creating 50 courses...\n";
+        // Create 20 courses
+        echo "Creating 20 courses...\n";
         $courses = Course::factory()
-            ->count(50)
+            ->count(20)
             ->published()
             ->openEnrollment()
             ->create();
@@ -54,7 +54,7 @@ class CourseSeeder extends Seeder
         $this->createUnitsAndLessons($courses);
 
         echo "✅ Course seeding completed!\n";
-        echo "Created 50 courses with units and lessons\n";
+        echo "Created 20 courses with units and lessons\n";
         
         gc_collect_cycles();
         \DB::connection()->enableQueryLog();
@@ -92,24 +92,22 @@ class CourseSeeder extends Seeder
     {
         $counter = 0;
         foreach ($courses as $course) {
-            $unitCount = rand(5, 8);
+            $unitCount = rand(2, 3);
             
-            // ✅ Create all units at once
             $units = Unit::factory()
                 ->count($unitCount)
                 ->forCourse($course)
                 ->create();
 
-            // ✅ Batch create lessons per unit
             foreach ($units as $unit) {
-                $lessonCount = rand(10, 15);
+                $lessonCount = rand(3, 5);
                 Lesson::factory()
                     ->count($lessonCount)
                     ->forUnit($unit)
                     ->create();
                     
                 $counter++;
-                if ($counter % 100 === 0) {
+                if ($counter % 30 === 0) {
                     gc_collect_cycles();
                 }
             }
