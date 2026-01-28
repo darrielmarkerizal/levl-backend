@@ -25,6 +25,8 @@ class QuestionOptionAnswerSubmissionSeeder extends Seeder
      */
     public function run(): void
     {
+        \DB::connection()->disableQueryLog();
+        
         echo "Seeding questions, options, answers, and submissions...\n";
 
         // Check if we have users and assignments to link to
@@ -220,6 +222,10 @@ class QuestionOptionAnswerSubmissionSeeder extends Seeder
             }
 
             echo "Processed assignment: {$assignment->title}. Questions: $questionCount, Submissions: $submissionCount, Answers: $answerCount\n";
+            
+            if ($questionCount % 5000 === 0) {
+                gc_collect_cycles();
+            }
         }
 
         // Insert any remaining answers
@@ -229,5 +235,10 @@ class QuestionOptionAnswerSubmissionSeeder extends Seeder
 
         echo "✅ Question, option, answer, and submission seeding completed!\n";
         echo "Created $questionCount questions, $submissionCount submissions, and $answerCount answers\n";
+        
+        gc_collect_cycles();
+        \DB::connection()->enableQueryLog();
+    }
+}
     }
 }

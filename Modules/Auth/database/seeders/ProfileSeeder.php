@@ -19,6 +19,8 @@ class ProfileSeeder extends Seeder
      */
     public function run(): void
     {
+        \DB::connection()->disableQueryLog();
+        
         echo "Seeding profile data for all users...\n";
 
         // ✅ Eager load relationships to avoid N+1
@@ -75,6 +77,9 @@ class ProfileSeeder extends Seeder
         echo "✅ Created $privacyCount privacy settings\n";
         echo "✅ Created $activityCount user activities\n";
         echo "✅ Profile seeding completed!\n";
+        
+        gc_collect_cycles();
+        \DB::connection()->enableQueryLog();
     }
 
     /**

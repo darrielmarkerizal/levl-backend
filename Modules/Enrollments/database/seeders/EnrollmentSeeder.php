@@ -13,6 +13,8 @@ class EnrollmentSeeder extends Seeder
 {
     public function run(): void
     {
+        \DB::connection()->disableQueryLog();
+        
         $this->command->info("Seeding enrollments and progress...");
 
         $students = User::whereHas('roles', function ($q) {
@@ -43,6 +45,12 @@ class EnrollmentSeeder extends Seeder
 
         $processedStudents = 0;
         foreach ($students as $student) {
+            $processedStudents++;
+            if ($processedStudents % 5000 === 0) {
+                gc_collect_cycles();
+                echo "      ✓ Processed $processedStudents students\n";
+            }
+            
             $enrollmentCount = rand(3, 8);
             $randomCourses = $courses->random(min($enrollmentCount, $courses->count()));
             // ... (rest of loop)
@@ -119,6 +127,9 @@ class EnrollmentSeeder extends Seeder
         }
 
         $this->command->info("✅ Enrollment seeding completed!");
+        
+        gc_collect_cycles();
+        \DB::connection()->enableQueryLog();
     }
 
     private function insertProgressData(array $enrollments, array $courseProgressData, array $unitProgressData, array $lessonProgressData): void

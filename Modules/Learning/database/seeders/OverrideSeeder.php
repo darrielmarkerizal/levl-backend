@@ -20,6 +20,8 @@ class OverrideSeeder extends Seeder
      */
     public function run(): void
     {
+        \DB::connection()->disableQueryLog();
+        
         echo "Seeding overrides...\n";
 
         // Check if we have users and assignments to link to
@@ -127,5 +129,8 @@ class OverrideSeeder extends Seeder
 
         echo "✅ Override seeding completed!\n";
         echo "Created $overrideCount overrides\n";
+        
+        gc_collect_cycles();
+        \DB::connection()->enableQueryLog();
     }
 }

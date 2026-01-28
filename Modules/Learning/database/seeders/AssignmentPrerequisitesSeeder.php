@@ -16,6 +16,8 @@ class AssignmentPrerequisitesSeeder extends Seeder
      */
     public function run(): void
     {
+        \DB::connection()->disableQueryLog();
+        
         echo "Seeding assignment prerequisites...\n";
 
         // Check if assignments exist
@@ -91,5 +93,8 @@ class AssignmentPrerequisitesSeeder extends Seeder
 
         echo "✅ Assignment prerequisites seeding completed!\n";
         echo "Created $prerequisiteCount prerequisite relationships\n";
+        
+        gc_collect_cycles();
+        \DB::connection()->enableQueryLog();
     }
 }

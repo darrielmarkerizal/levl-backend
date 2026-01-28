@@ -30,6 +30,8 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        \DB::connection()->disableQueryLog();
+        
         // Create demo users for testing
         $this->createDemoUsers();
 
@@ -51,6 +53,9 @@ class UserSeeder extends Seeder
 
         echo "✅ User seeding completed successfully!\n";
         echo "Total users created: 1000\n";
+        
+        gc_collect_cycles();
+        \DB::connection()->enableQueryLog();
     }
 
     /**
@@ -227,9 +232,15 @@ class UserSeeder extends Seeder
             $users->push($user);
         }
 
+        $counter = 0;
         foreach ($users as $user) {
             if (!$user->hasRole($role)) {
                 $user->assignRole($role);
+            }
+            
+            $counter++;
+            if ($counter % 5000 === 0) {
+                gc_collect_cycles();
             }
         }
 

@@ -23,6 +23,8 @@ class GradeAndAppealSeeder extends Seeder
      */
     public function run(): void
     {
+        \DB::connection()->disableQueryLog();
+        
         echo "\n📋 Seeding grades and appeals...\n";
 
         // ✅ Get instructors using raw SQL for speed
@@ -154,11 +156,19 @@ class GradeAndAppealSeeder extends Seeder
             }
 
             echo "      ✓ Chunk $chunkNum: $chunkSubmissions submissions | Created Grades: " . count($grades) . " | Appeals: " . count($appeals) . "\n";
+            
+            if ($chunkNum % 5 === 0) {
+                gc_collect_cycles();
+            }
 
             $offset += $chunkSize;
         }
+        
         echo "\n✅ Grading and appeal seeding completed!\n";
         echo "   📊 Total grades created: $gradeCount\n";
         echo "   📊 Total appeals created: $appealCount\n";
+        
+        gc_collect_cycles();
+        \DB::connection()->enableQueryLog();
     }
 }

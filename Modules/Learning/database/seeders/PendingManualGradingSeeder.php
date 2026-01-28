@@ -17,6 +17,8 @@ class PendingManualGradingSeeder extends Seeder
      */
     public function run(): void
     {
+        \DB::connection()->disableQueryLog();
+        
         echo "\n📋 Seeding submissions with PendingManualGrading state...\n";
 
         // Count submissions that need updating (using raw SQL for speed)
@@ -71,10 +73,17 @@ class PendingManualGradingSeeder extends Seeder
             $totalUpdated += $count;
 
             echo "      ✓ Chunk $chunkNum: Updated $count submissions (Total: $totalUpdated/$totalToUpdate)\n";
+            
+            if ($chunkNum % 5 === 0) {
+                gc_collect_cycles();
+            }
 
             $offset += $chunkSize;
         }
 
         echo "\n✅ Completed! Updated $totalUpdated submissions to PendingManualGrading state\n";
+        
+        gc_collect_cycles();
+        \DB::connection()->enableQueryLog();
     }
 }

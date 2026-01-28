@@ -22,6 +22,8 @@ class AssignmentAndSubmissionSeeder extends Seeder
      */
     public function run(): void
     {
+        \DB::connection()->disableQueryLog();
+        
         echo "Seeding assignments and submissions...\n";
 
         // ✅ Eager load relationships to avoid N+1
@@ -98,7 +100,14 @@ class AssignmentAndSubmissionSeeder extends Seeder
         // ✅ Pre-calculate submission data grouped by course
         $enrollmentsByCourse = $enrollments->groupBy('course_id');
 
+        $processedAssignments = 0;
         foreach ($assignmentModels as $assignment) {
+            $processedAssignments++;
+            if ($processedAssignments % 5000 === 0) {
+                gc_collect_cycles();
+                echo "      ✓ Processed $processedAssignments assignments\n";
+            }
+            
             $courseId = $assignment->lesson->unit->course_id;
             $courseEnrollments = $enrollmentsByCourse->get($courseId, collect());
 
@@ -143,5 +152,8 @@ class AssignmentAndSubmissionSeeder extends Seeder
 
         echo "✅ Assignment and submission seeding completed!\n";
         echo "Created $assignmentCount assignments with $submissionCount submissions\n";
+        
+        gc_collect_cycles();
+        \DB::connection()->enableQueryLog();
     }
 }

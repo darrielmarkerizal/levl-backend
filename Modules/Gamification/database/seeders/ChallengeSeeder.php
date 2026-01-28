@@ -9,6 +9,8 @@ class ChallengeSeeder extends Seeder
 {
     public function run(): void
     {
+        \DB::connection()->disableQueryLog();
+        
         // Daily Challenges
         $dailyChallenges = [
             [
@@ -91,5 +93,8 @@ class ChallengeSeeder extends Seeder
         }
 
         $this->command->info('Sample challenges seeded successfully!');
+        
+        gc_collect_cycles();
+        \DB::connection()->enableQueryLog();
     }
 }

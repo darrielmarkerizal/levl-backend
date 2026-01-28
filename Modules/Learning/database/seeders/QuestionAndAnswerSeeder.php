@@ -21,6 +21,8 @@ class QuestionAndAnswerSeeder extends Seeder
      */
     public function run(): void
     {
+        \DB::connection()->disableQueryLog();
+        
         echo "Seeding questions and answers...\n";
 
         // Check if any assignments exist to start with
@@ -112,6 +114,7 @@ class QuestionAndAnswerSeeder extends Seeder
             }
 
             echo "Processed chunk. Questions created: $questionCount\n";
+            gc_collect_cycles();
         });
 
         // Process submissions in chunks to create answers
@@ -187,6 +190,7 @@ class QuestionAndAnswerSeeder extends Seeder
             }
 
             echo "Processed chunk. Answers created: $answerCount\n";
+            gc_collect_cycles();
         });
 
         echo "✅ Question and answer seeding completed!\n";
@@ -194,6 +198,9 @@ class QuestionAndAnswerSeeder extends Seeder
         
         // Update some submissions to have the correct state for grading
         $this->updateSubmissionStates();
+        
+        gc_collect_cycles();
+        \DB::connection()->enableQueryLog();
     }
 
     private function updateSubmissionStates(): void

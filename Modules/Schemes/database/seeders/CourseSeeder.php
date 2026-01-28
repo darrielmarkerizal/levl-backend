@@ -24,6 +24,8 @@ class CourseSeeder extends Seeder
      */
     public function run(): void
     {
+        \DB::connection()->disableQueryLog();
+        
         echo "Seeding courses and course structure...\n";
 
         $instructors = User::whereHas('roles', function ($q) {
@@ -53,6 +55,9 @@ class CourseSeeder extends Seeder
 
         echo "✅ Course seeding completed!\n";
         echo "Created 50 courses with units and lessons\n";
+        
+        gc_collect_cycles();
+        \DB::connection()->enableQueryLog();
     }
 
     /**
@@ -85,6 +90,7 @@ class CourseSeeder extends Seeder
      */
     private function createUnitsAndLessons($courses): void
     {
+        $counter = 0;
         foreach ($courses as $course) {
             $unitCount = rand(5, 8);
             
@@ -101,6 +107,11 @@ class CourseSeeder extends Seeder
                     ->count($lessonCount)
                     ->forUnit($unit)
                     ->create();
+                    
+                $counter++;
+                if ($counter % 100 === 0) {
+                    gc_collect_cycles();
+                }
             }
         }
     }
