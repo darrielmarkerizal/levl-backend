@@ -4,9 +4,6 @@ declare(strict_types=1);
 namespace Modules\Enrollments\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Modules\Auth\Models\User;
-use Modules\Schemes\Models\Course;
-use Modules\Enrollments\Models\Enrollment;
 use Modules\Enrollments\Enums\ProgressStatus;
 
 class EnrollmentSeeder extends Seeder
@@ -17,46 +14,45 @@ class EnrollmentSeeder extends Seeder
         
         $this->command->info("Seeding enrollments and progress...");
 
-        $students = User::whereHas('roles', function ($q) {
-            $q->where('name', 'Student');
-        })->limit(800)->get();
+        // ✅ Use raw SQL for minimal memory footprint
+        $studentIds = \DB::table('users')
+            ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+            ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+            ->where('roles.name', 'Student')
+            ->limit(800)
+            ->pluck('users.id')
+            ->toArray();
+        
+        $courseIds = \DB::table('courses')
+            ->where('status', 'published')
+            ->pluck('id')
+            ->toArray();
 
-        $courses = Course::with('units.lessons')->get();
-
-        if ($students->isEmpty() || $courses->isEmpty()) {
+        if (empty($studentIds) || empty($courseIds)) {
             echo "⚠️  No students or courses found. Skipping enrollment seeding.\n";
             return;
         }
 
-        $this->command->info("Creating 500-800 enrollments...");
+        $this->command->info("Creating enrollments for " . count($studentIds) . " students...");
 
-        $enrollments = [];
-        $courseProgressData = [];
-        $unitProgressData = [];
-        $lessonProgressData = [];
-
-        // Pre-fetch existing enrollments to avoid N+1 checks
-        $existingPairs = \Illuminate\Support\Facades\DB::table('enrollments')
-            ->select(['user_id', 'course_id'])
-            ->get()
+        // Pre-fetch existing enrollments
+        $existingPairs = \DB::table('enrollments')
+            ->get(['user_id', 'course_id'])
             ->map(fn($r) => $r->user_id . ':' . $r->course_id)
             ->flip()
             ->all();
 
-        $processedStudents = 0;
-        foreach ($students as $student) {
-            $processedStudents++;
-            if ($processedStudents % 5000 === 0) {
-                gc_collect_cycles();
-                echo "      ✓ Processed $processedStudents students\n";
-            }
-            
-            $enrollmentCount = rand(3, 8);
-            $randomCourses = $courses->random(min($enrollmentCount, $courses->count()));
-            // ... (rest of loop)
+        $enrollments = [];
+        $enrollmentBatchSize = 300;
+        $totalEnrollments = 0;
 
-            foreach ($randomCourses as $course) {
-                $pairKey = $student->id . ':' . $course->id;
+        foreach ($studentIds as $studentId) {
+            $enrollmentCount = rand(3, 8);
+            $selectedCourses = array_rand(array_flip($courseIds), min($enrollmentCount, count($courseIds)));
+            $selectedCourses = is_array($selectedCourses) ? $selectedCourses : [$selectedCourses];
+
+            foreach ($selectedCourses as $courseId) {
+                $pairKey = $studentId . ':' . $courseId;
                 if (isset($existingPairs[$pairKey])) {
                     continue;
                 }
@@ -68,63 +64,43 @@ class EnrollmentSeeder extends Seeder
                     default => 'completed'
                 };
 
-                $enrollmentData = [
-                    'user_id' => $student->id,
-                    'course_id' => $course->id,
+                $enrollments[] = [
+                    'user_id' => $studentId,
+                    'course_id' => $courseId,
                     'status' => $status,
                     'enrolled_at' => now()->subDays(rand(1, 180)),
                     'completed_at' => $status === 'completed' ? now()->subDays(rand(1, 30)) : null,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
+                $totalEnrollments++;
 
-                $enrollments[] = $enrollmentData;
-
-                $enrollmentIndex = count($enrollments) - 1;
-                $courseProgressData[] = [
-                    'enrollment_id' => $enrollmentIndex,
-                    'status' => $this->mapStatus($status),
-                    'progress_percent' => $status === 'completed' ? 100 : rand(0, 100),
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-
-                if (\Illuminate\Support\Facades\Schema::hasTable('unit_progress')) {
-                    foreach ($course->units as $unit) {
-                        $unitProgressData[] = [
-                            'enrollment_id' => $enrollmentIndex,
-                            'unit_id' => $unit->id,
-                            'status' => 'not_started',
-                            'progress_percent' => 0,
-                            'created_at' => now(),
-                            'updated_at' => now(),
-                        ];
-
-                        if (\Illuminate\Support\Facades\Schema::hasTable('lesson_progress')) {
-                            foreach ($unit->lessons as $lesson) {
-                                $lessonProgressData[] = [
-                                    'enrollment_id' => $enrollmentIndex,
-                                    'lesson_id' => $lesson->id,
-                                    'status' => 'not_started',
-                                    'progress_percent' => 0,
-                                    'attempt_count' => 0,
-                                    'created_at' => now(),
-                                    'updated_at' => now(),
-                                ];
-                            }
-                        }
+                if (count($enrollments) >= $enrollmentBatchSize) {
+                    \DB::table('enrollments')->insertOrIgnore($enrollments);
+                    $this->command->info("  ✅ Inserted $totalEnrollments enrollments");
+                    
+                    $enrollments = [];
+                    unset($enrollments);
+                    $enrollments = [];
+                    
+                    if ($totalEnrollments % 1000 === 0) {
+                        gc_collect_cycles();
                     }
                 }
             }
         }
 
         if (!empty($enrollments)) {
-            foreach (array_chunk($enrollments, 1000) as $chunk) {
-                \Illuminate\Support\Facades\DB::table('enrollments')->insertOrIgnore($chunk);
-                $this->command->info("  ✅ Inserted " . count($chunk) . " enrollments");
-            }
-            $this->insertProgressData($enrollments, $courseProgressData, $unitProgressData, $lessonProgressData);
+            \DB::table('enrollments')->insertOrIgnore($enrollments);
+            unset($enrollments);
         }
+
+        $this->command->info("✅ Created $totalEnrollments enrollments");
+        gc_collect_cycles();
+
+        // ✅ Create progress records using chunked processing
+        $this->command->info("Creating progress records...");
+        $this->createProgressRecordsChunked();
 
         $this->command->info("✅ Enrollment seeding completed!");
         
@@ -132,84 +108,99 @@ class EnrollmentSeeder extends Seeder
         \DB::connection()->enableQueryLog();
     }
 
-    private function insertProgressData(array $enrollments, array $courseProgressData, array $unitProgressData, array $lessonProgressData): void
+    private function createProgressRecordsChunked(): void
     {
-        $userIds = collect($enrollments)->pluck('user_id')->unique()->all();
-        $courseIds = collect($enrollments)->pluck('course_id')->unique()->all();
+        $chunkSize = 50; // Small chunks to avoid memory issues
+        $totalProcessed = 0;
 
-        $enrollmentModels = Enrollment::whereIn('user_id', $userIds)
-            ->whereIn('course_id', $courseIds)
-            ->get(['id', 'user_id', 'course_id']);
+        \DB::table('enrollments')
+            ->orderBy('id')
+            ->chunk($chunkSize, function ($enrollmentChunk) use (&$totalProcessed) {
+                $courseProgress = [];
+                $unitProgress = [];
+                $lessonProgress = [];
 
-        if ($enrollmentModels->isEmpty()) {
-            return;
-        }
+                foreach ($enrollmentChunk as $enrollment) {
+                    // Course Progress
+                    $courseProgress[] = [
+                        'enrollment_id' => $enrollment->id,
+                        'status' => $this->mapStatus($enrollment->status),
+                        'progress_percent' => $enrollment->status === 'completed' ? 100 : rand(0, 100),
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
 
-        if (!empty($enrollmentModels)) {
-            $pairToId = [];
-            foreach ($enrollmentModels as $model) {
-                $pairToId[$model->user_id . ':' . $model->course_id] = $model->id;
-            }
+                    // Unit Progress (raw SQL to avoid loading models)
+                    if (\Schema::hasTable('unit_progress')) {
+                        $unitIds = \DB::table('units')
+                            ->where('course_id', $enrollment->course_id)
+                            ->pluck('id')
+                            ->toArray();
 
-            $indexToId = [];
-            foreach ($enrollments as $idx => $enroll) {
-                $key = $enroll['user_id'] . ':' . $enroll['course_id'];
-                if (isset($pairToId[$key])) {
-                    $indexToId[$idx] = $pairToId[$key];
-                }
-            }
+                        foreach ($unitIds as $unitId) {
+                            $unitProgress[] = [
+                                'enrollment_id' => $enrollment->id,
+                                'unit_id' => $unitId,
+                                'status' => 'not_started',
+                                'progress_percent' => 0,
+                                'created_at' => now(),
+                                'updated_at' => now(),
+                            ];
+                        }
+                        unset($unitIds);
+                    }
 
-            // Insert Course Progress
-            if (!empty($courseProgressData) && \Illuminate\Support\Facades\Schema::hasTable('course_progress')) {
-                $courseBatch = [];
-                foreach ($courseProgressData as $idx => $data) {
-                    if (isset($indexToId[$idx])) {
-                        $data['enrollment_id'] = $indexToId[$idx];
-                        $courseBatch[] = $data;
+                    // Lesson Progress (limit to 30 per enrollment to save memory)
+                    if (\Schema::hasTable('lesson_progress')) {
+                        $lessonIds = \DB::table('lessons')
+                            ->join('units', 'lessons.unit_id', '=', 'units.id')
+                            ->where('units.course_id', $enrollment->course_id)
+                            ->limit(30)
+                            ->pluck('lessons.id')
+                            ->toArray();
+
+                        foreach ($lessonIds as $lessonId) {
+                            $lessonProgress[] = [
+                                'enrollment_id' => $enrollment->id,
+                                'lesson_id' => $lessonId,
+                                'status' => 'not_started',
+                                'progress_percent' => 0,
+                                'attempt_count' => 0,
+                                'created_at' => now(),
+                                'updated_at' => now(),
+                            ];
+                        }
+                        unset($lessonIds);
                     }
                 }
-                if (!empty($courseBatch)) {
-                    foreach (array_chunk($courseBatch, 1000) as $chunk) {
-                        \Illuminate\Support\Facades\DB::table('course_progress')->insertOrIgnore($chunk);
-                    }
-                }
-            }
 
-            // Insert Unit Progress
-            if (!empty($unitProgressData) && \Illuminate\Support\Facades\Schema::hasTable('unit_progress')) {
-                $unitBatch = [];
-                foreach ($unitProgressData as $data) {
-                    $idx = $data['enrollment_id'];
-                    if (isset($indexToId[$idx])) {
-                        $data['enrollment_id'] = $indexToId[$idx];
-                        $unitBatch[] = $data;
+                // Insert in batches
+                if (!empty($courseProgress)) {
+                    foreach (array_chunk($courseProgress, 300) as $chunk) {
+                        \DB::table('course_progress')->insertOrIgnore($chunk);
                     }
                 }
 
-                if (!empty($unitBatch)) {
-                    foreach (array_chunk($unitBatch, 1000) as $chunk) {
-                        \Illuminate\Support\Facades\DB::table('unit_progress')->insertOrIgnore($chunk);
+                if (!empty($unitProgress)) {
+                    foreach (array_chunk($unitProgress, 300) as $chunk) {
+                        \DB::table('unit_progress')->insertOrIgnore($chunk);
                     }
                 }
-            }
 
-            // Insert Lesson Progress
-            if (!empty($lessonProgressData) && \Illuminate\Support\Facades\Schema::hasTable('lesson_progress')) {
-                $lessonBatch = [];
-                foreach ($lessonProgressData as $data) {
-                    $idx = $data['enrollment_id'];
-                    if (isset($indexToId[$idx])) {
-                        $data['enrollment_id'] = $indexToId[$idx];
-                        $lessonBatch[] = $data;
+                if (!empty($lessonProgress)) {
+                    foreach (array_chunk($lessonProgress, 300) as $chunk) {
+                        \DB::table('lesson_progress')->insertOrIgnore($chunk);
                     }
                 }
-                if (!empty($lessonBatch)) {
-                    foreach (array_chunk($lessonBatch, 1000) as $chunk) {
-                         \Illuminate\Support\Facades\DB::table('lesson_progress')->insertOrIgnore($chunk);
-                    }
+
+                $totalProcessed += count($enrollmentChunk);
+                unset($courseProgress, $unitProgress, $lessonProgress);
+                
+                if ($totalProcessed % 200 === 0) {
+                    gc_collect_cycles();
+                    $this->command->info("   ✓ Created progress for $totalProcessed enrollments");
                 }
-            }
-        }
+            });
     }
 
     private function mapStatus(string|ProgressStatus $enrollmentStatus): string

@@ -51,6 +51,13 @@ class AssignmentAndSubmissionSeeder extends Seeder
         $assignmentCount = 0;
         $assignments = [];
         $assignmentBatchSize = 500;
+        
+        // Pre-generate common strings to reduce Faker overhead
+        $titleTemplates = [
+            'Assignment %d', 'Task %d', 'Exercise %d', 'Practice %d', 
+            'Lab %d', 'Project %d', 'Activity %d', 'Challenge %d'
+        ];
+        $descTemplate = 'Complete this assignment by following the instructions provided in the lesson materials.';
 
         foreach (\DB::table('lessons')->orderBy('id')->cursor() as $lesson) {
             $assignmentsPerLesson = rand(5, 8);
@@ -59,8 +66,8 @@ class AssignmentAndSubmissionSeeder extends Seeder
             for ($i = 0; $i < $assignmentsPerLesson; $i++) {
                 $assignments[] = [
                     'lesson_id' => $lesson->id,
-                    'title' => fake()->sentence(5),
-                    'description' => fake()->paragraph(),
+                    'title' => sprintf($titleTemplates[array_rand($titleTemplates)], $assignmentCount + 1),
+                    'description' => $descTemplate,
                     'created_by' => $instructorId,
                     'max_score' => rand(50, 100),
                     'deadline_at' => now()->addDays(rand(7, 30)),
@@ -72,7 +79,7 @@ class AssignmentAndSubmissionSeeder extends Seeder
                 
                 if (count($assignments) >= $assignmentBatchSize) {
                     \DB::table('assignments')->insert($assignments);
-                    $assignments = [];
+                    $assignments = null;
                     unset($assignments);
                     $assignments = [];
                     
@@ -92,90 +99,102 @@ class AssignmentAndSubmissionSeeder extends Seeder
         echo "✅ Created $assignmentCount assignments\n";
         gc_collect_cycles();
 
-        // ✅ STEP 2: Create submissions using chunked processing
+        // ✅ STEP 2: Create submissions using cursor (maximum memory efficiency)
         echo "Creating submissions...\n";
         $submissionCount = 0;
         $submissions = [];
-        $submissionBatchSize = 300; // Smaller batch for memory
-        $chunkSize = 100; // Process assignments in small chunks
+        $submissionBatchSize = 200; // Even smaller batch
+        $processedAssignments = 0;
+        
+        // Pre-generate answer templates to reduce Faker overhead
+        $answerTemplates = [
+            'Answer submitted for review.',
+            'Completed assignment as per instructions.',
+            'Solution provided based on lesson materials.',
+            'Task completed successfully.',
+            'Assignment work submitted.',
+        ];
 
-        \DB::table('assignments')
-            ->orderBy('id')
-            ->chunk($chunkSize, function ($assignmentChunk) use (&$submissionCount, &$submissions, $submissionBatchSize) {
-                static $chunkNum = 0;
-                $chunkNum++;
+        // Use cursor instead of chunk to avoid memory buildup
+        foreach (\DB::table('assignments')->orderBy('id')->cursor() as $assignment) {
+            $processedAssignments++;
+            
+            // Get course_id via raw SQL join (single value query)
+            $courseId = \DB::table('lessons')
+                ->join('units', 'lessons.unit_id', '=', 'units.id')
+                ->where('lessons.id', $assignment->lesson_id)
+                ->value('units.course_id');
+            
+            if (!$courseId) continue;
+            
+            // Get LIMITED enrollments for this course (max 30 per assignment)
+            $enrollmentIds = \DB::table('enrollments')
+                ->where('course_id', $courseId)
+                ->where('status', 'active')
+                ->inRandomOrder()
+                ->limit(30) // REDUCED from 50 to 30
+                ->pluck('id', 'user_id')
+                ->toArray();
+            
+            if (empty($enrollmentIds)) {
+                unset($enrollmentIds);
+                continue;
+            }
+            
+            // 50-70% submission rate
+            $submissionRate = rand(50, 70);
+            $toSubmit = (int) (count($enrollmentIds) * $submissionRate / 100);
+            $selectedEnrollments = array_slice($enrollmentIds, 0, max(1, $toSubmit), true);
+            
+            foreach ($selectedEnrollments as $userId => $enrollmentId) {
+                $statusRandom = rand(1, 100);
+                $status = match (true) {
+                    $statusRandom <= 30 => 'submitted',
+                    $statusRandom <= 70 => 'graded',
+                    default => 'draft',
+                };
                 
-                foreach ($assignmentChunk as $assignment) {
-                    // Get course_id via raw SQL join
-                    $courseId = \DB::table('lessons')
-                        ->join('units', 'lessons.unit_id', '=', 'units.id')
-                        ->where('lessons.id', $assignment->lesson_id)
-                        ->value('units.course_id');
+                $submissions[] = [
+                    'assignment_id' => $assignment->id,
+                    'user_id' => $userId,
+                    'enrollment_id' => $enrollmentId,
+                    'answer_text' => $answerTemplates[array_rand($answerTemplates)],
+                    'status' => $status,
+                    'score' => $status === 'graded' ? rand(0, $assignment->max_score) : null,
+                    'submitted_at' => $status !== 'draft' ? now()->subDays(rand(1, 30)) : null,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+                $submissionCount++;
+                
+                if (count($submissions) >= $submissionBatchSize) {
+                    \DB::table('submissions')->insertOrIgnore($submissions);
                     
-                    if (!$courseId) continue;
+                    // Explicit memory cleanup
+                    $submissions = null;
+                    unset($submissions);
+                    $submissions = [];
                     
-                    // Get enrollments for this course (using raw SQL)
-                    $enrollmentIds = \DB::table('enrollments')
-                        ->where('course_id', $courseId)
-                        ->where('status', 'active')
-                        ->inRandomOrder()
-                        ->limit(100) // Limit to 100 max per assignment
-                        ->pluck('id', 'user_id')
-                        ->toArray();
-                    
-                    if (empty($enrollmentIds)) continue;
-                    
-                    // 50-70% submission rate
-                    $submissionRate = rand(50, 70);
-                    $toSubmit = (int) (count($enrollmentIds) * $submissionRate / 100);
-                    $selectedEnrollments = array_slice($enrollmentIds, 0, max(1, $toSubmit), true);
-                    
-                    foreach ($selectedEnrollments as $userId => $enrollmentId) {
-                        $statusRandom = rand(1, 100);
-                        $status = match (true) {
-                            $statusRandom <= 30 => 'submitted',
-                            $statusRandom <= 70 => 'graded',
-                            default => 'draft',
-                        };
-                        
-                        $submissions[] = [
-                            'assignment_id' => $assignment->id,
-                            'user_id' => $userId,
-                            'enrollment_id' => $enrollmentId,
-                            'answer_text' => fake()->text(200), // Shorter text
-                            'status' => $status,
-                            'score' => $status === 'graded' ? rand(0, $assignment->max_score) : null,
-                            'submitted_at' => $status !== 'draft' ? now()->subDays(rand(1, 30)) : null,
-                            'created_at' => now(),
-                            'updated_at' => now(),
-                        ];
-                        $submissionCount++;
-                        
-                        if (count($submissions) >= $submissionBatchSize) {
-                            \DB::table('submissions')->insertOrIgnore($submissions);
-                            echo "  ✅ Inserted $submissionCount submissions\n";
-                            
-                            $submissions = [];
-                            unset($submissions);
-                            $submissions = [];
-                            
-                            if ($submissionCount % 1000 === 0) {
-                                gc_collect_cycles();
-                            }
-                        }
+                    // More aggressive GC
+                    if ($submissionCount % 500 === 0) {
+                        gc_collect_cycles();
+                        echo "  ✅ Inserted $submissionCount submissions\n";
                     }
-                    
-                    unset($enrollmentIds, $selectedEnrollments);
                 }
-                
-                if ($chunkNum % 10 === 0) {
-                    gc_collect_cycles();
-                    echo "   ✓ Processed chunk $chunkNum\n";
-                }
-            });
+            }
+            
+            // Explicit cleanup
+            unset($enrollmentIds, $selectedEnrollments);
+            
+            // GC every 25 assignments (more aggressive)
+            if ($processedAssignments % 25 === 0) {
+                gc_collect_cycles();
+            }
+        }
 
         if (!empty($submissions)) {
             \DB::table('submissions')->insertOrIgnore($submissions);
+            $submissions = null;
             unset($submissions);
         }
 
