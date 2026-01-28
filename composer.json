@@ -13,6 +13,7 @@
     "beyondcode/laravel-query-detector": "^2.1",
     "darkaonline/l5-swagger": "^10.0",
     "dedoc/scramble": "^0.13.10",
+    "fakerphp/faker": "^1.23",
     "hisorange/browser-detect": "^5.0",
     "http-interop/http-factory-guzzle": "^1.2",
     "laravel/framework": "^11.0",
@@ -24,8 +25,8 @@
     "laravel/tinker": "^2.10.1",
     "league/flysystem-aws-s3-v3": "^3.0",
     "maatwebsite/excel": "^3.1",
-    "meilisearch/meilisearch-php": "^1.16",
     "mbezhanov/faker-provider-collection": "^2.0",
+    "meilisearch/meilisearch-php": "^1.16",
     "nwidart/laravel-modules": "^11.0",
     "scalar/laravel": "^0.2.0",
     "spatie/laravel-activitylog": "^4.10",
@@ -36,8 +37,8 @@
     "spatie/laravel-permission": "^6.22",
     "spatie/laravel-query-builder": "^6.3",
     "spatie/laravel-sluggable": "^3.7",
-    "tymon/jwt-auth": "^2.2",
-    "fakerphp/faker": "^1.23"
+    "stevebauman/location": "^7.6",
+    "tymon/jwt-auth": "^2.2"
   },
   "require-dev": {
     "barryvdh/laravel-ide-helper": "^3.6",

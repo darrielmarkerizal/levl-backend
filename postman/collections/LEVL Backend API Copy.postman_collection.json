@@ -228,9 +228,21 @@
           "name": "Login",
           "event": [
             {
+              "listen": "prerequest",
+              "script": {
+                "id": "2b19a256-6f9e-4544-b9d3-264a2865ce40",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
               "listen": "test",
               "script": {
-                "id": "8083cbf6-738d-485e-a2b6-a36d8df433d0",
+                "id": "4f20fead-4fa9-4d2e-b53a-78b6d98decdb",
                 "exec": [
                   "// pastikan response sukses",
                   "pm.test(\"Login berhasil\", function () {",
@@ -252,18 +264,6 @@
                 "packages": {},
                 "requests": {}
               }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "id": "4a62cea5-29d7-40c1-9349-73ba8b8c9478",
-                "exec": [
-                  ""
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
             }
           ],
           "id": "d0f3e420-64c0-417e-a855-72ef2e2f2559",
@@ -272,7 +272,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"login\": \"superadmin\",\n  \"password\": \"password\"\n}",
+              "raw": "{\n    \"login\":\"superadmin.demo@test.com\",\n    \"password\":\"password\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -290,90 +290,7 @@
               ]
             }
           },
-          "response": [
-            {
-              "id": "25a8b227-24f2-4310-96f2-fcf6aea38388",
-              "name": "Login 200",
-              "originalRequest": {
-                "method": "POST",
-                "header": [],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"login\": \"student@example.com\",\n  \"password\": \"password\"\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "{{url}}/auth/login",
-                  "host": [
-                    "{{url}}"
-                  ],
-                  "path": [
-                    "auth",
-                    "login"
-                  ]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "Text",
-              "header": [
-                {
-                  "key": "Server",
-                  "value": "nginx"
-                },
-                {
-                  "key": "Date",
-                  "value": "Sun, 18 Jan 2026 13:01:47 GMT"
-                },
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                },
-                {
-                  "key": "Content-Length",
-                  "value": "607"
-                },
-                {
-                  "key": "Connection",
-                  "value": "keep-alive"
-                },
-                {
-                  "key": "Cache-Control",
-                  "value": "no-cache, private"
-                },
-                {
-                  "key": "Content-Encoding",
-                  "value": "br"
-                },
-                {
-                  "key": "Vary",
-                  "value": "Origin"
-                },
-                {
-                  "key": "Vary",
-                  "value": "Accept-Encoding"
-                },
-                {
-                  "key": "X-Powered-By",
-                  "value": "PHP/8.4.17"
-                },
-                {
-                  "key": "X-Ratelimit-Limit",
-                  "value": "10"
-                },
-                {
-                  "key": "X-Ratelimit-Remaining",
-                  "value": "7"
-                }
-              ],
-              "cookie": [],
-              "body": "{\n    \"success\": true,\n    \"message\": \"Login berhasil.\",\n    \"data\": {\n        \"user\": {\n            \"id\": 4,\n            \"name\": \"Student\",\n            \"email\": \"student@example.com\",\n            \"username\": \"student\",\n            \"avatar_url\": null,\n            \"status\": \"active\",\n            \"account_status\": \"active\",\n            \"created_at\": \"2026-01-11T19:44:13.000000Z\",\n            \"email_verified_at\": \"2026-01-11T19:44:13.000000Z\",\n            \"is_password_set\": true,\n            \"roles\": [\n                \"Student\"\n            ],\n            \"media\": []\n        },\n        \"access_token\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2xldmwtYmFja2VuZC5zaXRlL2FwaS92MS9hdXRoL2xvZ2luIiwiaWF0IjoxNzY4NzQxMzA3LCJleHAiOjE3Njg3NDIyMDcsIm5iZiI6MTc2ODc0MTMwNywianRpIjoiRTRCeldBVHJuWldkYm9VZSIsInN1YiI6IjQiLCJwcnYiOiJmMWQzNGFiZDQyNDczNTM4MjEyMzZiNDgxODk3MmE4NTI4NDM4M2I3Iiwic3RhdHVzIjoiYWN0aXZlIiwicm9sZXMiOlsiU3R1ZGVudCJdfQ.TYxrSEeA-PZcxq-8ONC5uLFFDXCrfoSzhxSYe6wod0c\",\n        \"refresh_token\": \"Ylk89taYxPNaoOXVwnY3tYnF3kguIb99e7Pp65A64kVtLnyECyeau3ywMyUim7W9\",\n        \"expires_in\": 900,\n        \"message\": null\n    },\n    \"meta\": null,\n    \"errors\": null\n}"
-            }
-          ]
+          "response": []
         },
         {
           "name": "Daftar (Student)",
@@ -3753,7 +3670,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{url}}/courses?page=7",
+              "raw": "{{url}}/courses",
               "host": [
                 "{{url}}"
               ],
@@ -3771,7 +3688,8 @@
                 {
                   "key": "page",
                   "value": "7",
-                  "uuid": "426ac389-3e7d-4d2a-989e-da5fd8413a01"
+                  "uuid": "426ac389-3e7d-4d2a-989e-da5fd8413a01",
+                  "disabled": true
                 },
                 {
                   "key": "filter[status]",

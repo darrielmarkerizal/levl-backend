@@ -31,6 +31,9 @@ class BrowserLogger
       // Parse user agent
       $result = Browser::parse($userAgent);
 
+      // Get Location
+      $location = \Stevebauman\Location\Facades\Location::get($ipAddress);
+
       return [
         "ip_address" => $ipAddress,
         "browser" => $result->browserName() ?: "Unknown",
@@ -38,6 +41,9 @@ class BrowserLogger
         "platform" => $result->platformName() ?: "Unknown",
         "device" => $result->deviceModel() ?: ($result->platformName() ?: "Unknown"),
         "device_type" => self::getDeviceType($result),
+        "city" => $location ? $location->cityName : null,
+        "region" => $location ? $location->regionName : null,
+        "country" => $location ? $location->countryName : null,
       ];
     } catch (\Exception $e) {
       // Fallback if browser-detect fails
@@ -48,6 +54,9 @@ class BrowserLogger
         "platform" => "Unknown",
         "device" => "Unknown",
         "device_type" => "desktop",
+        "city" => null,
+        "region" => null,
+        "country" => null,
       ];
     }
   }

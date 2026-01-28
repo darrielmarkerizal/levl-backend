@@ -5,45 +5,57 @@ declare(strict_types=1);
 
 namespace Modules\Auth\Traits;
 
+
+use App\Models\ActivityLog;
 use Illuminate\Database\Eloquent\Model;
-use Modules\Auth\Models\UserActivity;
 
 trait TracksUserActivity
 {
-  public function logActivity(string $type, array $data = [], ?Model $related = null): UserActivity
-  {
-    return UserActivity::create([
-      "user_id" => $this->id,
-      "activity_type" => $type,
-      "activity_data" => $data,
-      "related_type" => $related ? get_class($related) : null,
-      "related_id" => $related?->id,
-    ]);
-  }
+    public function logActivity(string $type, array $data = [], ?Model $related = null)
+    {
+        $activity = activity('user_activity')
+            ->causedBy($this)
+            ->withProperties($data)
+            ->event($type);
 
-  public function getRecentActivities(int $limit = 10)
-  {
-    return $this->activities()->orderBy("created_at", "desc")->limit($limit)->get();
-  }
+        if ($related) {
+            $activity->performedOn($related);
+        }
 
-  public function latestActivity()
-  {
-    return $this->hasOne(UserActivity::class)->latestOfMany();
-  }
-
-  public function getLastActivityAttribute(): ?UserActivity
-  {
-    return $this->latestActivity;
-  }
-
-  public function getLastActiveRelativeAttribute(): ?string
-  {
-    $lastActivity = $this->lastActivity;
-
-    if (!$lastActivity) {
-      return null;
+        return $activity->log($type);
     }
 
-    return $lastActivity->created_at->locale("id")->diffForHumans();
-  }
+    public function getRecentActivities(int $limit = 10)
+    {
+        return $this->actions()->orderBy('created_at', 'desc')->limit($limit)->get();
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     */
+    public function actions()
+    {
+        return $this->morphMany(ActivityLog::class, 'causer');
+    }
+
+    public function latestActivity()
+    {
+        return $this->morphOne(ActivityLog::class, 'causer')->latestOfMany();
+    }
+
+    public function getLastActivityAttribute()
+    {
+        return $this->latestActivity;
+    }
+
+    public function getLastActiveRelativeAttribute(): ?string
+    {
+        $lastActivity = $this->lastActivity;
+
+        if (! $lastActivity) {
+            return null;
+        }
+
+        return $lastActivity->created_at->locale('id')->diffForHumans();
+    }
 }

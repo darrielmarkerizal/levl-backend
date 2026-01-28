@@ -21,5 +21,8 @@ class ActivityLogObserver
     $activity->platform = $deviceInfo["platform"];
     $activity->device = $deviceInfo["device"];
     $activity->device_type = $deviceInfo["device_type"];
+    $activity->city = $deviceInfo["city"];
+    $activity->region = $deviceInfo["region"];
+    $activity->country = $deviceInfo["country"];
   }
 }

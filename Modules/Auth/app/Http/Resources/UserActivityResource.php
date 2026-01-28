@@ -17,16 +17,23 @@ class UserActivityResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        /** @var UserActivity $activity */
+        /** @var \App\Models\ActivityLog $activity */
         $activity = $this->resource;
 
         return [
             'id' => $activity->id,
-            'activity_type' => $activity->activity_type,
-            'activity_data' => $activity->activity_data,
-            'related_type' => $activity->related_type,
-            'related_id' => $activity->related_id,
+            'activity_type' => $activity->event ?? $activity->description,
+            'activity_data' => $activity->properties,
+            'related_type' => $activity->subject_type,
+            'related_id' => $activity->subject_id,
             'created_at' => $activity->created_at?->toISOString(),
+            // Optional: Include new fields if useful
+            'location' => [
+                'city' => $activity->city,
+                'region' => $activity->region,
+                'country' => $activity->country,
+            ],
+            'device_info' => $activity->device_info,
         ];
     }
 }

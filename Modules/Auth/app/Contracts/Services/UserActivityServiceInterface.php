@@ -13,7 +13,7 @@ use Modules\Auth\Models\UserActivity;
 
 interface UserActivityServiceInterface
 {
-    public function logActivity(User $user, string $type, array $data, ?Model $related = null): UserActivity;
+    public function logActivity(User $user, string $type, array $data, ?Model $related = null);
 
     public function getActivities(User $user, array $filters = []): LengthAwarePaginator;
 

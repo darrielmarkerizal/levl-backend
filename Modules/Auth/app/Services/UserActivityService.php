@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Auth\Services;
 
+use App\Models\ActivityLog;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Modules\Auth\Contracts\Services\UserActivityServiceInterface;
@@ -12,24 +13,30 @@ use Modules\Auth\Models\UserActivity;
 
 class UserActivityService implements UserActivityServiceInterface
 {
-    public function logActivity(User $user, string $type, array $data, ?Model $related = null): UserActivity
+    public function logActivity(User $user, string $type, array $data, ?Model $related = null)
     {
-        return UserActivity::create([
-            'user_id' => $user->id,
-            'activity_type' => $type,
-            'activity_data' => $data,
-            'related_type' => $related ? get_class($related) : null,
-            'related_id' => $related?->id,
-        ]);
+        $activity = activity('user_activity')
+            ->causedBy($user)
+            ->withProperties($data)
+            ->event($type);
+
+        if ($related) {
+            $activity->performedOn($related);
+        }
+
+        return $activity->log($type);
     }
 
     public function getActivities(User $user, array $filters = []): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
-        $query = UserActivity::where('user_id', $user->id)
+        $query = ActivityLog::queries() // using queries() if available or query()
+            ->where('log_name', 'user_activity')
+            ->where('causer_type', User::class)
+            ->where('causer_id', $user->id)
             ->orderBy('created_at', 'desc');
 
         if (! empty($filters['type'])) {
-            $query->where('activity_type', $filters['type']);
+            $query->where('event', $filters['type']);
         }
 
         if (! empty($filters['start_date']) && ! empty($filters['end_date'])) {
@@ -43,7 +50,10 @@ class UserActivityService implements UserActivityServiceInterface
 
     public function getRecentActivities(User $user, int $limit = 10): Collection
     {
-        return UserActivity::where('user_id', $user->id)
+        return ActivityLog::query()
+            ->where('log_name', 'user_activity')
+            ->where('causer_type', User::class)
+            ->where('causer_id', $user->id)
             ->orderBy('created_at', 'desc')
             ->limit($limit)
             ->get();
@@ -72,5 +82,4 @@ class UserActivityService implements UserActivityServiceInterface
             'assignment_name' => $assignment->name ?? 'Assignment',
         ], $assignment);
     }
-
 }

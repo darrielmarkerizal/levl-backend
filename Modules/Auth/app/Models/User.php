@@ -127,15 +127,7 @@ class User extends Authenticatable implements HasMedia, JWTSubject
         return $this->hasOne(ProfilePrivacySetting::class);
     }
 
-    public function activities()
-    {
-        return $this->hasMany(UserActivity::class);
-    }
 
-    public function auditLogs()
-    {
-        return $this->hasMany(ProfileAuditLog::class, 'user_id');
-    }
 
     public function gamificationStats()
     {
