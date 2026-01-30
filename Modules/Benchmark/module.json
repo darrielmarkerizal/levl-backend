@@ -1,0 +1,11 @@
+{
+    "name": "Benchmark",
+    "alias": "benchmark",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Benchmark\\Providers\\BenchmarkServiceProvider"
+    ],
+    "files": []
+}
