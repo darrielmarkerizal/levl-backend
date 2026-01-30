@@ -143,5 +143,11 @@ Route::prefix("v1")
     // Development Only: Token Generator for Testing (REMOVE BEFORE PRODUCTION!)
     Route::get('/dev/tokens', [AuthApiController::class, 'generateDevTokens'])
       ->name('dev.tokens');
+
+    // Benchmark Routes (Publicly accessible for stress testing)
+    Route::prefix('benchmark')->group(function () {
+        Route::get('/users', [\Modules\Auth\Http\Controllers\BenchmarkController::class, 'index']);
+        Route::post('/users', [\Modules\Auth\Http\Controllers\BenchmarkController::class, 'store']);
+    });
   });
 
