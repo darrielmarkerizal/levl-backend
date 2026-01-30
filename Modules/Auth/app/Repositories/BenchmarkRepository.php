@@ -20,7 +20,7 @@ class BenchmarkRepository extends BaseRepository
      */
     public function get1000Users(): Collection
     {
-        return $this->model->newQuery()
+        return $this->query()
             ->select(['id', 'name', 'username', 'email', 'created_at'])
             ->limit(1000)
             ->get();
@@ -31,7 +31,7 @@ class BenchmarkRepository extends BaseRepository
      */
     public function insert1000Users(array $data): bool
     {
-        return $this->model->newQuery()->insert($data);
+        return $this->query()->insert($data);
     }
 
     /**
@@ -40,6 +40,6 @@ class BenchmarkRepository extends BaseRepository
      */
     public function truncateUsers(): void
     {
-        $this->model->newQuery()->truncate();
+        $this->query()->truncate();
     }
 }
