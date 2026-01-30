@@ -56,4 +56,12 @@ class BenchmarkService
         // 1000 rows is fine for single insert in most modern DBs.
         return $this->repository->insert1000Users($users);
     }
+
+    /**
+     * Truncate the users table to reset benchmark state.
+     */
+    public function cleanupDatabase(): void
+    {
+        $this->repository->truncateUsers();
+    }
 }

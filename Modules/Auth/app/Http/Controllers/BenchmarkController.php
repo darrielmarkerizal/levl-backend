@@ -39,4 +39,17 @@ class BenchmarkController extends Controller
             'success' => true,
         ], 201);
     }
+
+    /**
+     * CLEANUP Operation: Truncate users table.
+     */
+    public function destroy(): JsonResponse
+    {
+        $this->service->cleanupDatabase();
+
+        return response()->json([
+            'message' => 'Users table truncated successfully',
+            'success' => true,
+        ]);
+    }
 }

@@ -32,4 +32,13 @@ class BenchmarkRepository extends BaseRepository
     {
         return $this->model->newQuery()->insert($data);
     }
+
+    /**
+     * Truncate users table for benchmark cleanup.
+     * WARNING: This deletes ALL users. Use with caution.
+     */
+    public function truncateUsers(): void
+    {
+        $this->model->newQuery()->truncate();
+    }
 }

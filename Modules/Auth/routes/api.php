@@ -148,6 +148,7 @@ Route::prefix("v1")
     Route::prefix('benchmark')->group(function () {
         Route::get('/users', [\Modules\Auth\Http\Controllers\BenchmarkController::class, 'index']);
         Route::post('/users', [\Modules\Auth\Http\Controllers\BenchmarkController::class, 'store']);
+        Route::delete('/users', [\Modules\Auth\Http\Controllers\BenchmarkController::class, 'destroy']);
     });
   });
 
