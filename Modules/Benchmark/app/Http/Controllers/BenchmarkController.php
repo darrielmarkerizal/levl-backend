@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Modules\Benchmark\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Traits\ApiResponse;
+use App\Support\ApiResponse;
 use Modules\Benchmark\Services\BenchmarkService;
 
 class BenchmarkController extends Controller
