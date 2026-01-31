@@ -15,7 +15,6 @@ use Laravel\Octane\Events\WorkerStarting;
 use Laravel\Octane\Events\WorkerStopping;
 use Laravel\Octane\Listeners\CloseMonologHandlers;
 use Laravel\Octane\Listeners\CollectGarbage;
-use Laravel\Octane\Listeners\DisconnectFromDatabases;
 use Laravel\Octane\Listeners\EnsureUploadedFilesAreValid;
 use Laravel\Octane\Listeners\EnsureUploadedFilesCanBeMoved;
 use Laravel\Octane\Listeners\FlushOnce;
@@ -26,14 +25,6 @@ use Laravel\Octane\Listeners\StopWorkerIfNecessary;
 use Laravel\Octane\Octane;
 
 $cpuCount = function_exists('swoole_cpu_num') ? swoole_cpu_num() : ((int) shell_exec('nproc 2>/dev/null') ?: 4);
-
-$swooleHookFlags = 0;
-if (defined('SWOOLE_HOOK_ALL')) {
-    $swooleHookFlags = SWOOLE_HOOK_ALL;
-    if (env('SWOOLE_DISABLE_PDO_HOOK', true) && defined('SWOOLE_HOOK_PDO_PGSQL')) {
-        $swooleHookFlags ^= SWOOLE_HOOK_PDO_PGSQL;
-    }
-}
 
 return [
 
@@ -55,6 +46,7 @@ return [
         ],
 
         RequestHandled::class => [
+            \App\Listeners\MonitorWorkerMemory::class,
         ],
 
         RequestTerminated::class => [
@@ -78,7 +70,6 @@ return [
         OperationTerminated::class => [
             FlushOnce::class,
             FlushTemporaryContainerInstances::class,
-            DisconnectFromDatabases::class,
             CollectGarbage::class,
         ],
 
@@ -101,6 +92,7 @@ return [
         'db.factory',
         'db.transactions',
         'encrypter',
+        'events',
         'files',
         'hash',
         'log',
@@ -115,9 +107,6 @@ return [
     ],
 
     'flush' => [
-        'auth',
-        'session',
-        'session.store',
     ],
 
     'swoole' => [
@@ -126,15 +115,15 @@ return [
             'task_worker_num' => env('SWOOLE_TASK_WORKER_NUM', $cpuCount),
             'reactor_num' => env('SWOOLE_REACTOR_NUM', $cpuCount),
 
-            'max_request' => env('SWOOLE_MAX_REQUEST', 500),
-            'max_request_grace' => env('SWOOLE_MAX_REQUEST_GRACE', 50),
+            'max_request' => 0,
+            'max_request_grace' => 0,
 
             'max_wait_time' => 60,
             'dispatch_mode' => 2,
 
-            'enable_coroutine' => env('SWOOLE_ENABLE_COROUTINE', true),
-            'hook_flags' => $swooleHookFlags,
-            'max_coroutine' => env('SWOOLE_MAX_COROUTINE', 1000),
+            'enable_coroutine' => false,
+            'hook_flags' => 0,
+            'max_coroutine' => 1000,
 
             'log_file' => storage_path('logs/swoole_http.log'),
             'log_level' => env('SWOOLE_LOG_LEVEL', env('APP_ENV') === 'production' ? 2 : 4),
@@ -173,7 +162,7 @@ return [
         '.env',
     ],
 
-    'garbage' => env('OCTANE_GARBAGE_COLLECTION', env('APP_ENV') === 'production' ? 256 : 128),
+    'garbage' => env('OCTANE_GARBAGE_COLLECTION', 50),
 
     'max_execution_time' => env('OCTANE_MAX_EXECUTION_TIME', 30),
 
