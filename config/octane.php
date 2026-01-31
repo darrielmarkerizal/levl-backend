@@ -15,7 +15,6 @@ use Laravel\Octane\Events\WorkerStarting;
 use Laravel\Octane\Events\WorkerStopping;
 use Laravel\Octane\Listeners\CloseMonologHandlers;
 use Laravel\Octane\Listeners\CollectGarbage;
-use Laravel\Octane\Listeners\DisconnectFromDatabases;
 use Laravel\Octane\Listeners\EnsureUploadedFilesAreValid;
 use Laravel\Octane\Listeners\EnsureUploadedFilesCanBeMoved;
 use Laravel\Octane\Listeners\FlushOnce;
@@ -119,22 +118,22 @@ return [
             'task_worker_num' => env('SWOOLE_TASK_WORKER_NUM', $cpuCount),
             'reactor_num' => env('SWOOLE_REACTOR_NUM', $cpuCount),
 
-            'max_request' => env('SWOOLE_MAX_REQUEST', 10000),
-            'max_request_grace' => env('SWOOLE_MAX_REQUEST_GRACE', 500),
+            'max_request' => env('SWOOLE_MAX_REQUEST', 1000),
+            'max_request_grace' => env('SWOOLE_MAX_REQUEST_GRACE', 100),
 
             'max_wait_time' => 60,
             'dispatch_mode' => 2,
 
             'enable_coroutine' => true,
             'hook_flags' => $swooleHookAll,
-            'max_coroutine' => 100000,
+            'max_coroutine' => 1000,
 
             'log_file' => storage_path('logs/swoole_http.log'),
             'log_level' => env('SWOOLE_LOG_LEVEL', env('APP_ENV') === 'production' ? 2 : 4),
 
-            'package_max_length' => 20 * 1024 * 1024,
-            'buffer_output_size' => 4 * 1024 * 1024,
-            'socket_buffer_size' => 16 * 1024 * 1024,
+            'package_max_length' => 10 * 1024 * 1024,
+            'buffer_output_size' => 2 * 1024 * 1024,
+            'socket_buffer_size' => 8 * 1024 * 1024,
 
             'open_tcp_nodelay' => true,
             'tcp_fastopen' => true,
@@ -143,7 +142,7 @@ return [
             'http_parse_post' => true,
             'http_parse_cookie' => true,
             'http_compression' => true,
-            'http_compression_level' => env('APP_ENV') === 'production' ? 3 : 1,
+            'http_compression_level' => env('APP_ENV') === 'production' ? 1 : 0,
 
             'open_http2_protocol' => false,
             'open_cpu_affinity' => true,

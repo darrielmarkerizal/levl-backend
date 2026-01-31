@@ -12,9 +12,6 @@ use Modules\Enrollments\Contracts\Services\EnrollmentReportServiceInterface;
 use Modules\Enrollments\Exports\EnrollmentsExport;
 use Modules\Schemes\Models\Course;
 
-/**
- * @tags Laporan & Statistik
- */
 class ReportController extends Controller
 {
     use ApiResponse;
@@ -23,22 +20,8 @@ class ReportController extends Controller
         private readonly EnrollmentReportServiceInterface $reportService
     ) {}
 
-    /**
-     * Statistik Tingkat Penyelesaian Kursus
-     *
-     * Get completion statistics including total enrolled, active, completed, and completion percentage for a specific course.
-     *
-     *
-     * @summary Statistik Tingkat Penyelesaian Kursus
-     *
-     * @response 200 scenario="Success" {"success":true,"message":"Success","data":{"id":1,"name":"Example Report"}}
-     * @response 401 scenario="Unauthorized" {"success":false,"message":"Tidak terotorisasi."}
-     *
-     * @authenticated
-     */
     public function courseCompletionRate(Request $request, Course $course)
     {
-        /** @var \Modules\Auth\Models\User $user */
         $user = auth('api')->user();
 
         if (! $this->reportService->canUserManageCourse($user, $course)) {
@@ -57,22 +40,8 @@ class ReportController extends Controller
         ]);
     }
 
-    /**
-     * Statistik Funnel Pendaftaran
-     *
-     * Get funnel statistics showing enrollment journey from request to completion.
-     *
-     *
-     * @summary Statistik Funnel Pendaftaran
-     *
-     * @response 200 scenario="Success" {"success":true,"message":"Success","data":{"id":1,"name":"Example Report"}}
-     * @response 401 scenario="Unauthorized" {"success":false,"message":"Tidak terotorisasi."}
-     *
-     * @authenticated
-     */
     public function enrollmentFunnel(Request $request)
     {
-        /** @var \Modules\Auth\Models\User $user */
         $user = auth('api')->user();
 
         if (
@@ -89,22 +58,8 @@ class ReportController extends Controller
         return $this->success(['funnel' => $funnel]);
     }
 
-    /**
-     * Ekspor Data Pendaftaran CSV
-     *
-     * Export enrollment data for a course to CSV format.
-     *
-     *
-     * @summary Ekspor Data Pendaftaran CSV
-     *
-     * @response 200 scenario="Success" {"success":true,"message":"Success","data":{"id":1,"name":"Example Report"}}
-     * @response 401 scenario="Unauthorized" {"success":false,"message":"Tidak terotorisasi."}
-     *
-     * @authenticated
-     */
     public function exportEnrollmentsCsv(Request $request, Course $course)
     {
-        /** @var \Modules\Auth\Models\User $user */
         $user = auth('api')->user();
 
         if (! $this->reportService->canUserManageCourse($user, $course)) {

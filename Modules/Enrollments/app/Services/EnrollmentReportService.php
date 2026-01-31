@@ -93,7 +93,7 @@ class EnrollmentReportService implements EnrollmentReportServiceInterface
         ];
     }
 
-    public function getDetailedEnrollmentsQuery(Course $course)
+    public function getDetailedEnrollmentsQuery(Course $course): \Illuminate\Database\Eloquent\Builder
     {
         return Enrollment::query()
             ->where('course_id', $course->id)
