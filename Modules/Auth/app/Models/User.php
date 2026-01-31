@@ -32,9 +32,6 @@ class User extends Authenticatable implements HasMedia, JWTSubject
         SoftDeletes,
         TracksUserActivity;
 
-    /**
-     * Register media collections for this model.
-     */
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('avatar')
@@ -43,9 +40,6 @@ class User extends Authenticatable implements HasMedia, JWTSubject
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
     }
 
-    /**
-     * Register media conversions for this model.
-     */
     public function registerMediaConversions(?Media $media = null): void
     {
         $this->addMediaConversion('thumb')
@@ -54,15 +48,11 @@ class User extends Authenticatable implements HasMedia, JWTSubject
             ->sharpen(10)
             ->performOnCollections('avatar');
 
-        // Responsive images for different screen sizes
         $this->addMediaConversion('small')->width(64)->height(64)->performOnCollections('avatar');
 
         $this->addMediaConversion('medium')->width(256)->height(256)->performOnCollections('avatar');
     }
 
-    /**
-     * Get activity log options for this model.
-     */
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
@@ -106,8 +96,6 @@ class User extends Authenticatable implements HasMedia, JWTSubject
         'is_password_set' => 'boolean',
     ];
 
-    protected $appends = ['last_active_relative'];
-
     public function getAvatarUrlAttribute(): ?string
     {
         $media = $this->getFirstMedia('avatar');
@@ -127,40 +115,26 @@ class User extends Authenticatable implements HasMedia, JWTSubject
         return $this->hasOne(ProfilePrivacySetting::class);
     }
 
-
-
     public function gamificationStats()
     {
         return $this->hasOne(\Modules\Gamification\Models\UserGamificationStat::class);
     }
 
-    /**
-     * Get appeals submitted by this user (as a student).
-     */
     public function appeals()
     {
         return $this->hasMany(\Modules\Grading\Models\Appeal::class, 'student_id');
     }
 
-    /**
-     * Get appeals reviewed by this user (as an instructor).
-     */
     public function reviewedAppeals()
     {
         return $this->hasMany(\Modules\Grading\Models\Appeal::class, 'reviewer_id');
     }
 
-    /**
-     * Get overrides received by this user (as a student).
-     */
     public function receivedOverrides()
     {
         return $this->hasMany(\Modules\Learning\Models\Override::class, 'student_id');
     }
 
-    /**
-     * Get overrides granted by this user (as an instructor).
-     */
     public function grantedOverrides()
     {
         return $this->hasMany(\Modules\Learning\Models\Override::class, 'grantor_id');
@@ -194,9 +168,6 @@ class User extends Authenticatable implements HasMedia, JWTSubject
         return $this->hasMany(\Modules\Enrollments\Models\Enrollment::class);
     }
 
-    /**
-     * Get courses managed by this user (courses where user is an admin)
-     */
     public function managedCourses()
     {
         return $this->belongsToMany(
@@ -207,9 +178,6 @@ class User extends Authenticatable implements HasMedia, JWTSubject
         );
     }
 
-    /**
-     * Get the indexable data array for the model.
-     */
     public function toSearchableArray(): array
     {
         return [
@@ -222,25 +190,16 @@ class User extends Authenticatable implements HasMedia, JWTSubject
         ];
     }
 
-    /**
-     * Get the name of the index associated with the model.
-     */
     public function searchableAs(): string
     {
         return 'users_index';
     }
 
-    /**
-     * Determine if the model should be searchable.
-     */
     public function shouldBeSearchable(): bool
     {
         return $this->account_status === 'active';
     }
 
-    /**
-     * Create a new factory instance for the model.
-     */
     protected static function newFactory()
     {
         return \Database\Factories\UserFactory::new();

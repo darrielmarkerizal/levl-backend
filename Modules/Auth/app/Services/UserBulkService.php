@@ -29,7 +29,7 @@ class UserBulkService implements UserBulkServiceInterface
             $userIds = $this->resolveUserIdsFromFilters($authUser, $data['filter'] ?? [], $data['search'] ?? null);
         }
 
-        if (!empty($userIds)) {
+        if (! empty($userIds)) {
             ExportUsersToEmailJob::dispatch($userIds, $recipientEmail);
         }
     }
@@ -39,7 +39,6 @@ class UserBulkService implements UserBulkServiceInterface
         $isSuperadmin = $authUser->hasRole('Superadmin');
         $isAdmin = $authUser->hasRole('Admin');
 
-        
         $query = QueryBuilder::for(User::class, new Request(['filter' => $filters]))
             ->select('id');
 
@@ -48,7 +47,7 @@ class UserBulkService implements UserBulkServiceInterface
             $query->whereIn('id', $ids);
         }
 
-        if ($isAdmin && !$isSuperadmin) {
+        if ($isAdmin && ! $isSuperadmin) {
             $managedCourseIds = CourseAdmin::query()
                 ->where('user_id', $authUser->id)
                 ->pluck('course_id')
@@ -58,26 +57,26 @@ class UserBulkService implements UserBulkServiceInterface
                 $q->whereHas('roles', function ($roleQuery) {
                     $roleQuery->where('name', 'Admin');
                 })
-                ->orWhere(function ($subQuery) use ($managedCourseIds) {
-                    $subQuery->whereHas('roles', function ($roleQuery) {
-                        $roleQuery->whereIn('name', ['Instructor', 'Student']);
-                    })
-                    ->whereHas('enrollments', function ($enrollmentQuery) use ($managedCourseIds) {
-                        $enrollmentQuery->whereIn('course_id', $managedCourseIds);
+                    ->orWhere(function ($subQuery) use ($managedCourseIds) {
+                        $subQuery->whereHas('roles', function ($roleQuery) {
+                            $roleQuery->whereIn('name', ['Instructor', 'Student']);
+                        })
+                            ->whereHas('enrollments', function ($enrollmentQuery) use ($managedCourseIds) {
+                                $enrollmentQuery->whereIn('course_id', $managedCourseIds);
+                            });
                     });
-                });
             });
         }
 
         return $query->allowedFilters([
-                AllowedFilter::exact('status'),
-                AllowedFilter::callback('role', function (Builder $query, $value) {
-                    $roles = is_array($value)
-                      ? $value
-                      : Str::of($value)->explode(',')->map(fn ($r) => trim($r))->toArray();
-                    $query->whereHas('roles', fn ($q) => $q->whereIn('name', $roles));
-                }),
-            ])
+            AllowedFilter::exact('status'),
+            AllowedFilter::callback('role', function (Builder $query, $value) {
+                $roles = is_array($value)
+                  ? $value
+                  : Str::of($value)->explode(',')->map(fn ($r) => trim($r))->toArray();
+                $query->whereHas('roles', fn ($q) => $q->whereIn('name', $roles));
+            }),
+        ])
             ->pluck('id')
             ->toArray();
     }

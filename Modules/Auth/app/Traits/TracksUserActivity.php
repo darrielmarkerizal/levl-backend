@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-
 namespace Modules\Auth\Traits;
-
 
 use App\Models\ActivityLog;
 use Illuminate\Database\Eloquent\Model;
@@ -30,9 +28,6 @@ trait TracksUserActivity
         return $this->actions()->orderBy('created_at', 'desc')->limit($limit)->get();
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
-     */
     public function actions()
     {
         return $this->morphMany(ActivityLog::class, 'causer');
@@ -43,14 +38,13 @@ trait TracksUserActivity
         return $this->morphOne(ActivityLog::class, 'causer')->latestOfMany();
     }
 
-    public function getLastActivityAttribute()
-    {
-        return $this->latestActivity;
-    }
-
     public function getLastActiveRelativeAttribute(): ?string
     {
-        $lastActivity = $this->lastActivity;
+        if (! $this->relationLoaded('latestActivity')) {
+            return null;
+        }
+
+        $lastActivity = $this->latestActivity;
 
         if (! $lastActivity) {
             return null;

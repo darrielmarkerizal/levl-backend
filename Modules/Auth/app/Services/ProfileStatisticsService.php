@@ -11,15 +11,18 @@ use Modules\Auth\Models\User;
 
 class ProfileStatisticsService implements ProfileStatisticsServiceInterface
 {
+    private const CACHE_TTL = 300;
+
     public function getStatistics(User $user): array
     {
-        return Cache::remember("user_statistics_{$user->id}", 300, function () use ($user) {
-            return [
-                'enrollments' => $this->getEnrollmentStats($user),
-                'performance' => $this->getPerformanceStats($user),
-                'activity' => $this->getActivityStats($user),
-            ];
-        });
+        return Cache::tags(['auth', 'user_stats'])
+            ->remember("auth:user:{$user->id}:statistics", self::CACHE_TTL, function () use ($user) {
+                return [
+                    'enrollments' => $this->getEnrollmentStats($user),
+                    'performance' => $this->getPerformanceStats($user),
+                    'activity' => $this->getActivityStats($user),
+                ];
+            });
     }
 
     public function getEnrollmentStats(User $user): array
@@ -53,8 +56,9 @@ class ProfileStatisticsService implements ProfileStatisticsServiceInterface
 
     public function getActivityStats(User $user): array
     {
-        $recentActivities = DB::table('user_activities')
-            ->where('user_id', $user->id)
+        $recentActivities = DB::table('activity_log')
+            ->where('causer_id', $user->id)
+            ->where('causer_type', User::class)
             ->where('created_at', '>=', now()->subDays(30))
             ->count();
 
@@ -83,5 +87,4 @@ class ProfileStatisticsService implements ProfileStatisticsServiceInterface
 
         return (float) round($averageScore ?? 0, 2);
     }
-
 }

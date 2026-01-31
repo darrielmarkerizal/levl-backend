@@ -23,7 +23,7 @@ class BenchmarkRepository extends BaseRepository
         return $this->query()
             ->select(['id', 'name', 'username', 'email', 'created_at'])
             ->limit(1000)
-            ->toBase()
+            ->to_base()
             ->get();
     }
 

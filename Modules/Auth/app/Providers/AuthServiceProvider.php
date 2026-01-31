@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace Modules\Auth\Providers;
 
 use App\Support\Traits\RegistersModuleConfig;
@@ -24,9 +23,6 @@ class AuthServiceProvider extends ServiceProvider
 
     protected string $nameLower = 'auth';
 
-    /**
-     * Boot the application events.
-     */
     public function boot(): void
     {
         $this->registerCommands();
@@ -36,110 +32,92 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
 
-        // Register observers
         User::observe(UserObserver::class);
 
-        // Register custom user provider
         $this->app['auth']->provider('trashable-eloquent', function ($app, array $config) {
             return new \Modules\Auth\Support\TrashableEloquentUserProvider($app['hash'], $config['model']);
         });
     }
 
-    /**
-     * Register the service provider.
-     */
     public function register(): void
     {
         $this->app->register(EventServiceProvider::class);
         $this->app->register(RouteServiceProvider::class);
 
-        $this->app->bind(AuthRepositoryInterface::class, AuthRepository::class);
-        $this->app->bind(AuthServiceInterface::class, AuthService::class);
-        $this->app->bind(
-            \Modules\Auth\Contracts\Services\AuthenticationServiceInterface::class,
-            \Modules\Auth\Services\AuthenticationService::class,
-        );
+        $this->app->singleton(AuthRepositoryInterface::class, AuthRepository::class);
 
-        $this->app->bind(
+        $this->app->singleton(
             \Modules\Auth\Contracts\Repositories\UserBulkRepositoryInterface::class,
             \Modules\Auth\Repositories\UserBulkRepository::class,
         );
 
-        $this->app->bind(
-            \App\Contracts\Services\ProfileServiceInterface::class,
-            \Modules\Auth\Services\ProfileService::class,
-        );
-
-        // Repository bindings
-        $this->app->bind(
+        $this->app->singleton(
             \Modules\Auth\Contracts\Repositories\ProfileAuditLogRepositoryInterface::class,
             \Modules\Auth\Repositories\ProfileAuditLogRepository::class,
         );
 
-        $this->app->bind(
+        $this->app->singleton(
             \Modules\Auth\Contracts\Repositories\PasswordResetTokenRepositoryInterface::class,
             \Modules\Auth\Repositories\PasswordResetTokenRepository::class,
         );
 
-        // Service bindings
-        $this->app->bind(
-            \Modules\Auth\Contracts\Services\EmailVerificationServiceInterface::class,
-            \Modules\Auth\Services\EmailVerificationService::class,
+        $this->app->singleton(
+            \Modules\Auth\Services\UserCacheService::class,
+            \Modules\Auth\Services\UserCacheService::class,
         );
 
-        $this->app->bind(
+        $this->app->singleton(
             \Modules\Auth\Contracts\Services\LoginThrottlingServiceInterface::class,
             \Modules\Auth\Services\LoginThrottlingService::class,
         );
 
-        $this->app->bind(
+        $this->app->scoped(AuthServiceInterface::class, AuthService::class);
+
+        $this->app->scoped(
+            \Modules\Auth\Contracts\Services\AuthenticationServiceInterface::class,
+            \Modules\Auth\Services\AuthenticationService::class,
+        );
+
+        $this->app->scoped(
+            \App\Contracts\Services\ProfileServiceInterface::class,
+            \Modules\Auth\Services\ProfileService::class,
+        );
+
+        $this->app->scoped(
+            \Modules\Auth\Contracts\Services\EmailVerificationServiceInterface::class,
+            \Modules\Auth\Services\EmailVerificationService::class,
+        );
+
+        $this->app->scoped(
             \Modules\Auth\Contracts\Services\ProfilePrivacyServiceInterface::class,
             \Modules\Auth\Services\ProfilePrivacyService::class,
         );
 
-        $this->app->bind(
+        $this->app->scoped(
             \Modules\Auth\Contracts\Services\UserActivityServiceInterface::class,
             \Modules\Auth\Services\UserActivityService::class,
         );
 
-        $this->app->bind(
+        $this->app->scoped(
             \Modules\Auth\Contracts\Services\UserBulkServiceInterface::class,
             \Modules\Auth\Services\UserBulkService::class,
         );
 
-        $this->app->bind(
+        $this->app->scoped(
             \Modules\Auth\Contracts\Services\UserManagementServiceInterface::class,
             \Modules\Auth\Services\UserManagementService::class,
         );
 
-        $this->app->bind(
+        $this->app->scoped(
             \Modules\Auth\Contracts\UserAccessPolicyInterface::class,
             \Modules\Auth\Policies\UserAccessPolicy::class,
         );
     }
 
-    /**
-     * Register commands in the format of Command::class
-     */
-    protected function registerCommands(): void
-    {
-        // $this->commands([]);
-    }
+    protected function registerCommands(): void {}
 
-    /**
-     * Register command Schedules.
-     */
-    protected function registerCommandSchedules(): void
-    {
-        // $this->app->booted(function () {
-        //     $schedule = $this->app->make(Schedule::class);
-        //     $schedule->command('inspire')->hourly();
-        // });
-    }
+    protected function registerCommandSchedules(): void {}
 
-    /**
-     * Register translations.
-     */
     public function registerTranslations(): void
     {
         $langPath = resource_path('lang/modules/'.$this->nameLower);
@@ -153,17 +131,11 @@ class AuthServiceProvider extends ServiceProvider
         }
     }
 
-    /**
-     * Register config.
-     */
     protected function registerConfig(): void
     {
         $this->registerModuleConfig();
     }
 
-    /**
-     * Register views.
-     */
     public function registerViews(): void
     {
         $viewPath = resource_path('views/modules/'.$this->nameLower);
@@ -182,9 +154,6 @@ class AuthServiceProvider extends ServiceProvider
         );
     }
 
-    /**
-     * Get the services provided by the provider.
-     */
     public function provides(): array
     {
         return [];

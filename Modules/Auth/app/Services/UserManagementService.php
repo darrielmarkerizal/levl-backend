@@ -6,19 +6,17 @@ namespace Modules\Auth\Services;
 
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Modules\Auth\Contracts\Repositories\AuthRepositoryInterface;
+use Modules\Auth\Contracts\Services\UserManagementServiceInterface;
 use Modules\Auth\Contracts\UserAccessPolicyInterface;
 use Modules\Auth\Enums\UserStatus;
 use Modules\Auth\Models\User;
-use Modules\Auth\Contracts\Services\UserManagementServiceInterface;
-use Modules\Common\Models\Audit;
-use Modules\Enrollments\Models\Enrollment;
 use Modules\Schemes\Models\CourseAdmin;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Str;
 
 class UserManagementService implements UserManagementServiceInterface
 {
@@ -35,7 +33,7 @@ class UserManagementService implements UserManagementServiceInterface
 
     public function listUsersForIndex(User $authUser, int $perPage = 15, ?string $search = null): LengthAwarePaginator
     {
-        if (!$authUser->can('viewAny', User::class)) {
+        if (! $authUser->can('viewAny', User::class)) {
             throw new AuthorizationException(__('messages.unauthorized'));
         }
 
@@ -48,7 +46,7 @@ class UserManagementService implements UserManagementServiceInterface
             $query->whereIn('id', $ids);
         }
 
-        if ($authUser->hasRole('Admin') && !$authUser->hasRole('Superadmin')) {
+        if ($authUser->hasRole('Admin') && ! $authUser->hasRole('Superadmin')) {
             $managedCourseIds = CourseAdmin::query()
                 ->where('user_id', $authUser->id)
                 ->pluck('course_id')
@@ -58,32 +56,32 @@ class UserManagementService implements UserManagementServiceInterface
                 $q->whereHas('roles', function ($roleQuery) {
                     $roleQuery->where('name', 'Admin');
                 })
-                ->orWhere(function ($subQuery) use ($managedCourseIds) {
-                    $subQuery->whereHas('roles', function ($roleQuery) {
-                        $roleQuery->whereIn('name', ['Instructor', 'Student']);
-                    })
-                    ->whereHas('enrollments', function ($enrollmentQuery) use ($managedCourseIds) {
-                        $enrollmentQuery->whereIn('course_id', $managedCourseIds);
+                    ->orWhere(function ($subQuery) use ($managedCourseIds) {
+                        $subQuery->whereHas('roles', function ($roleQuery) {
+                            $roleQuery->whereIn('name', ['Instructor', 'Student']);
+                        })
+                            ->whereHas('enrollments', function ($enrollmentQuery) use ($managedCourseIds) {
+                                $enrollmentQuery->whereIn('course_id', $managedCourseIds);
+                            });
                     });
-                });
             });
         }
 
         return $query->allowedFilters([
-                AllowedFilter::exact('status'),
-                AllowedFilter::callback('role', function (Builder $query, $value) {
-                    $roles = is_array($value)
-                      ? $value
-                      : Str::of($value)->explode(',')->map(fn ($r) => trim($r))->toArray();
-                    $query->whereHas('roles', fn ($q) => $q->whereIn('name', $roles));
-                }),
-                AllowedFilter::callback('search', function (Builder $query, $value) {
-                    if (is_string($value) && trim($value) !== '') {
-                        $ids = User::search($value)->keys()->toArray();
-                        $query->whereIn($query->getModel()->getTable().'.id', $ids);
-                    }
-                }),
-            ])
+            AllowedFilter::exact('status'),
+            AllowedFilter::callback('role', function (Builder $query, $value) {
+                $roles = is_array($value)
+                  ? $value
+                  : Str::of($value)->explode(',')->map(fn ($r) => trim($r))->toArray();
+                $query->whereHas('roles', fn ($q) => $q->whereIn('name', $roles));
+            }),
+            AllowedFilter::callback('search', function (Builder $query, $value) {
+                if (is_string($value) && trim($value) !== '') {
+                    $ids = User::search($value)->keys()->toArray();
+                    $query->whereIn($query->getModel()->getTable().'.id', $ids);
+                }
+            }),
+        ])
             ->allowedSorts(['name', 'email', 'username', 'status', 'created_at'])
             ->defaultSort('-created_at')
             ->paginate($perPage);
@@ -91,15 +89,13 @@ class UserManagementService implements UserManagementServiceInterface
 
     public function showUser(User $authUser, int $userId): User
     {
-        
         $target = $this->cacheService->getUser($userId);
-        
-        if (!$target) {
+
+        if (! $target) {
             $target = User::findOrFail($userId);
         }
-        
-        
-        if (!$authUser->can('view', $target)) {
+
+        if (! $authUser->can('view', $target)) {
             throw new AuthorizationException(__('messages.auth.no_access_to_user'));
         }
 
@@ -125,10 +121,9 @@ class UserManagementService implements UserManagementServiceInterface
         return DB::transaction(function () use ($user, $status) {
             $user->status = UserStatus::from($status);
             $user->save();
-            
-            
+
             $this->cacheService->invalidateUser($user->id);
-            
+
             return $user->fresh();
         });
     }
@@ -143,9 +138,8 @@ class UserManagementService implements UserManagementServiceInterface
             ]);
         }
 
-        if (!$authUser->hasRole('Superadmin')) {
-            
-            
+        if (! $authUser->hasRole('Superadmin')) {
+
             if ($user->hasRole('Superadmin')) {
                 throw new AuthorizationException(__('messages.forbidden'));
             }
@@ -158,22 +152,20 @@ class UserManagementService implements UserManagementServiceInterface
     {
         $role = $validated['role'];
 
-        
         if ($role === config('auth.default_role', 'Student')) {
             throw \Illuminate\Validation\ValidationException::withMessages([
                 'role' => [__('messages.auth.student_creation_forbidden')],
             ]);
         }
 
-        
-        if ($authUser->hasRole('Admin') && !$authUser->hasRole('Superadmin')) {
-            
-            if (!in_array($role, ['Admin', 'Instructor'])) {
+        if ($authUser->hasRole('Admin') && ! $authUser->hasRole('Superadmin')) {
+
+            if (! in_array($role, ['Admin', 'Instructor'])) {
                 throw new AuthorizationException(__('messages.forbidden'));
             }
         } elseif ($authUser->hasRole('Superadmin')) {
-            
-            if (!in_array($role, ['Superadmin', 'Admin', 'Instructor'])) {
+
+            if (! in_array($role, ['Superadmin', 'Admin', 'Instructor'])) {
                 throw new AuthorizationException(__('messages.forbidden'));
             }
         } else {
@@ -183,12 +175,10 @@ class UserManagementService implements UserManagementServiceInterface
         $passwordPlain = Str::random(12);
         unset($validated['role']);
         $validated['password'] = \Illuminate\Support\Facades\Hash::make($passwordPlain);
-        
+
         $user = $this->authRepository->createUser($validated + ['is_password_set' => false]);
         $user->assignRole($role);
 
-        
-        
         return $user;
     }
 
@@ -203,16 +193,10 @@ class UserManagementService implements UserManagementServiceInterface
                 }
             }
 
-            
-            
-            
-            
-            
-            
             $user->save();
-            
-            if (!empty($changes)) {
-                 dispatch(new \App\Jobs\CreateAuditJob([
+
+            if (! empty($changes)) {
+                dispatch(new \App\Jobs\CreateAuditJob([
                     'action' => 'update',
                     'user_id' => $user->id,
                     'module' => 'Auth',
@@ -221,10 +205,10 @@ class UserManagementService implements UserManagementServiceInterface
                     'meta' => ['action' => 'profile.update', 'changes' => $changes],
                     'logged_at' => now(),
                     'ip_address' => $ip,
-                    'user_agent' => $userAgent
+                    'user_agent' => $userAgent,
                 ]));
             }
-            
+
             return $user->fresh();
         });
     }
