@@ -26,373 +26,312 @@ use Spatie\Sluggable\SlugOptions;
 
 class Course extends Model implements HasMedia
 {
-  use HasFactory, HasSlug, InteractsWithMedia, LogsActivity, Searchable, SoftDeletes;
+    use HasFactory, HasSlug, InteractsWithMedia, LogsActivity, Searchable, SoftDeletes;
 
-  public function registerMediaCollections(): void
-  {
-    $this->addMediaCollection("thumbnail")
-      ->singleFile()
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('thumbnail')
+            ->singleFile()
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp']);
 
-      ->acceptsMimeTypes(["image/jpeg", "image/png", "image/webp"]);
-
-    $this->addMediaCollection("banner")
-      ->singleFile()
-
-      ->acceptsMimeTypes(["image/jpeg", "image/png", "image/webp"]);
-  }
-
-  public function registerMediaConversions(?Media $media = null): void
-  {
-    $this->addMediaConversion("thumb")
-      ->width(400)
-      ->height(225)
-      ->sharpen(10)
-      ->performOnCollections("thumbnail", "banner");
-
-    $this->addMediaConversion("medium")
-      ->width(800)
-      ->height(450)
-      ->performOnCollections("thumbnail", "banner");
-
-    $this->addMediaConversion("large")->width(1920)->height(1080)->performOnCollections("banner");
-
-    // Mobile-optimized sizes
-    $this->addMediaConversion("mobile")->width(320)->height(180)->performOnCollections("thumbnail");
-
-    $this->addMediaConversion("tablet")->width(600)->height(338)->performOnCollections("thumbnail");
-  }
-
-  public function getSlugOptions(): SlugOptions
-  {
-    return SlugOptions::create()
-      ->generateSlugsFrom("title")
-      ->saveSlugsTo("slug")
-      ->doNotGenerateSlugsOnUpdate();
-  }
-
-  public function getActivitylogOptions(): LogOptions
-  {
-    return LogOptions::defaults()
-      ->logAll()
-      ->logOnlyDirty()
-      ->dontSubmitEmptyLogs()
-      ->setDescriptionForEvent(
-        fn(string $eventName) => match ($eventName) {
-          "created" => "Course baru telah dibuat",
-          "updated" => "Course telah diperbarui",
-          "deleted" => "Course telah dihapus",
-          default => "Course {$eventName}",
-        },
-      );
-  }
-
-  protected array $searchable = ["title", "short_desc"];
-
-  protected $fillable = [
-    "code",
-    "slug",
-    "title",
-    "short_desc",
-    "type",
-    "level_tag",
-    "category_id",
-    "tags_json",
-    "prereq_text",
-    "duration_estimate",
-    "progression_mode",
-    "enrollment_type",
-    "enrollment_key", // Virtual attribute
-    "enrollment_key_hash",
-    "status",
-    "published_at",
-    "instructor_id",
-  ];
-
-  protected $guarded = [
-    "deleted_by", // Should only be set automatically during soft delete
-  ];
-
-  protected $casts = [
-    "tags_json" => "array",
-    "published_at" => "datetime",
-    "status" => CourseStatus::class,
-    "type" => CourseType::class,
-    "level_tag" => LevelTag::class,
-    "enrollment_type" => EnrollmentType::class,
-    "progression_mode" => ProgressionMode::class,
-  ];
-
-    protected $appends = ["tag_list"];
-
-  protected $hidden = ["enrollment_key_hash", "deleted_at"];
-
-  public function getThumbnailUrlAttribute(): ?string
-  {
-    $media = $this->getFirstMedia("thumbnail");
-
-    return $media?->getUrl();
-  }
-
-  public function getThumbnailThumbUrlAttribute(): ?string
-  {
-    $media = $this->getFirstMedia("thumbnail");
-
-    return $media?->getUrl("thumb");
-  }
-
-  public function getBannerUrlAttribute(): ?string
-  {
-    $media = $this->getFirstMedia("banner");
-
-    return $media?->getUrl();
-  }
-
-  public function getBannerLargeUrlAttribute(): ?string
-  {
-    $media = $this->getFirstMedia("banner");
-
-    return $media?->getUrl("large");
-  }
-
-  /**
-   * Get thumbnail URL efficiently when media is already loaded
-   */
-  public function getThumbnailUrlEfficient(): string
-  {
-    if ($this->relationLoaded('media')) {
-      $thumbnailMedia = $this->media->where('collection_name', 'thumbnail')->first();
-      return $thumbnailMedia ? $thumbnailMedia->getUrl() : '';
-    }
-    return $this->getThumbnailUrlAttribute() ?? '';
-  }
-
-  /**
-   * Get banner URL efficiently when media is already loaded
-   */
-  public function getBannerUrlEfficient(): string
-  {
-    if ($this->relationLoaded('media')) {
-      $bannerMedia = $this->media->where('collection_name', 'banner')->first();
-      return $bannerMedia ? $bannerMedia->getUrl() : '';
-    }
-    return $this->getBannerUrlAttribute() ?? '';
-  }
-
-  /**
-   * Get media URLs without triggering additional queries
-   * This method fetches media URLs efficiently by using a single query
-   */
-  /**
-   * Scope to add media URLs to the query results
-   */
-  public function scopeWithMediaUrls($query)
-  {
-    return $query->addSelect([
-      'thumbnail_url' => \Spatie\MediaLibrary\MediaCollections\Models\Media::selectRaw('CONCAT("/storage/", directory, "/", file_name)')
-        ->whereColumn('model_id', 'courses.id')
-        ->where('model_type', static::class)
-        ->where('collection_name', 'thumbnail')
-        ->limit(1),
-      'banner_url' => \Spatie\MediaLibrary\MediaCollections\Models\Media::selectRaw('CONCAT("/storage/", directory, "/", file_name)')
-        ->whereColumn('model_id', 'courses.id')
-        ->where('model_type', static::class)
-        ->where('collection_name', 'banner')
-        ->limit(1),
-    ]);
-  }
-
-  public function tagPivot(): HasMany
-  {
-    return $this->hasMany(CourseTag::class, "course_id");
-  }
-
-  public function tags(): BelongsToMany
-  {
-    return $this->belongsToMany(
-      Tag::class,
-      "course_tag_pivot",
-      "course_id",
-      "tag_id",
-    )->withTimestamps();
-  }
-
-  public function units(): HasMany
-  {
-    return $this->hasMany(Unit::class);
-  }
-
-  /**
-   * Get the instructor of the course.
-   */
-  public function instructor(): BelongsTo
-  {
-    return $this->belongsTo(\Modules\Auth\Models\User::class, "instructor_id");
-  }
-
-  /**
-   * Get the creator of the course (the first admin who was assigned).
-   */
-  public function getCreatorAttribute()
-  {
-    if ($this->relationLoaded('admins')) {
-      return $this->admins->sortBy('pivot.created_at')->first();
+        $this->addMediaCollection('banner')
+            ->singleFile()
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp']);
     }
 
-    return $this->admins()->orderBy('course_admins.created_at', 'asc')->first();
-  }
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $this->addMediaConversion('thumb')
+            ->width(400)
+            ->height(225)
+            ->sharpen(10)
+            ->performOnCollections('thumbnail', 'banner');
 
-  /**
-   * Get the user who deleted the course.
-   */
-  public function deletedBy(): BelongsTo
-  {
-    return $this->belongsTo(\Modules\Auth\Models\User::class, "deleted_by");
-  }
+        $this->addMediaConversion('medium')
+            ->width(800)
+            ->height(450)
+            ->performOnCollections('thumbnail', 'banner');
 
-  /**
-   * Get the admins of the course (many-to-many through course_admins pivot).
-   */
-  public function admins(): BelongsToMany
-  {
-    return $this->belongsToMany(
-      \Modules\Auth\Models\User::class,
-      "course_admins",
-      "course_id",
-      "user_id",
-    )->withTimestamps();
-  }
+        $this->addMediaConversion('large')->width(1920)->height(1080)->performOnCollections('banner');
 
-  /**
-   * Get the course admins pivot records.
-   */
-  public function courseAdmins(): HasMany
-  {
-    return $this->hasMany(\Modules\Schemes\Models\CourseAdmin::class);
-  }
+        $this->addMediaConversion('mobile')->width(320)->height(180)->performOnCollections('thumbnail');
 
-  /**
-   * Check if a user is an admin of this course.
-   */
-  public function hasAdmin($user): bool
-  {
-    return $this->admins()
-      ->where("user_id", is_object($user) ? $user->id : $user)
-      ->exists();
-  }
-
-  /**
-   * Check if a user is the instructor of this course.
-   */
-  public function hasInstructor($user): bool
-  {
-    return $this->instructor_id === (is_object($user) ? $user->id : $user);
-  }
-
-  public function getRouteKeyName(): string
-  {
-    return "slug";
-  }
-
-  public function getTagListAttribute(): array
-  {
-    if ($this->relationLoaded("tags")) {
-      return $this->tags->pluck("name")->unique()->values()->toArray();
+        $this->addMediaConversion('tablet')->width(600)->height(338)->performOnCollections('thumbnail');
     }
 
-    if (is_array($this->tags_json)) {
-      return $this->tags_json;
+    public function getSlugOptions(): SlugOptions
+    {
+        return SlugOptions::create()
+            ->generateSlugsFrom('title')
+            ->saveSlugsTo('slug')
+            ->doNotGenerateSlugsOnUpdate();
     }
 
-    return [];
-  }
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(
+                fn (string $eventName) => match ($eventName) {
+                    'created' => 'Course baru telah dibuat',
+                    'updated' => 'Course telah diperbarui',
+                    'deleted' => 'Course telah dihapus',
+                    default => "Course {$eventName}",
+                },
+            );
+    }
 
-  /**
-   * Virtual enrollment_key accessor for backward compatibility
-   * Returns null since we now use enrollment_key_hash
-   */
-  public function getEnrollmentKeyAttribute(): ?string
-  {
-    // Since migration dropped enrollment_key column and we use hash now,
-    // return null. Tests should not set this directly.
-    return null;
-  }
+    protected array $searchable = ['title', 'short_desc'];
 
-    /**
-     * Virtual setter for enrollment_key - hashes the plain key and stores in enrollment_key_hash.
-     * Since migration dropped enrollment_key column and uses enrollment_key_hash instead.
-     */
+    protected $fillable = [
+        'code',
+        'slug',
+        'title',
+        'short_desc',
+        'type',
+        'level_tag',
+        'category_id',
+        'tags_json',
+        'prereq_text',
+        'duration_estimate',
+        'progression_mode',
+        'enrollment_type',
+        'enrollment_key',
+        'enrollment_key_hash',
+        'status',
+        'published_at',
+        'instructor_id',
+    ];
+
+    protected $guarded = [
+        'deleted_by',
+    ];
+
+    protected $casts = [
+        'tags_json' => 'array',
+        'published_at' => 'datetime',
+        'status' => CourseStatus::class,
+        'type' => CourseType::class,
+        'level_tag' => LevelTag::class,
+        'enrollment_type' => EnrollmentType::class,
+        'progression_mode' => ProgressionMode::class,
+    ];
+
+    protected $appends = ['tag_list'];
+
+    protected $hidden = ['enrollment_key_hash', 'deleted_at'];
+
+    public function getThumbnailUrlAttribute(): ?string
+    {
+        $media = $this->getFirstMedia('thumbnail');
+
+        return $media?->getUrl();
+    }
+
+    public function getThumbnailThumbUrlAttribute(): ?string
+    {
+        $media = $this->getFirstMedia('thumbnail');
+
+        return $media?->getUrl('thumb');
+    }
+
+    public function getBannerUrlAttribute(): ?string
+    {
+        $media = $this->getFirstMedia('banner');
+
+        return $media?->getUrl();
+    }
+
+    public function getBannerLargeUrlAttribute(): ?string
+    {
+        $media = $this->getFirstMedia('banner');
+
+        return $media?->getUrl('large');
+    }
+
+    public function getThumbnailUrlEfficient(): string
+    {
+        if ($this->relationLoaded('media')) {
+            $thumbnailMedia = $this->media->where('collection_name', 'thumbnail')->first();
+
+            return $thumbnailMedia ? $thumbnailMedia->getUrl() : '';
+        }
+
+        return $this->getThumbnailUrlAttribute() ?? '';
+    }
+
+    public function getBannerUrlEfficient(): string
+    {
+        if ($this->relationLoaded('media')) {
+            $bannerMedia = $this->media->where('collection_name', 'banner')->first();
+
+            return $bannerMedia ? $bannerMedia->getUrl() : '';
+        }
+
+        return $this->getBannerUrlAttribute() ?? '';
+    }
+
+    public function scopeWithMediaUrls($query)
+    {
+        return $query->addSelect([
+            'thumbnail_url' => \Spatie\MediaLibrary\MediaCollections\Models\Media::selectRaw('CONCAT("/storage/", directory, "/", file_name)')
+                ->whereColumn('model_id', 'courses.id')
+                ->where('model_type', static::class)
+                ->where('collection_name', 'thumbnail')
+                ->limit(1),
+            'banner_url' => \Spatie\MediaLibrary\MediaCollections\Models\Media::selectRaw('CONCAT("/storage/", directory, "/", file_name)')
+                ->whereColumn('model_id', 'courses.id')
+                ->where('model_type', static::class)
+                ->where('collection_name', 'banner')
+                ->limit(1),
+        ]);
+    }
+
+    public function tagPivot(): HasMany
+    {
+        return $this->hasMany(CourseTag::class, 'course_id');
+    }
+
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Tag::class,
+            'course_tag_pivot',
+            'course_id',
+            'tag_id',
+        )->withTimestamps();
+    }
+
+    public function units(): HasMany
+    {
+        return $this->hasMany(Unit::class);
+    }
+
+    public function instructor(): BelongsTo
+    {
+        return $this->belongsTo(\Modules\Auth\Models\User::class, 'instructor_id');
+    }
+
+    public function getCreatorAttribute()
+    {
+        if ($this->relationLoaded('admins')) {
+            return $this->admins->sortBy('pivot.created_at')->first();
+        }
+
+        return $this->admins()->orderBy('course_admins.created_at', 'asc')->first();
+    }
+
+    public function deletedBy(): BelongsTo
+    {
+        return $this->belongsTo(\Modules\Auth\Models\User::class, 'deleted_by');
+    }
+
+    public function admins(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            \Modules\Auth\Models\User::class,
+            'course_admins',
+            'course_id',
+            'user_id',
+        )->withTimestamps();
+    }
+
+    public function courseAdmins(): HasMany
+    {
+        return $this->hasMany(\Modules\Schemes\Models\CourseAdmin::class);
+    }
+
+    public function hasAdmin($user): bool
+    {
+        return $this->admins()
+            ->where('user_id', is_object($user) ? $user->id : $user)
+            ->exists();
+    }
+
+    public function hasInstructor($user): bool
+    {
+        return $this->instructor_id === (is_object($user) ? $user->id : $user);
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
+    public function getTagListAttribute(): array
+    {
+        if ($this->relationLoaded('tags')) {
+            return $this->tags->pluck('name')->unique()->values()->toArray();
+        }
+
+        if (is_array($this->tags_json)) {
+            return $this->tags_json;
+        }
+
+        return [];
+    }
+
+    public function getEnrollmentKeyAttribute(): ?string
+    {
+        return null;
+    }
+
     public function setEnrollmentKeyAttribute($value): void
     {
         if ($value === null) {
-            // Clear the hash if null
             $this->attributes['enrollment_key_hash'] = null;
         } else {
-            // Hash the plain key and store it
             $hasher = app(\App\Contracts\EnrollmentKeyHasherInterface::class);
             $this->attributes['enrollment_key_hash'] = $hasher->hash($value);
         }
     }
 
-  public function category(): BelongsTo
-  {
-    return $this->belongsTo(\Modules\Common\Models\Category::class, "category_id");
-  }
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(\Modules\Common\Models\Category::class, 'category_id');
+    }
 
-  /**
-   * Get the outcomes for this course.
-   */
-  public function outcomes(): HasMany
-  {
-    return $this->hasMany(CourseOutcome::class)->orderBy("order");
-  }
+    public function outcomes(): HasMany
+    {
+        return $this->hasMany(CourseOutcome::class)->orderBy('order');
+    }
 
-  /**
-   * Get the indexable data array for the model.
-   */
-  public function toSearchableArray(): array
-  {
-    // Load relationships if not already loaded
-    $this->loadMissing(["category", "instructor", "tags"]);
+    public function toSearchableArray(): array
+    {
+        $this->loadMissing(['category', 'instructor', 'tags']);
 
-    return [
-      "id" => $this->id,
-      "title" => $this->title,
-      "short_desc" => $this->short_desc,
-      "code" => $this->code,
-      "level_tag" => $this->level_tag?->value,
-    "category_id" => $this->category_id,
-    "category_name" => $this->category?->name,
-    "instructor_id" => $this->instructor_id,
-    "instructor_name" => $this->instructor?->name,
-    "tags" => $this->tags->pluck("name")->toArray(),
-    "status" => $this->status?->value,
-    "type" => $this->type?->value,
-      "duration_estimate" => $this->duration_estimate,
-      "published_at" => $this->published_at?->timestamp,
-    ];
-  }
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'short_desc' => $this->short_desc,
+            'code' => $this->code,
+            'level_tag' => $this->level_tag?->value,
+            'category_id' => $this->category_id,
+            'category_name' => $this->category?->name,
+            'instructor_id' => $this->instructor_id,
+            'instructor_name' => $this->instructor?->name,
+            'tags' => $this->tags->pluck('name')->toArray(),
+            'status' => $this->status?->value,
+            'type' => $this->type?->value,
+            'duration_estimate' => $this->duration_estimate,
+            'published_at' => $this->published_at?->timestamp,
+        ];
+    }
 
-  /**
-   * Get the name of the index associated with the model.
-   */
-  public function searchableAs(): string
-  {
-    return "courses_index";
-  }
+    public function searchableAs(): string
+    {
+        return 'courses_index';
+    }
 
-  /**
-   * Determine if the model should be searchable.
-   */
-  public function shouldBeSearchable(): bool
-  {
-    return $this->status === CourseStatus::Published;
-  }
+    public function shouldBeSearchable(): bool
+    {
+        return $this->status === CourseStatus::Published;
+    }
 
-  /**
-   * Create a new factory instance for the model.
-   */
-  protected static function newFactory()
-  {
-    return \Modules\Schemes\Database\Factories\CourseFactory::new();
-  }
+    protected static function newFactory()
+    {
+        return \Modules\Schemes\Database\Factories\CourseFactory::new();
+    }
 }

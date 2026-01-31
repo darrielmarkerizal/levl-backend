@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Modules\Schemes\Services;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
@@ -20,7 +19,7 @@ class TagService
     use \App\Support\Traits\BuildsQueryBuilderRequest;
 
     public function __construct(
-        private TagRepositoryInterface $repository
+        private readonly TagRepositoryInterface $repository
     ) {}
 
     public function list(array $filters = [], int $perPage = 0): LengthAwarePaginator|Collection
@@ -70,7 +69,6 @@ class TagService
         return $this->create($data);
     }
 
-    
     public function createMany(array $names): BaseCollection
     {
         return BaseCollection::make($names)
@@ -153,14 +151,13 @@ class TagService
             ->where('slug', $slug)
             ->exists();
 
-        if (!$exists) {
+        if (! $exists) {
             return $slug;
         }
 
         return $this->findUniqueSlug($base, "{$base}-{$counter}", $counter + 1, $ignoreId);
     }
 
-    
     private function resolveTagIds(array $tags): array
     {
         return BaseCollection::make($tags)

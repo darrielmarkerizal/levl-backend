@@ -12,33 +12,10 @@ use Modules\Schemes\Models\Unit;
 
 class UnitRepository extends BaseRepository implements UnitRepositoryInterface
 {
-    /**
-     * Allowed filter keys.
-     *
-     * @var array<int, string>
-     */
-    protected array $allowedFilters = [
-        'status',
-    ];
+    protected array $allowedFilters = ['status'];
 
-    /**
-     * Allowed sort fields.
-     *
-     * @var array<int, string>
-     */
-    protected array $allowedSorts = [
-        'id',
-        'code',
-        'title',
-        'order',
-        'status',
-        'created_at',
-        'updated_at',
-    ];
+    protected array $allowedSorts = ['id', 'code', 'title', 'order', 'status', 'created_at', 'updated_at'];
 
-    /**
-     * Default sort field.
-     */
     protected string $defaultSort = 'order';
 
     protected function model(): string

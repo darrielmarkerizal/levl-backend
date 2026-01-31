@@ -26,7 +26,7 @@ class UnitService
     public function validateHierarchy(int $courseId, int $unitId): void
     {
         $unit = Unit::findOrFail($unitId);
-        
+
         if ((int) $unit->course_id !== $courseId) {
             throw new \Illuminate\Database\Eloquent\ModelNotFoundException(__('messages.units.not_in_course'));
         }
@@ -69,7 +69,6 @@ class UnitService
             }
 
             if (isset($attributes['order'])) {
-                
                 Unit::where('course_id', $courseId)
                     ->where('order', '>=', $attributes['order'])
                     ->increment('order');
@@ -90,20 +89,19 @@ class UnitService
             $unit = $this->repository->findByIdOrFail($id);
             $attributes = $data instanceof UpdateUnitDTO ? $data->toArrayWithoutNull() : $data;
 
-            
             if (isset($attributes['order']) && $attributes['order'] != $unit->order) {
                 $newOrder = $attributes['order'];
                 $currentOrder = $unit->order;
                 $courseId = $unit->course_id;
 
                 if ($newOrder < $currentOrder) {
-                    
+
                     Unit::where('course_id', $courseId)
                         ->where('order', '>=', $newOrder)
                         ->where('order', '<', $currentOrder)
                         ->increment('order');
                 } elseif ($newOrder > $currentOrder) {
-                    
+
                     Unit::where('course_id', $courseId)
                         ->where('order', '>', $currentOrder)
                         ->where('order', '<=', $newOrder)
@@ -127,7 +125,7 @@ class UnitService
             $deleted = $this->repository->delete($unit);
 
             if ($deleted) {
-                
+
                 Unit::where('course_id', $courseId)
                     ->where('order', '>', $deletedOrder)
                     ->decrement('order');
@@ -142,20 +140,16 @@ class UnitService
         return \Illuminate\Support\Facades\DB::transaction(function () use ($courseId, $data) {
             $unitIds = array_map('intval', $data['units']);
 
-            
             if (count($unitIds) !== count(array_unique($unitIds))) {
                 throw new \InvalidArgumentException(__('messages.units.duplicate_ids'));
             }
 
-            
             $allUnits = Unit::where('course_id', $courseId)->pluck('id')->toArray();
 
-            
             if (count($unitIds) !== count($allUnits) || array_diff($allUnits, $unitIds)) {
                 throw new \InvalidArgumentException(__('messages.units.must_include_all'));
             }
 
-            
             $count = Unit::whereIn('id', $unitIds)
                 ->where('course_id', $courseId)
                 ->count();
@@ -168,7 +162,6 @@ class UnitService
                 $this->repository->updateOrder($unitId, $index + 1);
             }
 
-            
             $this->cacheService->invalidateCourse($courseId);
 
             return true;
@@ -179,8 +172,7 @@ class UnitService
     {
         $unit = $this->repository->findByIdOrFail($id);
         $unit->update(['status' => 'published']);
-        
-        
+
         $this->cacheService->invalidateCourse($unit->course_id);
 
         return $unit->fresh();
@@ -190,8 +182,7 @@ class UnitService
     {
         $unit = $this->repository->findByIdOrFail($id);
         $unit->update(['status' => 'draft']);
-        
-        
+
         $this->cacheService->invalidateCourse($unit->course_id);
 
         return $unit->fresh();

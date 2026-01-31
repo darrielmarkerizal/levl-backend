@@ -16,9 +16,6 @@ class Unit extends Model
 {
     use HasFactory, HasSlug, LogsActivity, Searchable;
 
-    /**
-     * Get the options for generating the slug.
-     */
     public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()
@@ -27,9 +24,6 @@ class Unit extends Model
             ->doNotGenerateSlugsOnUpdate();
     }
 
-    /**
-     * Get activity log options for this model.
-     */
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
@@ -68,9 +62,6 @@ class Unit extends Model
         return 'slug';
     }
 
-    /**
-     * Get the indexable data array for the model.
-     */
     public function toSearchableArray(): array
     {
         $this->loadMissing('course');
@@ -86,25 +77,16 @@ class Unit extends Model
         ];
     }
 
-    /**
-     * Get the name of the index associated with the model.
-     */
     public function searchableAs(): string
     {
         return 'units_index';
     }
 
-    /**
-     * Determine if the model should be searchable.
-     */
     public function shouldBeSearchable(): bool
     {
         return $this->status === 'published';
     }
 
-    /**
-     * Create a new factory instance for the model.
-     */
     protected static function newFactory()
     {
         return \Modules\Schemes\Database\Factories\UnitFactory::new();
