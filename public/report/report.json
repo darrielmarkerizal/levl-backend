@@ -130,7 +130,9 @@
             "Modules\\Learning\\Http\\Requests\\StoreAssignmentRequest",
             "Modules\\Learning\\Jobs\\ProcessFileUploadJob",
             "Modules\\Learning\\Services\\QuestionService",
-            "Modules\\Learning\\Services\\AssignmentService",
+            "Modules\\Learning\\Services\\Support\\AssignmentFinder",
+            "Modules\\Learning\\Services\\Support\\AssignmentOverrideProcessor",
+            "Modules\\Learning\\Services\\Support\\AssignmentPrerequisiteProcessor",
             "Modules\\Content\\Repositories\\ContentStatisticsRepository",
             "Modules\\Content\\Models\\ContentRead",
             "Modules\\Content\\Models\\ContentRevision",
@@ -143,7 +145,7 @@
             "Modules\\Common\\Models\\SystemSetting",
             "Modules\\Common\\Models\\AuditLog",
             "Modules\\Common\\Services\\MasterDataService",
-            "anonymous@00000000000039ce0000000000000000",
+            "anonymous@00000000000039c00000000000000000",
             "Modules\\Notifications\\Jobs\\SendNotificationJob"
         ],
         "incoming_package_dependencies": [
@@ -172,6 +174,7 @@
             "Modules\\Learning\\Http\\Requests\\",
             "Modules\\Learning\\Jobs\\",
             "Modules\\Learning\\Services\\",
+            "Modules\\Learning\\Services\\Support\\",
             "Modules\\Content\\Repositories\\",
             "Modules\\Content\\Models\\",
             "Modules\\Content\\Exceptions\\",
@@ -182,10 +185,10 @@
             "Modules\\Notifications\\Jobs\\"
         ],
         "abstraction": 0,
-        "instability": 0.03508771929824561,
+        "instability": 0.03389830508474576,
         "dependent_instabilities": [],
-        "distance": 0.6822960169343879,
-        "normalized_distance": 0.9649122807017544,
+        "distance": 0.6831370597903933,
+        "normalized_distance": 0.9661016949152542,
         "violations": {},
         "_type": "Hal\\Metric\\PackageMetric"
     },
@@ -500,8 +503,8 @@
         "abstraction": 0,
         "instability": 1,
         "dependent_instabilities": {
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
-            "Modules\\Schemes\\Models\\": 0.11764705882352941,
+            "Modules\\Auth\\Models\\": 0.06,
+            "Modules\\Schemes\\Models\\": 0.11650485436893204,
             "Modules\\Forums\\Models\\": 0.3
         },
         "distance": 0,
@@ -690,8 +693,8 @@
         "abstraction": 0,
         "instability": 0.6666666666666666,
         "dependent_instabilities": {
-            "Modules\\Schemes\\Models\\": 0.11764705882352941,
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
+            "Modules\\Schemes\\Models\\": 0.11650485436893204,
+            "Modules\\Auth\\Models\\": 0.06,
             "Modules\\Forums\\Models\\": 0.3
         },
         "distance": 0.23570226039551584,
@@ -1295,7 +1298,7 @@
         "instability": 0.5,
         "dependent_instabilities": {
             "Modules\\Forums\\Models\\": 0.3,
-            "Modules\\Auth\\Models\\": 0.06040268456375839
+            "Modules\\Auth\\Models\\": 0.06
         },
         "distance": 0.35355339059327373,
         "normalized_distance": 0.5,
@@ -2507,7 +2510,7 @@
         "instability": 0.3,
         "dependent_instabilities": {
             "Modules\\Forums\\Database\\Factories\\": 0.6666666666666666,
-            "\\": 0.03508771929824561
+            "\\": 0.03389830508474576
         },
         "distance": 0.4949747468305832,
         "normalized_distance": 0.7,
@@ -3084,10 +3087,10 @@
         "abstraction": 0,
         "instability": 1,
         "dependent_instabilities": {
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
+            "Modules\\Auth\\Models\\": 0.06,
             "Modules\\Forums\\Models\\": 0.3,
             "Modules\\Enrollments\\Models\\": 0.10810810810810811,
-            "Modules\\Schemes\\Models\\": 0.11764705882352941
+            "Modules\\Schemes\\Models\\": 0.11650485436893204
         },
         "distance": 0,
         "normalized_distance": 0,
@@ -3612,9 +3615,9 @@
         "abstraction": 0,
         "instability": 1,
         "dependent_instabilities": {
-            "\\": 0.03508771929824561,
+            "\\": 0.03389830508474576,
             "Modules\\Enrollments\\Models\\": 0.10810810810810811,
-            "Modules\\Schemes\\Models\\": 0.11764705882352941
+            "Modules\\Schemes\\Models\\": 0.11650485436893204
         },
         "distance": 0,
         "normalized_distance": 0,
@@ -5340,9 +5343,9 @@
             "Modules\\Forums\\Contracts\\Services\\": 0.5,
             "Modules\\Forums\\Repositories\\": 0.6470588235294118,
             "Modules\\Forums\\Models\\": 0.3,
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
+            "Modules\\Auth\\Models\\": 0.06,
             "Modules\\Forums\\Events\\": 0.3,
-            "\\": 0.03508771929824561
+            "\\": 0.03389830508474576
         },
         "distance": 0.0614875461901346,
         "normalized_distance": 0.08695652173913049,
@@ -7336,9 +7339,9 @@
         "abstraction": 0,
         "instability": 1,
         "dependent_instabilities": {
-            "Modules\\Schemes\\Models\\": 0.11764705882352941,
-            "\\": 0.03508771929824561,
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
+            "Modules\\Schemes\\Models\\": 0.11650485436893204,
+            "\\": 0.03389830508474576,
+            "Modules\\Auth\\Models\\": 0.06,
             "Modules\\Common\\Models\\": 0.30303030303030304
         },
         "distance": 0,
@@ -7881,8 +7884,8 @@
         "abstraction": 0,
         "instability": 0.75,
         "dependent_instabilities": {
-            "Modules\\Schemes\\Models\\": 0.11764705882352941,
-            "Modules\\Auth\\Models\\": 0.06040268456375839
+            "Modules\\Schemes\\Models\\": 0.11650485436893204,
+            "Modules\\Auth\\Models\\": 0.06
         },
         "distance": 0.17677669529663687,
         "normalized_distance": 0.25,
@@ -8577,8 +8580,8 @@
         "abstraction": 0,
         "instability": 0.8,
         "dependent_instabilities": {
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
-            "Modules\\Schemes\\Models\\": 0.11764705882352941,
+            "Modules\\Auth\\Models\\": 0.06,
+            "Modules\\Schemes\\Models\\": 0.11650485436893204,
             "Modules\\Enrollments\\Models\\": 0.10810810810810811
         },
         "distance": 0.14142135623730948,
@@ -8670,7 +8673,7 @@
         "abstraction": 1,
         "instability": 0.26666666666666666,
         "dependent_instabilities": {
-            "Modules\\Schemes\\Models\\": 0.11764705882352941
+            "Modules\\Schemes\\Models\\": 0.11650485436893204
         },
         "distance": 0.18856180831641262,
         "normalized_distance": 0.2666666666666666,
@@ -9056,7 +9059,7 @@
         "abstraction": 1,
         "instability": 0.6666666666666666,
         "dependent_instabilities": {
-            "Modules\\Schemes\\Models\\": 0.11764705882352941,
+            "Modules\\Schemes\\Models\\": 0.11650485436893204,
             "Modules\\Schemes\\Contracts\\Repositories\\": 0.26666666666666666,
             "Modules\\Schemes\\Repositories\\": 0.9375
         },
@@ -9734,7 +9737,7 @@
         "instability": 0.9375,
         "dependent_instabilities": {
             "Modules\\Schemes\\Contracts\\Repositories\\": 0.26666666666666666,
-            "Modules\\Schemes\\Models\\": 0.11764705882352941
+            "Modules\\Schemes\\Models\\": 0.11650485436893204
         },
         "distance": 0.044194173824159216,
         "normalized_distance": 0.0625,
@@ -10328,7 +10331,8 @@
             "Modules\\Learning\\Models\\Assignment",
             "Modules\\Learning\\Policies\\AssignmentPolicy",
             "Modules\\Learning\\Http\\Controllers\\AssignmentController",
-            "Modules\\Learning\\Services\\SubmissionService",
+            "Modules\\Learning\\Services\\Support\\SubmissionCreationProcessor",
+            "Modules\\Learning\\Services\\Support\\AssignmentFinder",
             "Modules\\Learning\\Services\\AssignmentService",
             "Modules\\Content\\Database\\Seeders\\ContentSeeder",
             "Modules\\Content\\Database\\Factories\\AnnouncementFactory",
@@ -10370,6 +10374,7 @@
             "Modules\\Learning\\Models\\",
             "Modules\\Learning\\Policies\\",
             "Modules\\Learning\\Http\\Controllers\\",
+            "Modules\\Learning\\Services\\Support\\",
             "Modules\\Learning\\Services\\",
             "Modules\\Content\\Database\\Seeders\\",
             "Modules\\Content\\Database\\Factories\\",
@@ -10402,12 +10407,12 @@
             "Spatie\\MediaLibrary\\MediaCollections\\Models\\"
         ],
         "abstraction": 0,
-        "instability": 0.11764705882352941,
+        "instability": 0.11650485436893204,
         "dependent_instabilities": {
             "Modules\\Schemes\\Database\\Factories\\": 0.75
         },
-        "distance": 0.6239177481057772,
-        "normalized_distance": 0.8823529411764706,
+        "distance": 0.6247254086211245,
+        "normalized_distance": 0.883495145631068,
         "violations": {},
         "_type": "Hal\\Metric\\PackageMetric"
     },
@@ -10716,9 +10721,9 @@
         "totalSystemComplexity": 1526.79,
         "package": "Modules\\Schemes\\Models\\",
         "pageRank": 0.02,
-        "afferentCoupling": 21,
+        "afferentCoupling": 22,
         "efferentCoupling": 4,
-        "instability": 0.16,
+        "instability": 0.15,
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
@@ -10842,9 +10847,9 @@
         "totalSystemComplexity": 1526.79,
         "package": "Modules\\Schemes\\Models\\",
         "pageRank": 0.03,
-        "afferentCoupling": 21,
+        "afferentCoupling": 22,
         "efferentCoupling": 4,
-        "instability": 0.16,
+        "instability": 0.15,
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
@@ -11136,7 +11141,7 @@
         "totalSystemComplexity": 83843.4,
         "package": "Modules\\Schemes\\Models\\",
         "pageRank": 0.05,
-        "afferentCoupling": 62,
+        "afferentCoupling": 63,
         "efferentCoupling": 9,
         "instability": 0.13,
         "violations": {},
@@ -11530,8 +11535,8 @@
         "abstraction": 0,
         "instability": 1,
         "dependent_instabilities": {
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
-            "Modules\\Schemes\\Models\\": 0.11764705882352941,
+            "Modules\\Auth\\Models\\": 0.06,
+            "Modules\\Schemes\\Models\\": 0.11650485436893204,
             "Modules\\Enrollments\\Models\\": 0.10810810810810811
         },
         "distance": 0,
@@ -13001,7 +13006,7 @@
         "abstraction": 0,
         "instability": 0.5,
         "dependent_instabilities": {
-            "Modules\\Schemes\\Models\\": 0.11764705882352941
+            "Modules\\Schemes\\Models\\": 0.11650485436893204
         },
         "distance": 0.35355339059327373,
         "normalized_distance": 0.5,
@@ -13650,7 +13655,7 @@
         "abstraction": 1,
         "instability": 1,
         "dependent_instabilities": {
-            "Modules\\Schemes\\Models\\": 0.11764705882352941
+            "Modules\\Schemes\\Models\\": 0.11650485436893204
         },
         "distance": 0.7071067811865475,
         "normalized_distance": 1,
@@ -13810,7 +13815,7 @@
         "instability": 1,
         "dependent_instabilities": {
             "Modules\\Schemes\\Services\\": 0.86,
-            "Modules\\Schemes\\Models\\": 0.11764705882352941,
+            "Modules\\Schemes\\Models\\": 0.11650485436893204,
             "Modules\\Schemes\\Http\\Resources\\": 0.3333333333333333,
             "Modules\\Schemes\\Http\\Requests\\": 0.5,
             "Modules\\Enrollments\\Contracts\\Services\\": 0.5,
@@ -14609,7 +14614,7 @@
         "abstraction": 0,
         "instability": 0.3333333333333333,
         "dependent_instabilities": {
-            "Modules\\Schemes\\Models\\": 0.11764705882352941,
+            "Modules\\Schemes\\Models\\": 0.11650485436893204,
             "Modules\\Enrollments\\Models\\": 0.10810810810810811
         },
         "distance": 0.4714045207910317,
@@ -15467,10 +15472,10 @@
         "instability": 0.86,
         "dependent_instabilities": {
             "Modules\\Schemes\\Contracts\\Repositories\\": 0.26666666666666666,
-            "Modules\\Schemes\\Models\\": 0.11764705882352941,
-            "\\": 0.03508771929824561,
+            "Modules\\Schemes\\Models\\": 0.11650485436893204,
+            "\\": 0.03389830508474576,
             "Modules\\Enrollments\\Models\\": 0.10810810810810811,
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
+            "Modules\\Auth\\Models\\": 0.06,
             "Modules\\Schemes\\Events\\": 0.3333333333333333,
             "Modules\\Schemes\\Contracts\\Services\\": 0.6666666666666666
         },
@@ -17197,9 +17202,9 @@
         "abstraction": 0,
         "instability": 1,
         "dependent_instabilities": {
-            "\\": 0.03508771929824561,
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
-            "Modules\\Schemes\\Models\\": 0.11764705882352941,
+            "\\": 0.03389830508474576,
+            "Modules\\Auth\\Models\\": 0.06,
+            "Modules\\Schemes\\Models\\": 0.11650485436893204,
             "Modules\\Enrollments\\Models\\": 0.10810810810810811
         },
         "distance": 0,
@@ -17406,8 +17411,8 @@
         "abstraction": 0,
         "instability": 0.8571428571428571,
         "dependent_instabilities": {
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
-            "Modules\\Schemes\\Models\\": 0.11764705882352941,
+            "Modules\\Auth\\Models\\": 0.06,
+            "Modules\\Schemes\\Models\\": 0.11650485436893204,
             "Modules\\Enrollments\\Models\\": 0.10810810810810811
         },
         "distance": 0.1010152544552211,
@@ -17700,8 +17705,8 @@
         "abstraction": 0,
         "instability": 0.8333333333333334,
         "dependent_instabilities": {
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
-            "Modules\\Schemes\\Models\\": 0.11764705882352941,
+            "Modules\\Auth\\Models\\": 0.06,
+            "Modules\\Schemes\\Models\\": 0.11650485436893204,
             "Modules\\Enrollments\\Models\\": 0.10810810810810811
         },
         "distance": 0.11785113019775789,
@@ -18158,12 +18163,12 @@
         "incoming_class_dependencies": [
             "Modules\\Enrollments\\Repositories\\EnrollmentRepository",
             "Modules\\Enrollments\\Services\\EnrollmentService",
-            "Modules\\Learning\\Services\\SubmissionService"
+            "Modules\\Learning\\Services\\Support\\SubmissionCreationProcessor"
         ],
         "incoming_package_dependencies": [
             "Modules\\Enrollments\\Repositories\\",
             "Modules\\Enrollments\\Services\\",
-            "Modules\\Learning\\Services\\"
+            "Modules\\Learning\\Services\\Support\\"
         ],
         "abstraction": 1,
         "instability": 0.4,
@@ -18270,8 +18275,8 @@
         "abstraction": 1,
         "instability": 0.5,
         "dependent_instabilities": {
-            "Modules\\Schemes\\Models\\": 0.11764705882352941,
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
+            "Modules\\Schemes\\Models\\": 0.11650485436893204,
+            "Modules\\Auth\\Models\\": 0.06,
             "Modules\\Enrollments\\Models\\": 0.10810810810810811
         },
         "distance": 0.35355339059327373,
@@ -19656,8 +19661,8 @@
         "abstraction": 0,
         "instability": 1,
         "dependent_instabilities": {
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
-            "Modules\\Schemes\\Models\\": 0.11764705882352941,
+            "Modules\\Auth\\Models\\": 0.06,
+            "Modules\\Schemes\\Models\\": 0.11650485436893204,
             "Modules\\Enrollments\\Models\\": 0.10810810810810811
         },
         "distance": 0,
@@ -19876,7 +19881,7 @@
         "abstraction": 0,
         "instability": 1,
         "dependent_instabilities": {
-            "\\": 0.03508771929824561
+            "\\": 0.03389830508474576
         },
         "distance": 0,
         "normalized_distance": 0,
@@ -20354,7 +20359,7 @@
         "instability": 1,
         "dependent_instabilities": {
             "Modules\\Enrollments\\Contracts\\Services\\": 0.5,
-            "Modules\\Schemes\\Models\\": 0.11764705882352941,
+            "Modules\\Schemes\\Models\\": 0.11650485436893204,
             "Modules\\Enrollments\\Exports\\": 0.8333333333333334,
             "Modules\\Enrollments\\Http\\Resources\\": 0.6666666666666666,
             "Modules\\Enrollments\\Models\\": 0.10810810810810811
@@ -21418,8 +21423,8 @@
             "Modules\\Enrollments\\Contracts\\Services\\": 0.5,
             "Modules\\Enrollments\\Contracts\\Repositories\\": 0.4,
             "Modules\\Enrollments\\Models\\": 0.10810810810810811,
-            "Modules\\Schemes\\Models\\": 0.11764705882352941,
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
+            "Modules\\Schemes\\Models\\": 0.11650485436893204,
+            "Modules\\Auth\\Models\\": 0.06,
             "Modules\\Enrollments\\Mail\\": 0.8333333333333334,
             "Modules\\Enrollments\\Events\\": 0.3333333333333333
         },
@@ -21910,7 +21915,7 @@
         "abstraction": 0,
         "instability": 1,
         "dependent_instabilities": {
-            "\\": 0.03508771929824561
+            "\\": 0.03389830508474576
         },
         "distance": 0,
         "normalized_distance": 0,
@@ -22191,8 +22196,8 @@
         "abstraction": 0,
         "instability": 1,
         "dependent_instabilities": {
-            "Modules\\Learning\\Models\\": 0.26506024096385544,
-            "Modules\\Auth\\Models\\": 0.06040268456375839
+            "Modules\\Learning\\Models\\": 0.2391304347826087,
+            "Modules\\Auth\\Models\\": 0.06
         },
         "distance": 0,
         "normalized_distance": 0,
@@ -22297,7 +22302,7 @@
         "instability": 0.6666666666666666,
         "dependent_instabilities": {
             "Modules\\Grading\\Contracts\\": 0.3333333333333333,
-            "Modules\\Learning\\Models\\": 0.26506024096385544
+            "Modules\\Learning\\Models\\": 0.2391304347826087
         },
         "distance": 0.23570226039551584,
         "normalized_distance": 0.33333333333333337,
@@ -22594,7 +22599,7 @@
         "abstraction": 1,
         "instability": 0.3333333333333333,
         "dependent_instabilities": {
-            "Modules\\Learning\\Models\\": 0.26506024096385544
+            "Modules\\Learning\\Models\\": 0.2391304347826087
         },
         "distance": 0.23570226039551578,
         "normalized_distance": 0.33333333333333326,
@@ -23363,7 +23368,7 @@
         "abstraction": 0,
         "instability": 0.26666666666666666,
         "dependent_instabilities": {
-            "\\": 0.03508771929824561
+            "\\": 0.03389830508474576
         },
         "distance": 0.5185449728701349,
         "normalized_distance": 0.7333333333333334,
@@ -23723,7 +23728,7 @@
         "abstraction": 0,
         "instability": 1,
         "dependent_instabilities": {
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
+            "Modules\\Auth\\Models\\": 0.06,
             "Modules\\Grading\\Models\\": 0.26666666666666666
         },
         "distance": 0,
@@ -23814,12 +23819,12 @@
             "Modules\\Grading\\Http\\Controllers\\GradingController",
             "Modules\\Grading\\Services\\GradingEntryService",
             "Modules\\Grading\\Services\\GradingBulkService",
-            "Modules\\Learning\\Services\\SubmissionService"
+            "Modules\\Learning\\Services\\Support\\SubmissionCompletionProcessor"
         ],
         "incoming_package_dependencies": [
             "Modules\\Grading\\Http\\Controllers\\",
             "Modules\\Grading\\Services\\",
-            "Modules\\Learning\\Services\\"
+            "Modules\\Learning\\Services\\Support\\"
         ],
         "abstraction": 0,
         "instability": 0.2,
@@ -25015,7 +25020,7 @@
         "dependent_instabilities": {
             "Modules\\Grading\\Services\\": 0.8076923076923077,
             "Modules\\Grading\\Http\\Requests\\": 0.5,
-            "Modules\\Learning\\Models\\": 0.26506024096385544,
+            "Modules\\Learning\\Models\\": 0.2391304347826087,
             "Modules\\Grading\\DTOs\\": 0.2,
             "Modules\\Grading\\Http\\Resources\\": 0.6666666666666666
         },
@@ -25159,10 +25164,10 @@
         "abstraction": 0,
         "instability": 0.8181818181818182,
         "dependent_instabilities": {
-            "Modules\\Learning\\Models\\": 0.26506024096385544,
+            "Modules\\Learning\\Models\\": 0.2391304347826087,
             "Modules\\Grading\\Strategies\\": 0.6666666666666666,
             "Modules\\Grading\\Events\\": 0.3,
-            "\\": 0.03508771929824561,
+            "\\": 0.03389830508474576,
             "Modules\\Grading\\Services\\": 0.8076923076923077
         },
         "distance": 0.12856486930664496,
@@ -25458,7 +25463,7 @@
         "instability": 0.3,
         "dependent_instabilities": {
             "Modules\\Grading\\Models\\": 0.26666666666666666,
-            "Modules\\Learning\\Models\\": 0.26506024096385544
+            "Modules\\Learning\\Models\\": 0.2391304347826087
         },
         "distance": 0.4949747468305832,
         "normalized_distance": 0.7,
@@ -25774,13 +25779,13 @@
             "Modules\\Grading\\Jobs\\BulkApplyFeedbackJob",
             "Modules\\Grading\\Jobs\\BulkReleaseGradesJob",
             "Modules\\Learning\\Listeners\\RecalculateCourseGradeOnNewHighScore",
-            "Modules\\Learning\\Services\\SubmissionService"
+            "Modules\\Learning\\Services\\Support\\SubmissionCompletionProcessor"
         ],
         "incoming_package_dependencies": [
             "Modules\\Grading\\Http\\Controllers\\",
             "Modules\\Grading\\Jobs\\",
             "Modules\\Learning\\Listeners\\",
-            "Modules\\Learning\\Services\\"
+            "Modules\\Learning\\Services\\Support\\"
         ],
         "outgoing_class_dependencies": [
             "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
@@ -25825,13 +25830,13 @@
         "abstraction": 0,
         "instability": 0.8076923076923077,
         "dependent_instabilities": {
-            "Modules\\Learning\\Models\\": 0.26506024096385544,
+            "Modules\\Learning\\Models\\": 0.2391304347826087,
             "Modules\\Grading\\Models\\": 0.26666666666666666,
             "Modules\\Grading\\Services\\Support\\": 0.9,
-            "Modules\\Learning\\Contracts\\Repositories\\": 0.5,
+            "Modules\\Learning\\Contracts\\Repositories\\": 0.375,
             "Modules\\Grading\\DTOs\\": 0.2,
-            "Modules\\Learning\\Exceptions\\": 0.2857142857142857,
-            "\\": 0.03508771929824561,
+            "Modules\\Learning\\Exceptions\\": 0.2222222222222222,
+            "\\": 0.03389830508474576,
             "Modules\\Grading\\Events\\": 0.3,
             "Modules\\Grading\\Jobs\\": 0.8181818181818182
         },
@@ -25957,12 +25962,12 @@
         "abstraction": 0,
         "instability": 0.9,
         "dependent_instabilities": {
-            "Modules\\Learning\\Models\\": 0.26506024096385544,
+            "Modules\\Learning\\Models\\": 0.2391304347826087,
             "Modules\\Common\\Models\\": 0.30303030303030304,
-            "Modules\\Learning\\Exceptions\\": 0.2857142857142857,
+            "Modules\\Learning\\Exceptions\\": 0.2222222222222222,
             "Modules\\Grading\\Models\\": 0.26666666666666666,
             "Modules\\Grading\\Events\\": 0.3,
-            "\\": 0.03508771929824561,
+            "\\": 0.03389830508474576,
             "Modules\\Grading\\Strategies\\": 0.6666666666666666
         },
         "distance": 0.07071067811865474,
@@ -27978,8 +27983,8 @@
         "abstraction": 0,
         "instability": 1,
         "dependent_instabilities": {
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
-            "\\": 0.03508771929824561
+            "Modules\\Auth\\Models\\": 0.06,
+            "\\": 0.03389830508474576
         },
         "distance": 0,
         "normalized_distance": 0,
@@ -28933,7 +28938,7 @@
         "abstraction": 0,
         "instability": 1,
         "dependent_instabilities": {
-            "Modules\\Auth\\Models\\": 0.06040268456375839
+            "Modules\\Auth\\Models\\": 0.06
         },
         "distance": 0,
         "normalized_distance": 0,
@@ -29695,7 +29700,7 @@
         "abstraction": 1,
         "instability": 1,
         "dependent_instabilities": {
-            "Modules\\Auth\\Models\\": 0.06040268456375839
+            "Modules\\Auth\\Models\\": 0.06
         },
         "distance": 0.7071067811865475,
         "normalized_distance": 1,
@@ -29876,7 +29881,7 @@
         "abstraction": 0,
         "instability": 0.3333333333333333,
         "dependent_instabilities": {
-            "Modules\\Auth\\Models\\": 0.06040268456375839
+            "Modules\\Auth\\Models\\": 0.06
         },
         "distance": 0.4714045207910317,
         "normalized_distance": 0.6666666666666667,
@@ -30234,7 +30239,7 @@
         "abstraction": 1,
         "instability": 0.3333333333333333,
         "dependent_instabilities": {
-            "Modules\\Auth\\Models\\": 0.06040268456375839
+            "Modules\\Auth\\Models\\": 0.06
         },
         "distance": 0.23570226039551578,
         "normalized_distance": 0.33333333333333326,
@@ -30391,7 +30396,7 @@
         "abstraction": 1,
         "instability": 0.3333333333333333,
         "dependent_instabilities": {
-            "Modules\\Auth\\Models\\": 0.06040268456375839
+            "Modules\\Auth\\Models\\": 0.06
         },
         "distance": 0.23570226039551578,
         "normalized_distance": 0.33333333333333326,
@@ -30674,7 +30679,7 @@
         "abstraction": 1,
         "instability": 0.2777777777777778,
         "dependent_instabilities": {
-            "Modules\\Auth\\Models\\": 0.06040268456375839
+            "Modules\\Auth\\Models\\": 0.06
         },
         "distance": 0.19641855032959646,
         "normalized_distance": 0.2777777777777777,
@@ -31505,7 +31510,7 @@
         "abstraction": 0,
         "instability": 1,
         "dependent_instabilities": {
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
+            "Modules\\Auth\\Models\\": 0.06,
             "Modules\\Auth\\Support\\": 0.25
         },
         "distance": 0,
@@ -31797,8 +31802,8 @@
         "instability": 0.9333333333333333,
         "dependent_instabilities": {
             "Modules\\Auth\\Contracts\\Repositories\\": 0.3333333333333333,
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
-            "\\": 0.03508771929824561
+            "Modules\\Auth\\Models\\": 0.06,
+            "\\": 0.03389830508474576
         },
         "distance": 0.047140452079103154,
         "normalized_distance": 0.06666666666666665,
@@ -32450,6 +32455,7 @@
             "Modules\\Learning\\Policies\\SubmissionPolicy",
             "Modules\\Learning\\Policies\\AssignmentPolicy",
             "Modules\\Learning\\Services\\SubmissionService",
+            "Modules\\Learning\\Services\\Support\\SubmissionFinder",
             "Modules\\Content\\Database\\Seeders\\ContentSeeder",
             "Modules\\Content\\Database\\Factories\\NewsFactory",
             "Modules\\Content\\Database\\Factories\\ContentRevisionFactory",
@@ -32525,6 +32531,7 @@
             "Modules\\Learning\\Contracts\\Services\\",
             "Modules\\Learning\\Policies\\",
             "Modules\\Learning\\Services\\",
+            "Modules\\Learning\\Services\\Support\\",
             "Modules\\Content\\Database\\Seeders\\",
             "Modules\\Content\\Database\\Factories\\",
             "Modules\\Content\\Traits\\",
@@ -32565,10 +32572,10 @@
             "Database\\Factories\\"
         ],
         "abstraction": 0,
-        "instability": 0.06040268456375839,
+        "instability": 0.06,
         "dependent_instabilities": [],
-        "distance": 0.6643956333296419,
-        "normalized_distance": 0.9395973154362416,
+        "distance": 0.6646803743153545,
+        "normalized_distance": 0.94,
         "violations": {},
         "_type": "Hal\\Metric\\PackageMetric"
     },
@@ -32765,9 +32772,9 @@
         "totalSystemComplexity": 11887.54,
         "package": "Modules\\Auth\\Models\\",
         "pageRank": 0.11,
-        "afferentCoupling": 137,
+        "afferentCoupling": 138,
         "efferentCoupling": 5,
-        "instability": 0.04,
+        "instability": 0.03,
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
@@ -33570,8 +33577,8 @@
         "abstraction": 0,
         "instability": 1,
         "dependent_instabilities": {
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
-            "Modules\\Schemes\\Models\\": 0.11764705882352941,
+            "Modules\\Auth\\Models\\": 0.06,
+            "Modules\\Schemes\\Models\\": 0.11650485436893204,
             "Modules\\Enrollments\\Models\\": 0.10810810810810811,
             "Modules\\Auth\\Contracts\\": 0.3333333333333333
         },
@@ -33775,7 +33782,7 @@
         "abstraction": 0,
         "instability": 0.8571428571428571,
         "dependent_instabilities": {
-            "Modules\\Auth\\Models\\": 0.06040268456375839
+            "Modules\\Auth\\Models\\": 0.06
         },
         "distance": 0.1010152544552211,
         "normalized_distance": 0.1428571428571429,
@@ -34342,7 +34349,7 @@
         "abstraction": 0,
         "instability": 1,
         "dependent_instabilities": {
-            "\\": 0.03508771929824561
+            "\\": 0.03389830508474576
         },
         "distance": 0,
         "normalized_distance": 0,
@@ -37624,7 +37631,7 @@
             "Modules\\Auth\\Contracts\\Repositories\\": 0.3333333333333333,
             "Modules\\Auth\\Services\\": 0.9322033898305084,
             "Modules\\Auth\\Http\\Resources\\": 0.2,
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
+            "Modules\\Auth\\Models\\": 0.06,
             "Modules\\Auth\\Mail\\": 0.3333333333333333,
             "Modules\\Auth\\Events\\": 0.2
         },
@@ -39030,7 +39037,7 @@
         "abstraction": 0,
         "instability": 0.2,
         "dependent_instabilities": {
-            "Modules\\Auth\\Models\\": 0.06040268456375839
+            "Modules\\Auth\\Models\\": 0.06
         },
         "distance": 0.565685424949238,
         "normalized_distance": 0.8,
@@ -39490,7 +39497,7 @@
         "abstraction": 0,
         "instability": 1,
         "dependent_instabilities": {
-            "Modules\\Auth\\Models\\": 0.06040268456375839
+            "Modules\\Auth\\Models\\": 0.06
         },
         "distance": 0,
         "normalized_distance": 0,
@@ -39750,10 +39757,10 @@
         "dependent_instabilities": {
             "Modules\\Auth\\Contracts\\Services\\": 0.2777777777777778,
             "Modules\\Auth\\Contracts\\Repositories\\": 0.3333333333333333,
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
+            "Modules\\Auth\\Models\\": 0.06,
             "Modules\\Auth\\Jobs\\": 0.8571428571428571,
-            "Modules\\Schemes\\Models\\": 0.11764705882352941,
-            "\\": 0.03508771929824561,
+            "Modules\\Schemes\\Models\\": 0.11650485436893204,
+            "\\": 0.03389830508474576,
             "Modules\\Common\\Models\\": 0.30303030303030304,
             "Modules\\Auth\\Mail\\": 0.3333333333333333,
             "Modules\\Auth\\Events\\": 0.2,
@@ -42597,7 +42604,7 @@
         "abstraction": 0,
         "instability": 1,
         "dependent_instabilities": {
-            "\\": 0.03508771929824561,
+            "\\": 0.03389830508474576,
             "Modules\\Gamification\\Models\\": 0.18181818181818182
         },
         "distance": 0,
@@ -42842,7 +42849,7 @@
         "abstraction": 0,
         "instability": 1,
         "dependent_instabilities": {
-            "Modules\\Auth\\Models\\": 0.06040268456375839
+            "Modules\\Auth\\Models\\": 0.06
         },
         "distance": 0,
         "normalized_distance": 0,
@@ -45699,7 +45706,7 @@
         "instability": 1,
         "dependent_instabilities": {
             "Modules\\Gamification\\Models\\": 0.18181818181818182,
-            "Modules\\Auth\\Models\\": 0.06040268456375839
+            "Modules\\Auth\\Models\\": 0.06
         },
         "distance": 0,
         "normalized_distance": 0,
@@ -46559,7 +46566,7 @@
             "Modules\\Gamification\\Services\\": 0.5357142857142857,
             "Modules\\Schemes\\Events\\": 0.3333333333333333,
             "Modules\\Common\\Models\\": 0.30303030303030304,
-            "Modules\\Learning\\Events\\": 0.2631578947368421
+            "Modules\\Learning\\Events\\": 0.23809523809523808
         },
         "distance": 0,
         "normalized_distance": 0,
@@ -47083,7 +47090,7 @@
         "dependent_instabilities": {
             "Modules\\Gamification\\Contracts\\Services\\": 0.5714285714285714,
             "Modules\\Gamification\\Models\\": 0.18181818181818182,
-            "\\": 0.03508771929824561,
+            "\\": 0.03389830508474576,
             "Modules\\Enrollments\\Models\\": 0.10810810810810811
         },
         "distance": 0.3282995769794685,
@@ -47430,7 +47437,7 @@
         "instability": 1,
         "dependent_instabilities": {
             "Modules\\Gamification\\Services\\": 0.5357142857142857,
-            "\\": 0.03508771929824561
+            "\\": 0.03389830508474576
         },
         "distance": 0,
         "normalized_distance": 0,
@@ -49041,11 +49048,11 @@
         "abstraction": 0,
         "instability": 1,
         "dependent_instabilities": {
-            "\\": 0.03508771929824561,
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
-            "Modules\\Schemes\\Models\\": 0.11764705882352941,
+            "\\": 0.03389830508474576,
+            "Modules\\Auth\\Models\\": 0.06,
+            "Modules\\Schemes\\Models\\": 0.11650485436893204,
             "Modules\\Enrollments\\Models\\": 0.10810810810810811,
-            "Modules\\Learning\\Models\\": 0.26506024096385544
+            "Modules\\Learning\\Models\\": 0.2391304347826087
         },
         "distance": 0,
         "normalized_distance": 0,
@@ -50087,10 +50094,10 @@
         "abstraction": 0,
         "instability": 0.7142857142857143,
         "dependent_instabilities": {
-            "Modules\\Learning\\Models\\": 0.26506024096385544,
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
+            "Modules\\Learning\\Models\\": 0.2391304347826087,
+            "Modules\\Auth\\Models\\": 0.06,
             "Modules\\Enrollments\\Models\\": 0.10810810810810811,
-            "Modules\\Schemes\\Models\\": 0.11764705882352941
+            "Modules\\Schemes\\Models\\": 0.11650485436893204
         },
         "distance": 0.20203050891044214,
         "normalized_distance": 0.2857142857142857,
@@ -50754,9 +50761,9 @@
         "abstraction": 0,
         "instability": 0.8333333333333334,
         "dependent_instabilities": {
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
-            "Modules\\Schemes\\Models\\": 0.11764705882352941,
-            "Modules\\Learning\\Models\\": 0.26506024096385544
+            "Modules\\Auth\\Models\\": 0.06,
+            "Modules\\Schemes\\Models\\": 0.11650485436893204,
+            "Modules\\Learning\\Models\\": 0.2391304347826087
         },
         "distance": 0.11785113019775789,
         "normalized_distance": 0.16666666666666663,
@@ -50825,9 +50832,9 @@
         "kanDefect": 0.15,
         "package": "Modules\\Learning\\Contracts\\Repositories\\",
         "pageRank": 0,
-        "afferentCoupling": 1,
+        "afferentCoupling": 2,
         "efferentCoupling": 3,
-        "instability": 0.75,
+        "instability": 0.6,
         "violations": {},
         "_type": "Hal\\Metric\\InterfaceMetric"
     },
@@ -50849,12 +50856,19 @@
             "Modules\\Learning\\Repositories\\QuestionRepository",
             "Modules\\Learning\\Services\\QuestionService",
             "Modules\\Learning\\Services\\SubmissionService",
-            "Modules\\Learning\\Services\\AssignmentService"
+            "Modules\\Learning\\Services\\Support\\SubmissionCreationProcessor",
+            "Modules\\Learning\\Services\\Support\\SubmissionFinder",
+            "Modules\\Learning\\Services\\Support\\SubmissionLifecycleProcessor",
+            "Modules\\Learning\\Services\\Support\\SubmissionCompletionProcessor",
+            "Modules\\Learning\\Services\\Support\\AssignmentDuplicator",
+            "Modules\\Learning\\Services\\Support\\AssignmentOverrideProcessor",
+            "Modules\\Learning\\Services\\Support\\AssignmentPrerequisiteProcessor"
         ],
         "incoming_package_dependencies": [
             "Modules\\Grading\\Services\\",
             "Modules\\Learning\\Repositories\\",
-            "Modules\\Learning\\Services\\"
+            "Modules\\Learning\\Services\\",
+            "Modules\\Learning\\Services\\Support\\"
         ],
         "outgoing_class_dependencies": [
             "Modules\\Learning\\Models\\Override",
@@ -50875,12 +50889,12 @@
             "Illuminate\\Contracts\\Pagination\\"
         ],
         "abstraction": 1,
-        "instability": 0.5,
+        "instability": 0.375,
         "dependent_instabilities": {
-            "Modules\\Learning\\Models\\": 0.26506024096385544
+            "Modules\\Learning\\Models\\": 0.2391304347826087
         },
-        "distance": 0.35355339059327373,
-        "normalized_distance": 0.5,
+        "distance": 0.2651650429449553,
+        "normalized_distance": 0.375,
         "violations": {},
         "_type": "Hal\\Metric\\PackageMetric"
     },
@@ -50983,9 +50997,9 @@
         "kanDefect": 0.15,
         "package": "Modules\\Learning\\Contracts\\Repositories\\",
         "pageRank": 0,
-        "afferentCoupling": 2,
+        "afferentCoupling": 5,
         "efferentCoupling": 3,
-        "instability": 0.6,
+        "instability": 0.38,
         "violations": {},
         "_type": "Hal\\Metric\\InterfaceMetric"
     },
@@ -51109,9 +51123,9 @@
         "kanDefect": 0.15,
         "package": "Modules\\Learning\\Contracts\\Repositories\\",
         "pageRank": 0,
-        "afferentCoupling": 3,
+        "afferentCoupling": 6,
         "efferentCoupling": 2,
-        "instability": 0.4,
+        "instability": 0.25,
         "violations": {},
         "_type": "Hal\\Metric\\InterfaceMetric"
     },
@@ -51239,9 +51253,9 @@
         "kanDefect": 0.15,
         "package": "Modules\\Learning\\Contracts\\Repositories\\",
         "pageRank": 0,
-        "afferentCoupling": 3,
+        "afferentCoupling": 5,
         "efferentCoupling": 5,
-        "instability": 0.63,
+        "instability": 0.5,
         "violations": {},
         "_type": "Hal\\Metric\\InterfaceMetric"
     },
@@ -51389,10 +51403,10 @@
         "abstraction": 1,
         "instability": 0.65,
         "dependent_instabilities": {
-            "Modules\\Learning\\Models\\": 0.26506024096385544,
-            "Modules\\Schemes\\Models\\": 0.11764705882352941,
-            "Modules\\Learning\\DTOs\\": 0.5,
-            "Modules\\Auth\\Models\\": 0.06040268456375839
+            "Modules\\Learning\\Models\\": 0.2391304347826087,
+            "Modules\\Schemes\\Models\\": 0.11650485436893204,
+            "Modules\\Learning\\DTOs\\": 0.4,
+            "Modules\\Auth\\Models\\": 0.06
         },
         "distance": 0.4596194077712558,
         "normalized_distance": 0.6499999999999999,
@@ -52528,9 +52542,9 @@
         "abstraction": 0,
         "instability": 0.9130434782608695,
         "dependent_instabilities": {
-            "Modules\\Learning\\Contracts\\Repositories\\": 0.5,
-            "Modules\\Learning\\Models\\": 0.26506024096385544,
-            "Modules\\Schemes\\Models\\": 0.11764705882352941
+            "Modules\\Learning\\Contracts\\Repositories\\": 0.375,
+            "Modules\\Learning\\Models\\": 0.2391304347826087,
+            "Modules\\Schemes\\Models\\": 0.11650485436893204
         },
         "distance": 0.0614875461901346,
         "normalized_distance": 0.08695652173913049,
@@ -53362,9 +53376,9 @@
         "totalSystemComplexity": 612.88,
         "package": "Modules\\Learning\\Models\\",
         "pageRank": 0,
-        "afferentCoupling": 5,
+        "afferentCoupling": 6,
         "efferentCoupling": 4,
-        "instability": 0.44,
+        "instability": 0.4,
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
@@ -53430,6 +53444,15 @@
             "Modules\\Learning\\Services\\QuestionService",
             "Modules\\Learning\\Services\\SubmissionService",
             "Modules\\Learning\\Services\\ReviewModeService",
+            "Modules\\Learning\\Services\\Support\\SubmissionValidator",
+            "Modules\\Learning\\Services\\Support\\SubmissionCreationProcessor",
+            "Modules\\Learning\\Services\\Support\\SubmissionFinder",
+            "Modules\\Learning\\Services\\Support\\AssignmentFinder",
+            "Modules\\Learning\\Services\\Support\\SubmissionLifecycleProcessor",
+            "Modules\\Learning\\Services\\Support\\SubmissionCompletionProcessor",
+            "Modules\\Learning\\Services\\Support\\AssignmentDuplicator",
+            "Modules\\Learning\\Services\\Support\\AssignmentOverrideProcessor",
+            "Modules\\Learning\\Services\\Support\\AssignmentPrerequisiteProcessor",
             "Modules\\Learning\\Services\\AssignmentService",
             "Modules\\Learning\\Console\\Commands\\PublishScheduledAssignments",
             "Modules\\Common\\Contracts\\Services\\AuditServiceInterface",
@@ -53462,6 +53485,7 @@
             "Modules\\Learning\\Jobs\\",
             "Modules\\Learning\\Events\\",
             "Modules\\Learning\\Services\\",
+            "Modules\\Learning\\Services\\Support\\",
             "Modules\\Learning\\Console\\Commands\\",
             "Modules\\Common\\Contracts\\Services\\",
             "Modules\\Common\\Services\\",
@@ -53507,16 +53531,16 @@
             "Modules\\Schemes\\Models\\"
         ],
         "abstraction": 0,
-        "instability": 0.26506024096385544,
+        "instability": 0.2391304347826087,
         "dependent_instabilities": {
             "Modules\\Learning\\Database\\Factories\\": 0.7142857142857143,
-            "\\": 0.03508771929824561,
-            "Modules\\Learning\\Exceptions\\": 0.2857142857142857,
-            "Modules\\Learning\\Events\\": 0.2631578947368421,
-            "Modules\\Schemes\\Models\\": 0.11764705882352941
+            "\\": 0.03389830508474576,
+            "Modules\\Learning\\Exceptions\\": 0.2222222222222222,
+            "Modules\\Learning\\Events\\": 0.23809523809523808,
+            "Modules\\Schemes\\Models\\": 0.11650485436893204
         },
-        "distance": 0.5196808873780651,
-        "normalized_distance": 0.7349397590361446,
+        "distance": 0.5380160291636774,
+        "normalized_distance": 0.7608695652173914,
         "violations": {},
         "_type": "Hal\\Metric\\PackageMetric"
     },
@@ -53663,9 +53687,9 @@
         "totalSystemComplexity": 789.89,
         "package": "Modules\\Learning\\Models\\",
         "pageRank": 0.02,
-        "afferentCoupling": 16,
+        "afferentCoupling": 17,
         "efferentCoupling": 6,
-        "instability": 0.27,
+        "instability": 0.26,
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
@@ -53963,9 +53987,9 @@
         "totalSystemComplexity": 26957.37,
         "package": "Modules\\Learning\\Models\\",
         "pageRank": 0.04,
-        "afferentCoupling": 34,
+        "afferentCoupling": 39,
         "efferentCoupling": 11,
-        "instability": 0.24,
+        "instability": 0.22,
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
@@ -54230,9 +54254,9 @@
         "totalSystemComplexity": 1838,
         "package": "Modules\\Learning\\Models\\",
         "pageRank": 0.01,
-        "afferentCoupling": 8,
+        "afferentCoupling": 10,
         "efferentCoupling": 5,
-        "instability": 0.38,
+        "instability": 0.33,
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
@@ -54464,10 +54488,10 @@
         "totalDataComplexity": 21.31,
         "totalSystemComplexity": 28196.31,
         "package": "Modules\\Learning\\Models\\",
-        "pageRank": 0.02,
-        "afferentCoupling": 25,
+        "pageRank": 0.03,
+        "afferentCoupling": 33,
         "efferentCoupling": 9,
-        "instability": 0.26,
+        "instability": 0.21,
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
@@ -54555,14 +54579,16 @@
             "Modules\\Grading\\Services\\Support\\GradingActionProcessor",
             "Modules\\Grading\\Services\\GradingEntryService",
             "Modules\\Learning\\Models\\Submission",
-            "Modules\\Learning\\Services\\SubmissionService",
-            "Modules\\Learning\\Services\\AssignmentService"
+            "Modules\\Learning\\Services\\Support\\SubmissionCreationProcessor",
+            "Modules\\Learning\\Services\\Support\\SubmissionCompletionProcessor",
+            "Modules\\Learning\\Services\\Support\\AssignmentDuplicator",
+            "Modules\\Learning\\Services\\Support\\AssignmentPrerequisiteProcessor"
         ],
         "incoming_package_dependencies": [
             "Modules\\Grading\\Services\\Support\\",
             "Modules\\Grading\\Services\\",
             "Modules\\Learning\\Models\\",
-            "Modules\\Learning\\Services\\"
+            "Modules\\Learning\\Services\\Support\\"
         ],
         "outgoing_class_dependencies": [
             "Exception",
@@ -54572,12 +54598,12 @@
             "\\"
         ],
         "abstraction": 0,
-        "instability": 0.2857142857142857,
+        "instability": 0.2222222222222222,
         "dependent_instabilities": {
-            "\\": 0.03508771929824561
+            "\\": 0.03389830508474576
         },
-        "distance": 0.5050762722761053,
-        "normalized_distance": 0.7142857142857143,
+        "distance": 0.5499719409228703,
+        "normalized_distance": 0.7777777777777778,
         "violations": {},
         "_type": "Hal\\Metric\\PackageMetric"
     },
@@ -54647,9 +54673,9 @@
         "totalSystemComplexity": 5,
         "package": "Modules\\Learning\\Exceptions\\",
         "pageRank": 0,
-        "afferentCoupling": 1,
+        "afferentCoupling": 2,
         "efferentCoupling": 1,
-        "instability": 0.5,
+        "instability": 0.33,
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
@@ -54747,9 +54773,9 @@
         "totalSystemComplexity": 39,
         "package": "Modules\\Learning\\Exceptions\\",
         "pageRank": 0.01,
-        "afferentCoupling": 4,
+        "afferentCoupling": 5,
         "efferentCoupling": 1,
-        "instability": 0.2,
+        "instability": 0.17,
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
@@ -54929,10 +54955,10 @@
         "abstraction": 0,
         "instability": 1,
         "dependent_instabilities": {
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
-            "Modules\\Learning\\Models\\": 0.26506024096385544,
+            "Modules\\Auth\\Models\\": 0.06,
+            "Modules\\Learning\\Models\\": 0.2391304347826087,
             "Modules\\Enrollments\\Models\\": 0.10810810810810811,
-            "Modules\\Schemes\\Models\\": 0.11764705882352941
+            "Modules\\Schemes\\Models\\": 0.11650485436893204
         },
         "distance": 0,
         "normalized_distance": 0,
@@ -55178,10 +55204,12 @@
         ],
         "incoming_class_dependencies": [
             "Modules\\Learning\\Contracts\\Services\\AssignmentServiceInterface",
+            "Modules\\Learning\\Services\\Support\\AssignmentPrerequisiteProcessor",
             "Modules\\Learning\\Services\\AssignmentService"
         ],
         "incoming_package_dependencies": [
             "Modules\\Learning\\Contracts\\Services\\",
+            "Modules\\Learning\\Services\\Support\\",
             "Modules\\Learning\\Services\\"
         ],
         "outgoing_class_dependencies": [
@@ -55193,10 +55221,10 @@
             "Illuminate\\Support\\"
         ],
         "abstraction": 0,
-        "instability": 0.5,
+        "instability": 0.4,
         "dependent_instabilities": [],
-        "distance": 0.35355339059327373,
-        "normalized_distance": 0.5,
+        "distance": 0.42426406871192845,
+        "normalized_distance": 0.6,
         "violations": {},
         "_type": "Hal\\Metric\\PackageMetric"
     },
@@ -55495,9 +55523,9 @@
         "totalSystemComplexity": 40,
         "package": "Modules\\Learning\\DTOs\\",
         "pageRank": 0,
-        "afferentCoupling": 2,
+        "afferentCoupling": 3,
         "efferentCoupling": 1,
-        "instability": 0.33,
+        "instability": 0.25,
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
@@ -56420,8 +56448,8 @@
         "abstraction": 0,
         "instability": 0.75,
         "dependent_instabilities": {
-            "\\": 0.03508771929824561,
-            "Modules\\Learning\\Models\\": 0.26506024096385544
+            "\\": 0.03389830508474576,
+            "Modules\\Learning\\Models\\": 0.2391304347826087
         },
         "distance": 0.17677669529663687,
         "normalized_distance": 0.25,
@@ -57627,12 +57655,12 @@
         "abstraction": 0,
         "instability": 1,
         "dependent_instabilities": {
-            "Modules\\Learning\\Services\\": 0.9787234042553191,
+            "Modules\\Learning\\Services\\": 0.9761904761904762,
             "Modules\\Learning\\Contracts\\Services\\": 0.65,
-            "Modules\\Schemes\\Models\\": 0.11764705882352941,
+            "Modules\\Schemes\\Models\\": 0.11650485436893204,
             "Modules\\Learning\\Http\\Resources\\": 0.5,
             "Modules\\Learning\\Http\\Requests\\": 0.75,
-            "Modules\\Learning\\Models\\": 0.26506024096385544
+            "Modules\\Learning\\Models\\": 0.2391304347826087
         },
         "distance": 0,
         "normalized_distance": 0,
@@ -58230,8 +58258,8 @@
         "abstraction": 0,
         "instability": 1,
         "dependent_instabilities": {
-            "Modules\\Learning\\Models\\": 0.26506024096385544,
-            "\\": 0.03508771929824561
+            "Modules\\Learning\\Models\\": 0.2391304347826087,
+            "\\": 0.03389830508474576
         },
         "distance": 0,
         "normalized_distance": 0,
@@ -58432,7 +58460,9 @@
             "Modules\\Learning\\Listeners\\CheckHighScoreOnSubmissionStateChanged",
             "Modules\\Learning\\Listeners\\RecalculateCourseGradeOnNewHighScore",
             "Modules\\Learning\\Services\\QuestionService",
-            "Modules\\Learning\\Services\\SubmissionService",
+            "Modules\\Learning\\Services\\Support\\SubmissionCreationProcessor",
+            "Modules\\Learning\\Services\\Support\\SubmissionCompletionProcessor",
+            "Modules\\Learning\\Services\\Support\\AssignmentOverrideProcessor",
             "Modules\\Learning\\Services\\AssignmentService",
             "Modules\\Common\\Listeners\\LogOverrideGranted",
             "Modules\\Common\\Listeners\\LogSubmissionCreated",
@@ -58445,6 +58475,7 @@
             "Modules\\Learning\\Models\\",
             "Modules\\Learning\\Listeners\\",
             "Modules\\Learning\\Services\\",
+            "Modules\\Learning\\Services\\Support\\",
             "Modules\\Common\\Listeners\\",
             "Modules\\Notifications\\Listeners\\"
         ],
@@ -58460,12 +58491,12 @@
             "Modules\\Learning\\Enums\\"
         ],
         "abstraction": 0,
-        "instability": 0.2631578947368421,
+        "instability": 0.23809523809523808,
         "dependent_instabilities": {
-            "Modules\\Learning\\Models\\": 0.26506024096385544
+            "Modules\\Learning\\Models\\": 0.2391304347826087
         },
-        "distance": 0.5210260492953508,
-        "normalized_distance": 0.736842105263158,
+        "distance": 0.538748023761179,
+        "normalized_distance": 0.7619047619047619,
         "violations": {},
         "_type": "Hal\\Metric\\PackageMetric"
     },
@@ -58899,7 +58930,7 @@
         "abstraction": 0,
         "instability": 1,
         "dependent_instabilities": {
-            "Modules\\Learning\\Events\\": 0.2631578947368421,
+            "Modules\\Learning\\Events\\": 0.23809523809523808,
             "Modules\\Enrollments\\Models\\": 0.10810810810810811,
             "Modules\\Learning\\Mail\\": 0.8333333333333334,
             "Modules\\Learning\\Contracts\\Services\\": 0.65,
@@ -59283,37 +59314,32 @@
             "Modules\\Learning\\Enums\\QuestionType",
             "Log",
             "Modules\\Learning\\Contracts\\Services\\SubmissionServiceInterface",
-            "Modules\\Learning\\Contracts\\Repositories\\SubmissionRepositoryInterface",
-            "Modules\\Enrollments\\Contracts\\Repositories\\EnrollmentRepositoryInterface",
-            "Modules\\Grading\\Services\\GradingEntryService",
-            "Modules\\Auth\\Models\\User",
+            "Modules\\Learning\\Services\\Support\\SubmissionFinder",
+            "Modules\\Learning\\Services\\Support\\SubmissionLifecycleProcessor",
+            "Modules\\Learning\\Services\\Support\\SubmissionValidator",
             "Modules\\Learning\\Models\\Submission",
-            "Modules\\Learning\\Exceptions\\SubmissionException",
-            "Modules\\Common\\Models\\SystemSetting",
-            "Illuminate\\Support\\Carbon",
-            "Modules\\Learning\\Events\\SubmissionCreated",
-            "Modules\\Grading\\DTOs\\SubmissionGradeDTO",
-            "Modules\\Schemes\\Models\\Lesson",
             "Modules\\Learning\\Models\\Answer",
-            "Illuminate\\Database\\Eloquent\\ModelNotFoundException",
-            "Modules\\Learning\\Events\\NewHighScoreAchieved",
+            "Modules\\Auth\\Models\\User",
             "Modules\\Learning\\Enums\\OverrideType",
             "Modules\\Learning\\Repositories\\LearningRepository",
             "Illuminate\\Contracts\\View\\View",
             "Modules\\Learning\\Contracts\\Services\\ReviewModeServiceInterface",
             "Modules\\Learning\\Contracts\\Services\\AssignmentServiceInterface",
             "Modules\\Learning\\Repositories\\AssignmentRepository",
+            "Modules\\Learning\\Services\\Support\\AssignmentFinder",
+            "Modules\\Learning\\Services\\Support\\AssignmentPrerequisiteProcessor",
+            "Modules\\Learning\\Services\\Support\\AssignmentOverrideProcessor",
+            "Modules\\Learning\\Services\\Support\\AssignmentDuplicator",
             "Modules\\Schemes\\Models\\Course",
+            "Modules\\Schemes\\Models\\Lesson",
             "Modules\\Schemes\\Models\\Unit",
+            "Illuminate\\Support\\Carbon",
             "Illuminate\\Support\\Facades\\Validator",
             "Illuminate\\Validation\\ValidationException",
             "Modules\\Learning\\Events\\AssignmentPublished",
             "Illuminate\\Database\\Eloquent\\Collection",
             "Modules\\Learning\\DTOs\\PrerequisiteCheckResult",
-            "Modules\\Learning\\Exceptions\\AssignmentException",
-            "Modules\\Learning\\Models\\Override",
-            "RuntimeException",
-            "Modules\\Learning\\Events\\OverrideGranted"
+            "Modules\\Learning\\Models\\Override"
         ],
         "outgoing_package_dependencies": [
             "Modules\\Learning\\Contracts\\Services\\",
@@ -59327,40 +59353,32 @@
             "Illuminate\\Contracts\\Pagination\\",
             "Spatie\\QueryBuilder\\",
             "Modules\\Learning\\Enums\\",
-            "Modules\\Enrollments\\Contracts\\Repositories\\",
-            "Modules\\Grading\\Services\\",
+            "Modules\\Learning\\Services\\Support\\",
             "Modules\\Auth\\Models\\",
-            "Modules\\Learning\\Exceptions\\",
-            "Modules\\Common\\Models\\",
-            "Modules\\Grading\\DTOs\\",
-            "Modules\\Schemes\\Models\\",
-            "Illuminate\\Database\\Eloquent\\",
             "Modules\\Learning\\Repositories\\",
             "Illuminate\\Contracts\\View\\",
+            "Modules\\Schemes\\Models\\",
             "Illuminate\\Validation\\",
+            "Illuminate\\Database\\Eloquent\\",
             "Modules\\Learning\\DTOs\\"
         ],
         "abstraction": 0,
-        "instability": 0.9787234042553191,
+        "instability": 0.9761904761904762,
         "dependent_instabilities": {
             "Modules\\Learning\\Contracts\\Services\\": 0.65,
-            "Modules\\Learning\\Contracts\\Repositories\\": 0.5,
-            "Modules\\Learning\\Models\\": 0.26506024096385544,
-            "\\": 0.03508771929824561,
-            "Modules\\Learning\\Events\\": 0.2631578947368421,
+            "Modules\\Learning\\Contracts\\Repositories\\": 0.375,
+            "Modules\\Learning\\Models\\": 0.2391304347826087,
+            "\\": 0.03389830508474576,
+            "Modules\\Learning\\Events\\": 0.23809523809523808,
             "Modules\\Grading\\Jobs\\": 0.8181818181818182,
-            "Modules\\Enrollments\\Contracts\\Repositories\\": 0.4,
-            "Modules\\Grading\\Services\\": 0.8076923076923077,
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
-            "Modules\\Learning\\Exceptions\\": 0.2857142857142857,
-            "Modules\\Common\\Models\\": 0.30303030303030304,
-            "Modules\\Grading\\DTOs\\": 0.2,
-            "Modules\\Schemes\\Models\\": 0.11764705882352941,
+            "Modules\\Learning\\Services\\Support\\": 0.9428571428571428,
+            "Modules\\Auth\\Models\\": 0.06,
             "Modules\\Learning\\Repositories\\": 0.9130434782608695,
-            "Modules\\Learning\\DTOs\\": 0.5
+            "Modules\\Schemes\\Models\\": 0.11650485436893204,
+            "Modules\\Learning\\DTOs\\": 0.4
         },
-        "distance": 0.015044825131628692,
-        "normalized_distance": 0.021276595744680882,
+        "distance": 0.016835875742536862,
+        "normalized_distance": 0.023809523809523836,
         "violations": {},
         "_type": "Hal\\Metric\\PackageMetric"
     },
@@ -59372,6 +59390,48 @@
         "methods": [
             {
                 "name": "__construct",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "create",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "startSubmission",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "update",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "saveAnswer",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "submitAnswers",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "delete",
                 "role": null,
                 "public": true,
                 "private": false,
@@ -59392,20 +59452,6 @@
                 "_type": "Hal\\Metric\\FunctionMetric"
             },
             {
-                "name": "create",
-                "role": null,
-                "public": true,
-                "private": false,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "update",
-                "role": null,
-                "public": true,
-                "private": false,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
                 "name": "getSubmission",
                 "role": null,
                 "public": true,
@@ -59413,35 +59459,7 @@
                 "_type": "Hal\\Metric\\FunctionMetric"
             },
             {
-                "name": "grade",
-                "role": null,
-                "public": true,
-                "private": false,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "getEnrollmentForLesson",
-                "role": null,
-                "public": false,
-                "private": true,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "incrementLessonProgressAttempt",
-                "role": null,
-                "public": false,
-                "private": true,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "startSubmission",
-                "role": null,
-                "public": true,
-                "private": false,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "saveAnswer",
+                "name": "getSubmissionDetail",
                 "role": null,
                 "public": true,
                 "private": false,
@@ -59462,7 +59480,14 @@
                 "_type": "Hal\\Metric\\FunctionMetric"
             },
             {
-                "name": "submitAnswers",
+                "name": "searchSubmissions",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "listByAssignment",
                 "role": null,
                 "public": true,
                 "private": false,
@@ -59476,35 +59501,14 @@
                 "_type": "Hal\\Metric\\FunctionMetric"
             },
             {
+                "name": "checkAttemptLimitsWithOverride",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
                 "name": "checkCooldownPeriod",
-                "role": null,
-                "public": true,
-                "private": false,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "getHighestScoreSubmission",
-                "role": null,
-                "public": true,
-                "private": false,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "checkAndDispatchNewHighScore",
-                "role": null,
-                "public": true,
-                "private": false,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "updateSubmissionScore",
-                "role": null,
-                "public": true,
-                "private": false,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "getSubmissionsWithHighestMarked",
                 "role": null,
                 "public": true,
                 "private": false,
@@ -59525,27 +59529,6 @@
                 "_type": "Hal\\Metric\\FunctionMetric"
             },
             {
-                "name": "getExtendedDeadline",
-                "role": null,
-                "public": false,
-                "private": true,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "checkAttemptLimitsWithOverride",
-                "role": null,
-                "public": true,
-                "private": false,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "getAdditionalAttempts",
-                "role": null,
-                "public": false,
-                "private": true,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
                 "name": "hasActiveOverride",
                 "role": null,
                 "public": true,
@@ -59553,28 +59536,21 @@
                 "_type": "Hal\\Metric\\FunctionMetric"
             },
             {
-                "name": "searchSubmissions",
+                "name": "getHighestScoreSubmission",
                 "role": null,
                 "public": true,
                 "private": false,
                 "_type": "Hal\\Metric\\FunctionMetric"
             },
             {
-                "name": "delete",
+                "name": "getSubmissionsWithHighestMarked",
                 "role": null,
                 "public": true,
                 "private": false,
                 "_type": "Hal\\Metric\\FunctionMetric"
             },
             {
-                "name": "listByAssignment",
-                "role": null,
-                "public": true,
-                "private": false,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "getSubmissionDetail",
+                "name": "updateSubmissionScore",
                 "role": null,
                 "public": true,
                 "private": false,
@@ -59586,146 +59562,100 @@
                 "public": true,
                 "private": false,
                 "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "grade",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
             }
         ],
-        "nbMethodsIncludingGettersSetters": 31,
-        "nbMethods": 31,
-        "nbMethodsPrivate": 4,
-        "nbMethodsPublic": 27,
+        "nbMethodsIncludingGettersSetters": 26,
+        "nbMethods": 26,
+        "nbMethodsPrivate": 0,
+        "nbMethodsPublic": 26,
         "nbMethodsGetter": 0,
         "nbMethodsSetters": 0,
-        "wmc": 116,
-        "ccn": 86,
-        "ccnMethodMax": 20,
+        "wmc": 26,
+        "ccn": 1,
+        "ccnMethodMax": 1,
         "externals": [
             "Modules\\Learning\\Contracts\\Services\\SubmissionServiceInterface",
-            "Modules\\Learning\\Contracts\\Repositories\\SubmissionRepositoryInterface",
-            "Modules\\Enrollments\\Contracts\\Repositories\\EnrollmentRepositoryInterface",
-            "Modules\\Grading\\Services\\GradingEntryService",
+            "Modules\\Learning\\Services\\Support\\SubmissionFinder",
+            "Modules\\Learning\\Services\\Support\\SubmissionLifecycleProcessor",
+            "Modules\\Learning\\Services\\Support\\SubmissionValidator",
             "Modules\\Learning\\Contracts\\Repositories\\QuestionRepositoryInterface",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Models\\Assignment",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Models\\Answer",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Models\\Submission",
             "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
             "Modules\\Learning\\Models\\Assignment",
             "Modules\\Auth\\Models\\User",
             "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
             "Modules\\Learning\\Models\\Assignment",
             "Modules\\Auth\\Models\\User",
-            "Spatie\\QueryBuilder\\QueryBuilder",
-            "Spatie\\QueryBuilder\\AllowedFilter",
-            "Spatie\\QueryBuilder\\AllowedFilter",
-            "Spatie\\QueryBuilder\\AllowedFilter",
-            "Spatie\\QueryBuilder\\AllowedFilter",
-            "Modules\\Learning\\Models\\Submission",
-            "Modules\\Learning\\Models\\Assignment",
-            "Modules\\Learning\\Exceptions\\SubmissionException",
-            "Modules\\Learning\\Exceptions\\SubmissionException",
-            "Modules\\Learning\\Exceptions\\SubmissionException",
-            "Modules\\Common\\Models\\SystemSetting",
-            "Modules\\Learning\\Exceptions\\SubmissionException",
-            "Illuminate\\Support\\Carbon",
-            "Modules\\Learning\\Events\\SubmissionCreated",
-            "Illuminate\\Support\\Facades\\DB",
             "Modules\\Learning\\Models\\Submission",
             "Modules\\Learning\\Models\\Submission",
-            "Modules\\Learning\\Exceptions\\SubmissionException",
-            "Illuminate\\Support\\Facades\\DB",
-            "Modules\\Learning\\Models\\Submission",
-            "Spatie\\QueryBuilder\\QueryBuilder",
-            "Modules\\Learning\\Models\\Submission",
-            "Modules\\Learning\\Models\\Submission",
-            "Modules\\Learning\\Exceptions\\SubmissionException",
-            "Modules\\Grading\\DTOs\\SubmissionGradeDTO",
-            "Illuminate\\Support\\Facades\\DB",
-            "Modules\\Schemes\\Models\\Lesson",
-            "Modules\\Learning\\Models\\Submission",
-            "Modules\\Learning\\Models\\Assignment",
-            "Modules\\Learning\\Exceptions\\SubmissionException",
-            "Modules\\Learning\\Exceptions\\SubmissionException",
-            "Modules\\Learning\\Exceptions\\SubmissionException",
-            "Modules\\Learning\\Models\\Submission",
-            "Illuminate\\Support\\Facades\\DB",
-            "Modules\\Learning\\Models\\Answer",
-            "Modules\\Learning\\Models\\Submission",
-            "Modules\\Learning\\Exceptions\\SubmissionException",
-            "Modules\\Learning\\Exceptions\\SubmissionException",
-            "Modules\\Learning\\Exceptions\\SubmissionException",
-            "Illuminate\\Database\\Eloquent\\ModelNotFoundException",
-            "Modules\\Learning\\Models\\Question",
-            "Illuminate\\Database\\Eloquent\\ModelNotFoundException",
-            "Modules\\Learning\\Models\\Question",
-            "Modules\\Learning\\Models\\Answer",
-            "Illuminate\\Support\\Facades\\DB",
             "Illuminate\\Support\\Collection",
             "Modules\\Learning\\Models\\Submission",
-            "Modules\\Learning\\Models\\Question",
             "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
             "Modules\\Learning\\Models\\Submission",
-            "Modules\\Learning\\Models\\Question",
-            "Modules\\Learning\\Models\\Question",
-            "Modules\\Learning\\Models\\Submission",
-            "Modules\\Learning\\Models\\Submission",
-            "Modules\\Learning\\Exceptions\\SubmissionException",
-            "Modules\\Learning\\Exceptions\\SubmissionException",
-            "Modules\\Learning\\Exceptions\\SubmissionException",
-            "Modules\\Learning\\Exceptions\\SubmissionException",
-            "Illuminate\\Support\\Carbon",
-            "Illuminate\\Support\\Facades\\DB",
-            "Modules\\Learning\\Models\\Assignment",
-            "Modules\\Learning\\Models\\Submission",
-            "Modules\\Learning\\Models\\Assignment",
-            "Modules\\Learning\\Models\\Submission",
-            "Modules\\Learning\\Models\\Submission",
-            "Modules\\Learning\\Models\\Submission",
-            "Modules\\Learning\\Events\\NewHighScoreAchieved",
-            "Modules\\Learning\\Models\\Submission",
-            "Modules\\Learning\\Models\\Submission",
-            "Illuminate\\Support\\Collection",
             "Modules\\Learning\\Models\\Assignment",
             "Modules\\Learning\\Models\\Assignment",
             "Modules\\Learning\\Models\\Assignment",
-            "Modules\\Learning\\Models\\Submission",
-            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Models\\Assignment",
+            "Modules\\Learning\\Models\\Assignment",
+            "Modules\\Learning\\Models\\Assignment",
             "Modules\\Learning\\Enums\\OverrideType",
+            "Illuminate\\Support\\Collection",
             "Modules\\Learning\\Models\\Submission",
-            "Illuminate\\Support\\Facades\\DB",
+            "Modules\\Learning\\Models\\Submission",
             "Modules\\Learning\\Models\\Assignment",
             "Modules\\Learning\\Models\\Submission",
-            "Modules\\Learning\\Models\\Assignment"
+            "Modules\\Learning\\Models\\Submission"
         ],
         "parents": [],
         "implements": [
             "Modules\\Learning\\Contracts\\Services\\SubmissionServiceInterface"
         ],
-        "lcom": 5,
-        "length": 1024,
-        "vocabulary": 155,
-        "volume": 7450.75,
-        "difficulty": 41.2,
-        "effort": 306944.35,
-        "level": 0.02,
-        "bugs": 2.48,
-        "time": 17052,
-        "intelligentContent": 180.86,
-        "number_operators": 255,
-        "number_operands": 769,
-        "number_operators_unique": 15,
-        "number_operands_unique": 140,
-        "cloc": 12,
-        "loc": 438,
-        "lloc": 426,
-        "mi": 16.64,
-        "mIwoC": 3.96,
-        "commentWeight": 12.68,
-        "kanDefect": 4.39,
-        "relativeStructuralComplexity": 14884,
-        "relativeDataComplexity": 0.44,
-        "relativeSystemComplexity": 14884.44,
-        "totalStructuralComplexity": 461404,
-        "totalDataComplexity": 13.69,
-        "totalSystemComplexity": 461417.69,
+        "lcom": 2,
+        "length": 171,
+        "vocabulary": 26,
+        "volume": 803.78,
+        "difficulty": 2.92,
+        "effort": 2347.02,
+        "level": 0.34,
+        "bugs": 0.27,
+        "time": 130,
+        "intelligentContent": 275.27,
+        "number_operators": 25,
+        "number_operands": 146,
+        "number_operators_unique": 1,
+        "number_operands_unique": 25,
+        "cloc": 0,
+        "loc": 107,
+        "lloc": 107,
+        "mi": 35.25,
+        "mIwoC": 35.25,
+        "commentWeight": 0,
+        "kanDefect": 0.15,
+        "relativeStructuralComplexity": 625,
+        "relativeDataComplexity": 1.05,
+        "relativeSystemComplexity": 626.05,
+        "totalStructuralComplexity": 16250,
+        "totalDataComplexity": 27.31,
+        "totalSystemComplexity": 16277.31,
         "package": "Modules\\Learning\\Services\\",
         "pageRank": 0,
         "afferentCoupling": 0,
-        "efferentCoupling": 24,
+        "efferentCoupling": 12,
         "instability": 1,
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
@@ -59922,6 +59852,1423 @@
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
+    "Modules\\Learning\\Services\\Support\\SubmissionValidator": {
+        "name": "Modules\\Learning\\Services\\Support\\SubmissionValidator",
+        "interface": false,
+        "abstract": false,
+        "final": false,
+        "methods": [
+            {
+                "name": "__construct",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "checkAttemptLimits",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "checkAttemptLimitsWithOverride",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "checkCooldownPeriod",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "checkDeadlineWithOverride",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "isSubmissionLate",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "hasActiveOverride",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "getDeadlineStatus",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "getExtendedDeadline",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "getAdditionalAttempts",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            }
+        ],
+        "nbMethodsIncludingGettersSetters": 10,
+        "nbMethods": 10,
+        "nbMethodsPrivate": 2,
+        "nbMethodsPublic": 8,
+        "nbMethodsGetter": 0,
+        "nbMethodsSetters": 0,
+        "wmc": 25,
+        "ccn": 16,
+        "ccnMethodMax": 5,
+        "externals": [
+            "Modules\\Learning\\Models\\Assignment",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Models\\Assignment",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Models\\Assignment",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Models\\Assignment",
+            "Modules\\Learning\\Models\\Assignment",
+            "Modules\\Learning\\Enums\\OverrideType",
+            "Modules\\Learning\\Models\\Assignment"
+        ],
+        "parents": [],
+        "implements": [],
+        "lcom": 4,
+        "length": 221,
+        "vocabulary": 42,
+        "volume": 1191.7,
+        "difficulty": 24.53,
+        "effort": 29233.94,
+        "level": 0.04,
+        "bugs": 0.4,
+        "time": 1624,
+        "intelligentContent": 48.58,
+        "number_operators": 64,
+        "number_operands": 157,
+        "number_operators_unique": 10,
+        "number_operands_unique": 32,
+        "cloc": 0,
+        "loc": 97,
+        "lloc": 97,
+        "mi": 32.97,
+        "mIwoC": 32.97,
+        "commentWeight": 0,
+        "kanDefect": 1.13,
+        "relativeStructuralComplexity": 441,
+        "relativeDataComplexity": 1.09,
+        "relativeSystemComplexity": 442.09,
+        "totalStructuralComplexity": 4410,
+        "totalDataComplexity": 10.91,
+        "totalSystemComplexity": 4420.91,
+        "package": "Modules\\Learning\\Services\\Support\\",
+        "pageRank": 0,
+        "afferentCoupling": 4,
+        "efferentCoupling": 3,
+        "instability": 0.43,
+        "violations": {},
+        "_type": "Hal\\Metric\\ClassMetric"
+    },
+    "Modules\\Learning\\Services\\Support\\": {
+        "name": "Modules\\Learning\\Services\\Support\\",
+        "classes": [
+            "Modules\\Learning\\Services\\Support\\SubmissionValidator",
+            "Modules\\Learning\\Services\\Support\\SubmissionCreationProcessor",
+            "Modules\\Learning\\Services\\Support\\SubmissionFinder",
+            "Modules\\Learning\\Services\\Support\\AssignmentFinder",
+            "Modules\\Learning\\Services\\Support\\SubmissionLifecycleProcessor",
+            "Modules\\Learning\\Services\\Support\\SubmissionCompletionProcessor",
+            "Modules\\Learning\\Services\\Support\\AssignmentDuplicator",
+            "Modules\\Learning\\Services\\Support\\AssignmentOverrideProcessor",
+            "Modules\\Learning\\Services\\Support\\AssignmentPrerequisiteProcessor"
+        ],
+        "incoming_class_dependencies": [
+            "Modules\\Learning\\Services\\SubmissionService",
+            "Modules\\Learning\\Services\\AssignmentService"
+        ],
+        "incoming_package_dependencies": [
+            "Modules\\Learning\\Services\\"
+        ],
+        "outgoing_class_dependencies": [
+            "Modules\\Learning\\Models\\Assignment",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Enums\\OverrideType",
+            "Modules\\Learning\\Contracts\\Repositories\\SubmissionRepositoryInterface",
+            "Modules\\Enrollments\\Contracts\\Repositories\\EnrollmentRepositoryInterface",
+            "Modules\\Learning\\Exceptions\\SubmissionException",
+            "Illuminate\\Support\\Carbon",
+            "Modules\\Learning\\Events\\SubmissionCreated",
+            "Illuminate\\Support\\Facades\\DB",
+            "Modules\\Schemes\\Models\\Lesson",
+            "Modules\\Common\\Models\\SystemSetting",
+            "Modules\\Learning\\Contracts\\Repositories\\QuestionRepositoryInterface",
+            "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
+            "Modules\\Auth\\Models\\User",
+            "Spatie\\QueryBuilder\\QueryBuilder",
+            "Spatie\\QueryBuilder\\AllowedFilter",
+            "Illuminate\\Support\\Collection",
+            "Modules\\Learning\\Models\\Question",
+            "Modules\\Schemes\\Models\\Course",
+            "Modules\\Schemes\\Models\\Unit",
+            "InvalidArgumentException",
+            "Illuminate\\Database\\Eloquent\\ModelNotFoundException",
+            "Modules\\Learning\\Models\\Answer",
+            "Modules\\Grading\\Services\\GradingEntryService",
+            "Modules\\Grading\\DTOs\\SubmissionGradeDTO",
+            "Modules\\Learning\\Events\\NewHighScoreAchieved",
+            "Modules\\Learning\\Contracts\\Repositories\\AssignmentRepositoryInterface",
+            "Modules\\Learning\\Exceptions\\AssignmentException",
+            "Modules\\Learning\\Contracts\\Repositories\\OverrideRepositoryInterface",
+            "Modules\\Learning\\Models\\Override",
+            "Modules\\Learning\\Events\\OverrideGranted",
+            "Illuminate\\Database\\Eloquent\\Collection",
+            "Modules\\Learning\\DTOs\\PrerequisiteCheckResult"
+        ],
+        "outgoing_package_dependencies": [
+            "Modules\\Learning\\Models\\",
+            "Modules\\Learning\\Enums\\",
+            "Modules\\Learning\\Contracts\\Repositories\\",
+            "Modules\\Enrollments\\Contracts\\Repositories\\",
+            "Modules\\Learning\\Exceptions\\",
+            "Illuminate\\Support\\",
+            "Modules\\Learning\\Events\\",
+            "Illuminate\\Support\\Facades\\",
+            "Modules\\Schemes\\Models\\",
+            "Modules\\Common\\Models\\",
+            "Illuminate\\Contracts\\Pagination\\",
+            "Modules\\Auth\\Models\\",
+            "Spatie\\QueryBuilder\\",
+            "\\",
+            "Illuminate\\Database\\Eloquent\\",
+            "Modules\\Grading\\Services\\",
+            "Modules\\Grading\\DTOs\\",
+            "Modules\\Learning\\DTOs\\"
+        ],
+        "abstraction": 0,
+        "instability": 0.9428571428571428,
+        "dependent_instabilities": {
+            "Modules\\Learning\\Models\\": 0.2391304347826087,
+            "Modules\\Learning\\Contracts\\Repositories\\": 0.375,
+            "Modules\\Enrollments\\Contracts\\Repositories\\": 0.4,
+            "Modules\\Learning\\Exceptions\\": 0.2222222222222222,
+            "Modules\\Learning\\Events\\": 0.23809523809523808,
+            "Modules\\Schemes\\Models\\": 0.11650485436893204,
+            "Modules\\Common\\Models\\": 0.30303030303030304,
+            "Modules\\Auth\\Models\\": 0.06,
+            "\\": 0.03389830508474576,
+            "Modules\\Grading\\Services\\": 0.8076923076923077,
+            "Modules\\Grading\\DTOs\\": 0.2,
+            "Modules\\Learning\\DTOs\\": 0.4
+        },
+        "distance": 0.04040610178208844,
+        "normalized_distance": 0.05714285714285716,
+        "violations": {},
+        "_type": "Hal\\Metric\\PackageMetric"
+    },
+    "Modules\\Learning\\Services\\Support\\SubmissionCreationProcessor": {
+        "name": "Modules\\Learning\\Services\\Support\\SubmissionCreationProcessor",
+        "interface": false,
+        "abstract": false,
+        "final": false,
+        "methods": [
+            {
+                "name": "__construct",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "create",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "startSubmission",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "getEnrollmentForLesson",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "isResubmitAllowed",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "generateQuestionSet",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            }
+        ],
+        "nbMethodsIncludingGettersSetters": 6,
+        "nbMethods": 6,
+        "nbMethodsPrivate": 3,
+        "nbMethodsPublic": 3,
+        "nbMethodsGetter": 0,
+        "nbMethodsSetters": 0,
+        "wmc": 25,
+        "ccn": 20,
+        "ccnMethodMax": 11,
+        "externals": [
+            "Modules\\Learning\\Contracts\\Repositories\\SubmissionRepositoryInterface",
+            "Modules\\Enrollments\\Contracts\\Repositories\\EnrollmentRepositoryInterface",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Models\\Assignment",
+            "Modules\\Learning\\Exceptions\\SubmissionException",
+            "Modules\\Learning\\Exceptions\\SubmissionException",
+            "Modules\\Learning\\Exceptions\\SubmissionException",
+            "Modules\\Learning\\Exceptions\\SubmissionException",
+            "Illuminate\\Support\\Carbon",
+            "Modules\\Learning\\Events\\SubmissionCreated",
+            "Illuminate\\Support\\Facades\\DB",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Services\\Support\\SubmissionValidator",
+            "Modules\\Learning\\Models\\Assignment",
+            "Modules\\Learning\\Exceptions\\SubmissionException",
+            "Modules\\Learning\\Exceptions\\SubmissionException",
+            "Modules\\Learning\\Exceptions\\SubmissionException",
+            "Modules\\Learning\\Models\\Submission",
+            "Illuminate\\Support\\Facades\\DB",
+            "Modules\\Schemes\\Models\\Lesson",
+            "Modules\\Learning\\Models\\Assignment",
+            "Modules\\Common\\Models\\SystemSetting"
+        ],
+        "parents": [],
+        "implements": [],
+        "lcom": 2,
+        "length": 204,
+        "vocabulary": 60,
+        "volume": 1205.01,
+        "difficulty": 12.23,
+        "effort": 14738.15,
+        "level": 0.08,
+        "bugs": 0.4,
+        "time": 819,
+        "intelligentContent": 98.52,
+        "number_operators": 45,
+        "number_operands": 159,
+        "number_operators_unique": 8,
+        "number_operands_unique": 52,
+        "cloc": 0,
+        "loc": 80,
+        "lloc": 80,
+        "mi": 34.22,
+        "mIwoC": 34.22,
+        "commentWeight": 0,
+        "kanDefect": 0.85,
+        "relativeStructuralComplexity": 841,
+        "relativeDataComplexity": 0.37,
+        "relativeSystemComplexity": 841.37,
+        "totalStructuralComplexity": 5046,
+        "totalDataComplexity": 2.23,
+        "totalSystemComplexity": 5048.23,
+        "package": "Modules\\Learning\\Services\\Support\\",
+        "pageRank": 0,
+        "afferentCoupling": 1,
+        "efferentCoupling": 11,
+        "instability": 0.92,
+        "violations": {},
+        "_type": "Hal\\Metric\\ClassMetric"
+    },
+    "Modules\\Learning\\Services\\Support\\SubmissionFinder": {
+        "name": "Modules\\Learning\\Services\\Support\\SubmissionFinder",
+        "interface": false,
+        "abstract": false,
+        "final": false,
+        "methods": [
+            {
+                "name": "__construct",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "listForAssignment",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "listForAssignmentForIndex",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "getSubmission",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "getSubmissionDetail",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "getSubmissionQuestions",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "getSubmissionQuestionsPaginated",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "searchSubmissions",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "listByAssignment",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "getHighestScoreSubmission",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "getSubmissionsWithHighestMarked",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            }
+        ],
+        "nbMethodsIncludingGettersSetters": 11,
+        "nbMethods": 11,
+        "nbMethodsPrivate": 0,
+        "nbMethodsPublic": 11,
+        "nbMethodsGetter": 0,
+        "nbMethodsSetters": 0,
+        "wmc": 17,
+        "ccn": 7,
+        "ccnMethodMax": 3,
+        "externals": [
+            "Modules\\Learning\\Contracts\\Repositories\\SubmissionRepositoryInterface",
+            "Modules\\Learning\\Contracts\\Repositories\\QuestionRepositoryInterface",
+            "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
+            "Modules\\Learning\\Models\\Assignment",
+            "Modules\\Auth\\Models\\User",
+            "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
+            "Modules\\Learning\\Models\\Assignment",
+            "Modules\\Auth\\Models\\User",
+            "Spatie\\QueryBuilder\\QueryBuilder",
+            "Spatie\\QueryBuilder\\AllowedFilter",
+            "Spatie\\QueryBuilder\\AllowedFilter",
+            "Spatie\\QueryBuilder\\AllowedFilter",
+            "Spatie\\QueryBuilder\\AllowedFilter",
+            "Modules\\Learning\\Models\\Submission",
+            "Spatie\\QueryBuilder\\QueryBuilder",
+            "Modules\\Learning\\Models\\Submission",
+            "Illuminate\\Support\\Collection",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Models\\Question",
+            "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Models\\Question",
+            "Modules\\Learning\\Models\\Question",
+            "Modules\\Learning\\Models\\Assignment",
+            "Illuminate\\Support\\Collection"
+        ],
+        "parents": [],
+        "implements": [],
+        "lcom": 3,
+        "length": 212,
+        "vocabulary": 59,
+        "volume": 1247.12,
+        "difficulty": 13.33,
+        "effort": 16628.27,
+        "level": 0.08,
+        "bugs": 0.42,
+        "time": 924,
+        "intelligentContent": 93.53,
+        "number_operators": 42,
+        "number_operands": 170,
+        "number_operators_unique": 8,
+        "number_operands_unique": 51,
+        "cloc": 0,
+        "loc": 89,
+        "lloc": 89,
+        "mi": 34.86,
+        "mIwoC": 34.86,
+        "commentWeight": 0,
+        "kanDefect": 0.43,
+        "relativeStructuralComplexity": 1521,
+        "relativeDataComplexity": 0.38,
+        "relativeSystemComplexity": 1521.38,
+        "totalStructuralComplexity": 16731,
+        "totalDataComplexity": 4.2,
+        "totalSystemComplexity": 16735.2,
+        "package": "Modules\\Learning\\Services\\Support\\",
+        "pageRank": 0,
+        "afferentCoupling": 1,
+        "efferentCoupling": 10,
+        "instability": 0.91,
+        "violations": {},
+        "_type": "Hal\\Metric\\ClassMetric"
+    },
+    "Modules\\Learning\\Services\\Support\\AssignmentFinder": {
+        "name": "Modules\\Learning\\Services\\Support\\AssignmentFinder",
+        "interface": false,
+        "abstract": false,
+        "final": false,
+        "methods": [
+            {
+                "name": "resolveCourseFromScope",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "resolveCourseFromScopeOrFail",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "listForIndex",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "listByLesson",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "listByLessonForIndex",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "listByUnit",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "listByUnitForIndex",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "listByCourse",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "listByCourseForIndex",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "listIncomplete",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "buildQuery",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "buildQueryForIndex",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            }
+        ],
+        "nbMethodsIncludingGettersSetters": 12,
+        "nbMethods": 12,
+        "nbMethodsPrivate": 2,
+        "nbMethodsPublic": 10,
+        "nbMethodsGetter": 0,
+        "nbMethodsSetters": 0,
+        "wmc": 27,
+        "ccn": 16,
+        "ccnMethodMax": 8,
+        "externals": [
+            "Modules\\Schemes\\Models\\Course",
+            "Modules\\Schemes\\Models\\Unit",
+            "Modules\\Schemes\\Models\\Lesson",
+            "Modules\\Schemes\\Models\\Course",
+            "InvalidArgumentException",
+            "InvalidArgumentException",
+            "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
+            "Modules\\Schemes\\Models\\Course",
+            "Modules\\Schemes\\Models\\Lesson",
+            "Illuminate\\Database\\Eloquent\\ModelNotFoundException",
+            "InvalidArgumentException",
+            "Modules\\Schemes\\Models\\Unit",
+            "Illuminate\\Database\\Eloquent\\ModelNotFoundException",
+            "InvalidArgumentException",
+            "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
+            "Modules\\Schemes\\Models\\Lesson",
+            "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
+            "Modules\\Schemes\\Models\\Lesson",
+            "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
+            "Modules\\Schemes\\Models\\Unit",
+            "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
+            "Modules\\Schemes\\Models\\Unit",
+            "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
+            "Modules\\Schemes\\Models\\Course",
+            "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
+            "Modules\\Schemes\\Models\\Course",
+            "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
+            "Modules\\Schemes\\Models\\Course",
+            "Spatie\\QueryBuilder\\QueryBuilder",
+            "Modules\\Learning\\Models\\Assignment",
+            "Spatie\\QueryBuilder\\QueryBuilder",
+            "Modules\\Learning\\Models\\Assignment",
+            "Spatie\\QueryBuilder\\AllowedFilter",
+            "Spatie\\QueryBuilder\\AllowedFilter",
+            "Spatie\\QueryBuilder\\QueryBuilder",
+            "Modules\\Learning\\Models\\Assignment",
+            "Spatie\\QueryBuilder\\QueryBuilder",
+            "Modules\\Learning\\Models\\Assignment",
+            "Spatie\\QueryBuilder\\AllowedFilter",
+            "Spatie\\QueryBuilder\\AllowedFilter"
+        ],
+        "parents": [],
+        "implements": [],
+        "lcom": 2,
+        "length": 289,
+        "vocabulary": 75,
+        "volume": 1800.13,
+        "difficulty": 8.46,
+        "effort": 15236.8,
+        "level": 0.12,
+        "bugs": 0.6,
+        "time": 846,
+        "intelligentContent": 212.67,
+        "number_operators": 52,
+        "number_operands": 237,
+        "number_operators_unique": 5,
+        "number_operands_unique": 70,
+        "cloc": 1,
+        "loc": 114,
+        "lloc": 113,
+        "mi": 37.5,
+        "mIwoC": 30.27,
+        "commentWeight": 7.23,
+        "kanDefect": 0.85,
+        "relativeStructuralComplexity": 2116,
+        "relativeDataComplexity": 0.34,
+        "relativeSystemComplexity": 2116.34,
+        "totalStructuralComplexity": 25392,
+        "totalDataComplexity": 4.04,
+        "totalSystemComplexity": 25396.04,
+        "package": "Modules\\Learning\\Services\\Support\\",
+        "pageRank": 0,
+        "afferentCoupling": 1,
+        "efferentCoupling": 9,
+        "instability": 0.9,
+        "violations": {},
+        "_type": "Hal\\Metric\\ClassMetric"
+    },
+    "Modules\\Learning\\Services\\Support\\SubmissionLifecycleProcessor": {
+        "name": "Modules\\Learning\\Services\\Support\\SubmissionLifecycleProcessor",
+        "interface": false,
+        "abstract": false,
+        "final": false,
+        "methods": [
+            {
+                "name": "__construct",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "create",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "startSubmission",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "update",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "grade",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "saveAnswer",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "submitAnswers",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "updateSubmissionScore",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "delete",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            }
+        ],
+        "nbMethodsIncludingGettersSetters": 9,
+        "nbMethods": 9,
+        "nbMethodsPrivate": 0,
+        "nbMethodsPublic": 9,
+        "nbMethodsGetter": 0,
+        "nbMethodsSetters": 0,
+        "wmc": 9,
+        "ccn": 1,
+        "ccnMethodMax": 1,
+        "externals": [
+            "Modules\\Learning\\Services\\Support\\SubmissionCreationProcessor",
+            "Modules\\Learning\\Services\\Support\\SubmissionCompletionProcessor",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Models\\Assignment",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Services\\Support\\SubmissionValidator",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Models\\Answer",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Services\\Support\\SubmissionValidator",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Services\\Support\\SubmissionValidator",
+            "Modules\\Learning\\Contracts\\Repositories\\QuestionRepositoryInterface",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Models\\Submission"
+        ],
+        "parents": [],
+        "implements": [],
+        "lcom": 2,
+        "length": 64,
+        "vocabulary": 19,
+        "volume": 271.87,
+        "difficulty": 1.56,
+        "effort": 422.9,
+        "level": 0.64,
+        "bugs": 0.09,
+        "time": 23,
+        "intelligentContent": 174.77,
+        "number_operators": 8,
+        "number_operands": 56,
+        "number_operators_unique": 1,
+        "number_operands_unique": 18,
+        "cloc": 0,
+        "loc": 39,
+        "lloc": 39,
+        "mi": 48.11,
+        "mIwoC": 48.11,
+        "commentWeight": 0,
+        "kanDefect": 0.15,
+        "relativeStructuralComplexity": 64,
+        "relativeDataComplexity": 1.2,
+        "relativeSystemComplexity": 65.2,
+        "totalStructuralComplexity": 576,
+        "totalDataComplexity": 10.78,
+        "totalSystemComplexity": 586.78,
+        "package": "Modules\\Learning\\Services\\Support\\",
+        "pageRank": 0,
+        "afferentCoupling": 1,
+        "efferentCoupling": 7,
+        "instability": 0.88,
+        "violations": {},
+        "_type": "Hal\\Metric\\ClassMetric"
+    },
+    "Modules\\Learning\\Services\\Support\\SubmissionCompletionProcessor": {
+        "name": "Modules\\Learning\\Services\\Support\\SubmissionCompletionProcessor",
+        "interface": false,
+        "abstract": false,
+        "final": false,
+        "methods": [
+            {
+                "name": "__construct",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "update",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "grade",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "saveAnswer",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "submitAnswers",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "updateSubmissionScore",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "delete",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "isTimerExpired",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "validateQuestionInAssignment",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "prepareAnswerData",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "handleFileUpload",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "processAnswers",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "validateAllQuestionsAnswered",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "checkAndDispatchNewHighScore",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            }
+        ],
+        "nbMethodsIncludingGettersSetters": 14,
+        "nbMethods": 14,
+        "nbMethodsPrivate": 7,
+        "nbMethodsPublic": 7,
+        "nbMethodsGetter": 0,
+        "nbMethodsSetters": 0,
+        "wmc": 55,
+        "ccn": 42,
+        "ccnMethodMax": 8,
+        "externals": [
+            "Modules\\Learning\\Contracts\\Repositories\\SubmissionRepositoryInterface",
+            "Modules\\Grading\\Services\\GradingEntryService",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Exceptions\\SubmissionException",
+            "Illuminate\\Support\\Facades\\DB",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Exceptions\\SubmissionException",
+            "Modules\\Grading\\DTOs\\SubmissionGradeDTO",
+            "Illuminate\\Support\\Facades\\DB",
+            "Modules\\Learning\\Models\\Answer",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Services\\Support\\SubmissionValidator",
+            "Modules\\Learning\\Exceptions\\SubmissionException",
+            "Modules\\Learning\\Exceptions\\SubmissionException",
+            "Modules\\Learning\\Exceptions\\SubmissionException",
+            "Modules\\Learning\\Models\\Question",
+            "Modules\\Learning\\Models\\Answer",
+            "Illuminate\\Support\\Facades\\DB",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Services\\Support\\SubmissionValidator",
+            "Modules\\Learning\\Contracts\\Repositories\\QuestionRepositoryInterface",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Exceptions\\SubmissionException",
+            "Modules\\Learning\\Exceptions\\SubmissionException",
+            "Modules\\Learning\\Exceptions\\SubmissionException",
+            "Illuminate\\Support\\Carbon",
+            "Illuminate\\Support\\Facades\\DB",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Models\\Submission",
+            "Illuminate\\Support\\Facades\\DB",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Models\\Submission",
+            "Illuminate\\Database\\Eloquent\\ModelNotFoundException",
+            "Modules\\Learning\\Models\\Question",
+            "Illuminate\\Database\\Eloquent\\ModelNotFoundException",
+            "Modules\\Learning\\Models\\Question",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Services\\Support\\SubmissionValidator",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Contracts\\Repositories\\QuestionRepositoryInterface",
+            "Modules\\Learning\\Exceptions\\SubmissionException",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Models\\Submission",
+            "Modules\\Learning\\Events\\NewHighScoreAchieved"
+        ],
+        "parents": [],
+        "implements": [],
+        "lcom": 3,
+        "length": 413,
+        "vocabulary": 78,
+        "volume": 2595.87,
+        "difficulty": 25.78,
+        "effort": 66911.48,
+        "level": 0.04,
+        "bugs": 0.87,
+        "time": 3717,
+        "intelligentContent": 100.71,
+        "number_operators": 99,
+        "number_operands": 314,
+        "number_operators_unique": 11,
+        "number_operands_unique": 67,
+        "cloc": 0,
+        "loc": 190,
+        "lloc": 190,
+        "mi": 20.74,
+        "mIwoC": 20.74,
+        "commentWeight": 0,
+        "kanDefect": 2.29,
+        "relativeStructuralComplexity": 3249,
+        "relativeDataComplexity": 0.3,
+        "relativeSystemComplexity": 3249.3,
+        "totalStructuralComplexity": 45486,
+        "totalDataComplexity": 4.24,
+        "totalSystemComplexity": 45490.24,
+        "package": "Modules\\Learning\\Services\\Support\\",
+        "pageRank": 0,
+        "afferentCoupling": 1,
+        "efferentCoupling": 13,
+        "instability": 0.93,
+        "violations": {},
+        "_type": "Hal\\Metric\\ClassMetric"
+    },
+    "Modules\\Learning\\Services\\Support\\AssignmentDuplicator": {
+        "name": "Modules\\Learning\\Services\\Support\\AssignmentDuplicator",
+        "interface": false,
+        "abstract": false,
+        "final": false,
+        "methods": [
+            {
+                "name": "__construct",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "duplicateAssignment",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "prepareAssignmentDataForDuplication",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "duplicateQuestions",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "duplicatePrerequisites",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            }
+        ],
+        "nbMethodsIncludingGettersSetters": 5,
+        "nbMethods": 5,
+        "nbMethodsPrivate": 3,
+        "nbMethodsPublic": 2,
+        "nbMethodsGetter": 0,
+        "nbMethodsSetters": 0,
+        "wmc": 28,
+        "ccn": 24,
+        "ccnMethodMax": 20,
+        "externals": [
+            "Modules\\Learning\\Contracts\\Repositories\\AssignmentRepositoryInterface",
+            "Modules\\Learning\\Models\\Assignment",
+            "Modules\\Learning\\Exceptions\\AssignmentException",
+            "Illuminate\\Support\\Facades\\DB",
+            "Modules\\Learning\\Models\\Assignment",
+            "Modules\\Learning\\Models\\Assignment",
+            "Modules\\Learning\\Models\\Assignment",
+            "Modules\\Learning\\Models\\Assignment",
+            "Modules\\Learning\\Models\\Assignment"
+        ],
+        "parents": [],
+        "implements": [],
+        "lcom": 2,
+        "length": 170,
+        "vocabulary": 47,
+        "volume": 944.28,
+        "difficulty": 8.27,
+        "effort": 7812.79,
+        "level": 0.12,
+        "bugs": 0.31,
+        "time": 434,
+        "intelligentContent": 114.13,
+        "number_operators": 31,
+        "number_operands": 139,
+        "number_operators_unique": 5,
+        "number_operands_unique": 42,
+        "cloc": 5,
+        "loc": 44,
+        "lloc": 39,
+        "mi": 66.17,
+        "mIwoC": 41.23,
+        "commentWeight": 24.94,
+        "kanDefect": 0.52,
+        "relativeStructuralComplexity": 256,
+        "relativeDataComplexity": 0.29,
+        "relativeSystemComplexity": 256.29,
+        "totalStructuralComplexity": 1280,
+        "totalDataComplexity": 1.47,
+        "totalSystemComplexity": 1281.47,
+        "package": "Modules\\Learning\\Services\\Support\\",
+        "pageRank": 0,
+        "afferentCoupling": 1,
+        "efferentCoupling": 4,
+        "instability": 0.8,
+        "violations": {},
+        "_type": "Hal\\Metric\\ClassMetric"
+    },
+    "Modules\\Learning\\Services\\Support\\AssignmentOverrideProcessor": {
+        "name": "Modules\\Learning\\Services\\Support\\AssignmentOverrideProcessor",
+        "interface": false,
+        "abstract": false,
+        "final": false,
+        "methods": [
+            {
+                "name": "__construct",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "grantOverride",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "getOverridesForAssignment",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "hasPrerequisiteOverride",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "getBypassedPrerequisiteIds",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "validateOverrideValue",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "validatePrerequisiteOverrideValue",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "validateAttemptsOverrideValue",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "validateDeadlineOverrideValue",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            }
+        ],
+        "nbMethodsIncludingGettersSetters": 9,
+        "nbMethods": 9,
+        "nbMethodsPrivate": 4,
+        "nbMethodsPublic": 5,
+        "nbMethodsGetter": 0,
+        "nbMethodsSetters": 0,
+        "wmc": 28,
+        "ccn": 20,
+        "ccnMethodMax": 6,
+        "externals": [
+            "Modules\\Learning\\Contracts\\Repositories\\OverrideRepositoryInterface",
+            "Modules\\Learning\\Contracts\\Repositories\\AssignmentRepositoryInterface",
+            "Modules\\Learning\\Models\\Override",
+            "InvalidArgumentException",
+            "Modules\\Learning\\Enums\\OverrideType",
+            "Modules\\Learning\\Enums\\OverrideType",
+            "InvalidArgumentException",
+            "Illuminate\\Support\\Carbon",
+            "Modules\\Learning\\Events\\OverrideGranted",
+            "Illuminate\\Support\\Facades\\DB",
+            "Illuminate\\Database\\Eloquent\\Collection",
+            "Modules\\Learning\\Enums\\OverrideType",
+            "Modules\\Learning\\Models\\Assignment",
+            "Modules\\Learning\\Models\\Assignment",
+            "InvalidArgumentException",
+            "InvalidArgumentException",
+            "Modules\\Learning\\Models\\Assignment",
+            "InvalidArgumentException",
+            "Illuminate\\Support\\Carbon",
+            "InvalidArgumentException",
+            "InvalidArgumentException"
+        ],
+        "parents": [],
+        "implements": [],
+        "lcom": 2,
+        "length": 182,
+        "vocabulary": 50,
+        "volume": 1027.18,
+        "difficulty": 13.05,
+        "effort": 13402.28,
+        "level": 0.08,
+        "bugs": 0.34,
+        "time": 745,
+        "intelligentContent": 78.73,
+        "number_operators": 45,
+        "number_operands": 137,
+        "number_operators_unique": 8,
+        "number_operands_unique": 42,
+        "cloc": 0,
+        "loc": 84,
+        "lloc": 84,
+        "mi": 34.25,
+        "mIwoC": 34.25,
+        "commentWeight": 0,
+        "kanDefect": 0.71,
+        "relativeStructuralComplexity": 484,
+        "relativeDataComplexity": 0.54,
+        "relativeSystemComplexity": 484.54,
+        "totalStructuralComplexity": 4356,
+        "totalDataComplexity": 4.83,
+        "totalSystemComplexity": 4360.83,
+        "package": "Modules\\Learning\\Services\\Support\\",
+        "pageRank": 0,
+        "afferentCoupling": 2,
+        "efferentCoupling": 10,
+        "instability": 0.83,
+        "violations": {},
+        "_type": "Hal\\Metric\\ClassMetric"
+    },
+    "Modules\\Learning\\Services\\Support\\AssignmentPrerequisiteProcessor": {
+        "name": "Modules\\Learning\\Services\\Support\\AssignmentPrerequisiteProcessor",
+        "interface": false,
+        "abstract": false,
+        "final": false,
+        "methods": [
+            {
+                "name": "__construct",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "checkPrerequisites",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "addPrerequisite",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "removePrerequisite",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "hasCircularDependency",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "detectCycle",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "getPrerequisitesForScope",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "filterPrerequisitesByLesson",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "filterPrerequisitesByUnit",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "getIncompletePrerequisites",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "hasCompletedAssignment",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            }
+        ],
+        "nbMethodsIncludingGettersSetters": 11,
+        "nbMethods": 11,
+        "nbMethodsPrivate": 6,
+        "nbMethodsPublic": 5,
+        "nbMethodsGetter": 0,
+        "nbMethodsSetters": 0,
+        "wmc": 30,
+        "ccn": 20,
+        "ccnMethodMax": 6,
+        "externals": [
+            "Modules\\Learning\\Contracts\\Repositories\\AssignmentRepositoryInterface",
+            "Modules\\Learning\\Contracts\\Repositories\\SubmissionRepositoryInterface",
+            "Modules\\Learning\\DTOs\\PrerequisiteCheckResult",
+            "Modules\\Learning\\Services\\Support\\AssignmentOverrideProcessor",
+            "Modules\\Learning\\Exceptions\\AssignmentException",
+            "Modules\\Learning\\DTOs\\PrerequisiteCheckResult",
+            "Modules\\Learning\\DTOs\\PrerequisiteCheckResult",
+            "Modules\\Learning\\DTOs\\PrerequisiteCheckResult",
+            "Modules\\Learning\\DTOs\\PrerequisiteCheckResult",
+            "Modules\\Learning\\DTOs\\PrerequisiteCheckResult",
+            "InvalidArgumentException",
+            "InvalidArgumentException",
+            "Illuminate\\Support\\Collection",
+            "Modules\\Learning\\Models\\Assignment",
+            "Illuminate\\Support\\Collection",
+            "Illuminate\\Support\\Collection",
+            "Modules\\Learning\\Models\\Assignment",
+            "Illuminate\\Support\\Collection",
+            "Illuminate\\Support\\Collection",
+            "Modules\\Learning\\Models\\Assignment",
+            "Illuminate\\Support\\Collection",
+            "Illuminate\\Support\\Collection",
+            "Modules\\Learning\\Services\\Support\\AssignmentOverrideProcessor"
+        ],
+        "parents": [],
+        "implements": [],
+        "lcom": 2,
+        "length": 204,
+        "vocabulary": 36,
+        "volume": 1054.66,
+        "difficulty": 17.38,
+        "effort": 18329.35,
+        "level": 0.06,
+        "bugs": 0.35,
+        "time": 1018,
+        "intelligentContent": 60.69,
+        "number_operators": 60,
+        "number_operands": 144,
+        "number_operators_unique": 7,
+        "number_operands_unique": 29,
+        "cloc": 2,
+        "loc": 118,
+        "lloc": 116,
+        "mi": 41.12,
+        "mIwoC": 31.11,
+        "commentWeight": 10.02,
+        "kanDefect": 1.36,
+        "relativeStructuralComplexity": 576,
+        "relativeDataComplexity": 0.93,
+        "relativeSystemComplexity": 576.93,
+        "totalStructuralComplexity": 6336,
+        "totalDataComplexity": 10.28,
+        "totalSystemComplexity": 6346.28,
+        "package": "Modules\\Learning\\Services\\Support\\",
+        "pageRank": 0,
+        "afferentCoupling": 1,
+        "efferentCoupling": 8,
+        "instability": 0.89,
+        "violations": {},
+        "_type": "Hal\\Metric\\ClassMetric"
+    },
     "Modules\\Learning\\Services\\AssignmentService": {
         "name": "Modules\\Learning\\Services\\AssignmentService",
         "interface": false,
@@ -60020,20 +61367,6 @@
                 "_type": "Hal\\Metric\\FunctionMetric"
             },
             {
-                "name": "buildQuery",
-                "role": null,
-                "public": false,
-                "private": true,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "buildQueryForIndex",
-                "role": null,
-                "public": false,
-                "private": true,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
                 "name": "create",
                 "role": null,
                 "public": true,
@@ -60097,66 +61430,10 @@
                 "_type": "Hal\\Metric\\FunctionMetric"
             },
             {
-                "name": "hasPrerequisiteOverride",
-                "role": null,
-                "public": false,
-                "private": true,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "getBypassedPrerequisiteIds",
-                "role": null,
-                "public": false,
-                "private": true,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "getPrerequisitesForScope",
-                "role": null,
-                "public": false,
-                "private": true,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "filterPrerequisitesByLesson",
-                "role": null,
-                "public": false,
-                "private": true,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "filterPrerequisitesByUnit",
-                "role": null,
-                "public": false,
-                "private": true,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "getIncompletePrerequisites",
-                "role": null,
-                "public": false,
-                "private": true,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "hasCompletedAssignment",
-                "role": null,
-                "public": false,
-                "private": true,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
                 "name": "hasCircularDependency",
                 "role": null,
                 "public": true,
                 "private": false,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "detectCycle",
-                "role": null,
-                "public": false,
-                "private": true,
                 "_type": "Hal\\Metric\\FunctionMetric"
             },
             {
@@ -60181,91 +61458,34 @@
                 "_type": "Hal\\Metric\\FunctionMetric"
             },
             {
-                "name": "validateOverrideValue",
-                "role": null,
-                "public": false,
-                "private": true,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "validatePrerequisiteOverrideValue",
-                "role": null,
-                "public": false,
-                "private": true,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "validateAttemptsOverrideValue",
-                "role": null,
-                "public": false,
-                "private": true,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "validateDeadlineOverrideValue",
-                "role": null,
-                "public": false,
-                "private": true,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
                 "name": "duplicateAssignment",
                 "role": null,
                 "public": true,
                 "private": false,
                 "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "prepareAssignmentDataForDuplication",
-                "role": null,
-                "public": false,
-                "private": true,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "duplicateQuestions",
-                "role": null,
-                "public": false,
-                "private": true,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "duplicatePrerequisites",
-                "role": null,
-                "public": false,
-                "private": true,
-                "_type": "Hal\\Metric\\FunctionMetric"
             }
         ],
-        "nbMethodsIncludingGettersSetters": 44,
-        "nbMethods": 44,
-        "nbMethodsPrivate": 17,
+        "nbMethodsIncludingGettersSetters": 27,
+        "nbMethods": 27,
+        "nbMethodsPrivate": 0,
         "nbMethodsPublic": 27,
         "nbMethodsGetter": 0,
         "nbMethodsSetters": 0,
-        "wmc": 163,
-        "ccn": 120,
-        "ccnMethodMax": 20,
+        "wmc": 59,
+        "ccn": 33,
+        "ccnMethodMax": 15,
         "externals": [
             "Modules\\Learning\\Contracts\\Services\\AssignmentServiceInterface",
             "Modules\\Learning\\Repositories\\AssignmentRepository",
-            "Modules\\Learning\\Contracts\\Repositories\\SubmissionRepositoryInterface",
-            "Modules\\Schemes\\Models\\Course",
-            "Modules\\Schemes\\Models\\Unit",
-            "Modules\\Schemes\\Models\\Lesson",
-            "Modules\\Schemes\\Models\\Course",
-            "InvalidArgumentException",
-            "InvalidArgumentException",
-            "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
+            "Modules\\Learning\\Services\\Support\\AssignmentFinder",
+            "Modules\\Learning\\Services\\Support\\AssignmentPrerequisiteProcessor",
+            "Modules\\Learning\\Services\\Support\\AssignmentOverrideProcessor",
+            "Modules\\Learning\\Services\\Support\\AssignmentDuplicator",
             "Modules\\Schemes\\Models\\Course",
             "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
             "Modules\\Schemes\\Models\\Course",
-            "Modules\\Schemes\\Models\\Lesson",
-            "Illuminate\\Database\\Eloquent\\ModelNotFoundException",
-            "InvalidArgumentException",
-            "Modules\\Schemes\\Models\\Unit",
-            "Illuminate\\Database\\Eloquent\\ModelNotFoundException",
-            "InvalidArgumentException",
+            "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
+            "Modules\\Schemes\\Models\\Course",
             "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
             "Modules\\Schemes\\Models\\Lesson",
             "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
@@ -60281,18 +61501,9 @@
             "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
             "Modules\\Schemes\\Models\\Course",
             "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
-            "Spatie\\QueryBuilder\\QueryBuilder",
-            "Modules\\Learning\\Models\\Assignment",
-            "Spatie\\QueryBuilder\\QueryBuilder",
-            "Modules\\Learning\\Models\\Assignment",
-            "Spatie\\QueryBuilder\\AllowedFilter",
-            "Spatie\\QueryBuilder\\AllowedFilter",
-            "Spatie\\QueryBuilder\\QueryBuilder",
-            "Modules\\Learning\\Models\\Assignment",
-            "Spatie\\QueryBuilder\\QueryBuilder",
-            "Modules\\Learning\\Models\\Assignment",
-            "Spatie\\QueryBuilder\\AllowedFilter",
-            "Spatie\\QueryBuilder\\AllowedFilter",
+            "Modules\\Schemes\\Models\\Course",
+            "Modules\\Schemes\\Models\\Unit",
+            "Modules\\Schemes\\Models\\Lesson",
             "Modules\\Learning\\Models\\Assignment",
             "Illuminate\\Support\\Carbon",
             "Illuminate\\Support\\Carbon",
@@ -60320,89 +61531,45 @@
             "Modules\\Learning\\Models\\Assignment",
             "Modules\\Learning\\Models\\Assignment",
             "Illuminate\\Database\\Eloquent\\Collection",
-            "Illuminate\\Database\\Eloquent\\Collection",
             "Modules\\Learning\\DTOs\\PrerequisiteCheckResult",
-            "Modules\\Learning\\Exceptions\\AssignmentException",
-            "Modules\\Learning\\DTOs\\PrerequisiteCheckResult",
-            "Modules\\Learning\\DTOs\\PrerequisiteCheckResult",
-            "Modules\\Learning\\DTOs\\PrerequisiteCheckResult",
-            "Modules\\Learning\\DTOs\\PrerequisiteCheckResult",
-            "Modules\\Learning\\DTOs\\PrerequisiteCheckResult",
-            "Illuminate\\Support\\Collection",
-            "Modules\\Learning\\Models\\Assignment",
-            "Illuminate\\Support\\Collection",
-            "Illuminate\\Support\\Collection",
-            "Modules\\Learning\\Models\\Assignment",
-            "Illuminate\\Support\\Collection",
-            "Illuminate\\Support\\Collection",
-            "Modules\\Learning\\Models\\Assignment",
-            "Illuminate\\Support\\Collection",
-            "Illuminate\\Support\\Collection",
-            "InvalidArgumentException",
-            "InvalidArgumentException",
             "Modules\\Learning\\Models\\Override",
-            "InvalidArgumentException",
-            "Modules\\Learning\\Enums\\OverrideType",
-            "Modules\\Learning\\Enums\\OverrideType",
-            "InvalidArgumentException",
-            "RuntimeException",
-            "Illuminate\\Support\\Carbon",
-            "Modules\\Learning\\Events\\OverrideGranted",
-            "Illuminate\\Support\\Facades\\DB",
-            "Modules\\Learning\\Enums\\OverrideType",
-            "Modules\\Learning\\Models\\Assignment",
-            "Modules\\Learning\\Models\\Assignment",
-            "InvalidArgumentException",
-            "InvalidArgumentException",
-            "Modules\\Learning\\Models\\Assignment",
-            "InvalidArgumentException",
-            "Illuminate\\Support\\Carbon",
-            "InvalidArgumentException",
-            "InvalidArgumentException",
-            "Modules\\Learning\\Models\\Assignment",
-            "Modules\\Learning\\Exceptions\\AssignmentException",
-            "Illuminate\\Support\\Facades\\DB",
-            "Modules\\Learning\\Models\\Assignment",
-            "Modules\\Learning\\Models\\Assignment",
-            "Modules\\Learning\\Models\\Assignment",
-            "Modules\\Learning\\Models\\Assignment",
             "Modules\\Learning\\Models\\Assignment"
         ],
         "parents": [],
         "implements": [
             "Modules\\Learning\\Contracts\\Services\\AssignmentServiceInterface"
         ],
-        "lcom": 4,
-        "length": 1261,
-        "vocabulary": 190,
-        "volume": 9545.59,
-        "difficulty": 30.27,
-        "effort": 288900.68,
-        "level": 0.03,
-        "bugs": 3.18,
-        "time": 16050,
-        "intelligentContent": 315.4,
-        "number_operators": 276,
-        "number_operands": 985,
-        "number_operators_unique": 11,
-        "number_operands_unique": 179,
-        "cloc": 7,
-        "loc": 460,
-        "lloc": 453,
-        "mi": 9.5,
-        "mIwoC": 0,
-        "commentWeight": 9.5,
-        "kanDefect": 4.36,
-        "relativeStructuralComplexity": 15625,
-        "relativeDataComplexity": 0.54,
-        "relativeSystemComplexity": 15625.54,
-        "totalStructuralComplexity": 687500,
-        "totalDataComplexity": 23.75,
-        "totalSystemComplexity": 687523.75,
+        "lcom": 2,
+        "length": 359,
+        "vocabulary": 70,
+        "volume": 2200.41,
+        "difficulty": 18.97,
+        "effort": 41736.86,
+        "level": 0.05,
+        "bugs": 0.73,
+        "time": 2319,
+        "intelligentContent": 116.01,
+        "number_operators": 65,
+        "number_operands": 294,
+        "number_operators_unique": 8,
+        "number_operands_unique": 62,
+        "cloc": 0,
+        "loc": 163,
+        "lloc": 163,
+        "mi": 23.9,
+        "mIwoC": 23.9,
+        "commentWeight": 0,
+        "kanDefect": 1.39,
+        "relativeStructuralComplexity": 1849,
+        "relativeDataComplexity": 0.73,
+        "relativeSystemComplexity": 1849.73,
+        "totalStructuralComplexity": 49923,
+        "totalDataComplexity": 19.7,
+        "totalSystemComplexity": 49942.7,
         "package": "Modules\\Learning\\Services\\",
         "pageRank": 0,
         "afferentCoupling": 0,
-        "efferentCoupling": 26,
+        "efferentCoupling": 20,
         "instability": 1,
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
@@ -60478,15 +61645,15 @@
         "name": "Modules\\Learning\\Console\\Commands\\",
         "classes": [
             "Modules\\Learning\\Console\\Commands\\PublishScheduledAssignments",
-            "anonymous@00000000000025800000000000000000",
-            "anonymous@0000000000001cf20000000000000000",
-            "anonymous@000000000000233b0000000000000000",
-            "anonymous@00000000000018180000000000000000",
-            "anonymous@00000000000023cd0000000000000000",
-            "anonymous@0000000000001a3e0000000000000000",
-            "anonymous@0000000000002b080000000000000000",
-            "anonymous@0000000000002c520000000000000000",
-            "anonymous@0000000000001dc40000000000000000"
+            "anonymous@0000000000002d750000000000000000",
+            "anonymous@00000000000006b00000000000000000",
+            "anonymous@00000000000026850000000000000000",
+            "anonymous@000000000000040c0000000000000000",
+            "anonymous@00000000000023420000000000000000",
+            "anonymous@0000000000001bb00000000000000000",
+            "anonymous@0000000000002d100000000000000000",
+            "anonymous@00000000000031080000000000000000",
+            "anonymous@00000000000016ee0000000000000000"
         ],
         "outgoing_class_dependencies": [
             "Illuminate\\Console\\Command",
@@ -60504,15 +61671,15 @@
         "abstraction": 0,
         "instability": 1,
         "dependent_instabilities": {
-            "Modules\\Learning\\Models\\": 0.26506024096385544
+            "Modules\\Learning\\Models\\": 0.2391304347826087
         },
         "distance": 0,
         "normalized_distance": 0,
         "violations": {},
         "_type": "Hal\\Metric\\PackageMetric"
     },
-    "anonymous@00000000000025800000000000000000": {
-        "name": "anonymous@00000000000025800000000000000000",
+    "anonymous@0000000000002d750000000000000000": {
+        "name": "anonymous@0000000000002d750000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -60585,8 +61752,8 @@
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
-    "anonymous@0000000000001cf20000000000000000": {
-        "name": "anonymous@0000000000001cf20000000000000000",
+    "anonymous@00000000000006b00000000000000000": {
+        "name": "anonymous@00000000000006b00000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -60659,8 +61826,8 @@
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
-    "anonymous@000000000000233b0000000000000000": {
-        "name": "anonymous@000000000000233b0000000000000000",
+    "anonymous@00000000000026850000000000000000": {
+        "name": "anonymous@00000000000026850000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -60735,8 +61902,8 @@
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
-    "anonymous@00000000000018180000000000000000": {
-        "name": "anonymous@00000000000018180000000000000000",
+    "anonymous@000000000000040c0000000000000000": {
+        "name": "anonymous@000000000000040c0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -60809,8 +61976,8 @@
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
-    "anonymous@00000000000023cd0000000000000000": {
-        "name": "anonymous@00000000000023cd0000000000000000",
+    "anonymous@00000000000023420000000000000000": {
+        "name": "anonymous@00000000000023420000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -60897,8 +62064,8 @@
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
-    "anonymous@0000000000001a3e0000000000000000": {
-        "name": "anonymous@0000000000001a3e0000000000000000",
+    "anonymous@0000000000001bb00000000000000000": {
+        "name": "anonymous@0000000000001bb00000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -60971,8 +62138,8 @@
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
-    "anonymous@0000000000002b080000000000000000": {
-        "name": "anonymous@0000000000002b080000000000000000",
+    "anonymous@0000000000002d100000000000000000": {
+        "name": "anonymous@0000000000002d100000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -61045,8 +62212,8 @@
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
-    "anonymous@0000000000002c520000000000000000": {
-        "name": "anonymous@0000000000002c520000000000000000",
+    "anonymous@00000000000031080000000000000000": {
+        "name": "anonymous@00000000000031080000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -61119,8 +62286,8 @@
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
-    "anonymous@0000000000001dc40000000000000000": {
-        "name": "anonymous@0000000000001dc40000000000000000",
+    "anonymous@00000000000016ee0000000000000000": {
+        "name": "anonymous@00000000000016ee0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -61282,8 +62449,8 @@
         "instability": 1,
         "dependent_instabilities": {
             "Modules\\Content\\Models\\": 0.375,
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
-            "Modules\\Schemes\\Models\\": 0.11764705882352941
+            "Modules\\Auth\\Models\\": 0.06,
+            "Modules\\Schemes\\Models\\": 0.11650485436893204
         },
         "distance": 0,
         "normalized_distance": 0,
@@ -61486,8 +62653,8 @@
         "abstraction": 0,
         "instability": 0.42857142857142855,
         "dependent_instabilities": {
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
-            "Modules\\Schemes\\Models\\": 0.11764705882352941
+            "Modules\\Auth\\Models\\": 0.06,
+            "Modules\\Schemes\\Models\\": 0.11650485436893204
         },
         "distance": 0.40406101782088427,
         "normalized_distance": 0.5714285714285714,
@@ -61814,7 +62981,7 @@
         "abstraction": 1,
         "instability": 1,
         "dependent_instabilities": {
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
+            "Modules\\Auth\\Models\\": 0.06,
             "Modules\\Content\\Models\\": 0.375
         },
         "distance": 0.7071067811865475,
@@ -61957,7 +63124,7 @@
         "abstraction": 1,
         "instability": 0.45454545454545453,
         "dependent_instabilities": {
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
+            "Modules\\Auth\\Models\\": 0.06,
             "Modules\\Content\\Models\\": 0.375
         },
         "distance": 0.32141217326661253,
@@ -62178,7 +63345,7 @@
         "abstraction": 1,
         "instability": 0.631578947368421,
         "dependent_instabilities": {
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
+            "Modules\\Auth\\Models\\": 0.06,
             "Modules\\Content\\Models\\": 0.375,
             "Modules\\Content\\DTOs\\": 0.16666666666666666
         },
@@ -63047,9 +64214,9 @@
         "instability": 0.7647058823529411,
         "dependent_instabilities": {
             "Modules\\Content\\Contracts\\Repositories\\": 0.45454545454545453,
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
+            "Modules\\Auth\\Models\\": 0.06,
             "Modules\\Content\\Models\\": 0.375,
-            "\\": 0.03508771929824561
+            "\\": 0.03389830508474576
         },
         "distance": 0.16637806616154063,
         "normalized_distance": 0.23529411764705888,
@@ -63637,8 +64804,8 @@
         "instability": 0.375,
         "dependent_instabilities": {
             "Modules\\Content\\Database\\Factories\\": 0.42857142857142855,
-            "\\": 0.03508771929824561,
-            "Modules\\Auth\\Models\\": 0.06040268456375839
+            "\\": 0.03389830508474576,
+            "Modules\\Auth\\Models\\": 0.06
         },
         "distance": 0.44194173824159216,
         "normalized_distance": 0.625,
@@ -64235,7 +65402,7 @@
         "abstraction": 0,
         "instability": 0.5,
         "dependent_instabilities": {
-            "\\": 0.03508771929824561
+            "\\": 0.03389830508474576
         },
         "distance": 0.35355339059327373,
         "normalized_distance": 0.5,
@@ -64379,9 +65546,9 @@
         "abstraction": 0,
         "instability": 1,
         "dependent_instabilities": {
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
+            "Modules\\Auth\\Models\\": 0.06,
             "Modules\\Content\\Models\\": 0.375,
-            "Modules\\Schemes\\Models\\": 0.11764705882352941
+            "Modules\\Schemes\\Models\\": 0.11650485436893204
         },
         "distance": 0,
         "normalized_distance": 0,
@@ -65643,7 +66810,7 @@
             "Modules\\Content\\Contracts\\Repositories\\": 0.45454545454545453,
             "Modules\\Content\\Models\\": 0.375,
             "Modules\\Content\\Repositories\\": 0.7647058823529411,
-            "Modules\\Schemes\\Models\\": 0.11764705882352941,
+            "Modules\\Schemes\\Models\\": 0.11650485436893204,
             "Modules\\Content\\Http\\Requests\\": 0.4,
             "Modules\\Content\\Http\\Resources\\": 0.5
         },
@@ -66419,7 +67586,7 @@
         "abstraction": 0,
         "instability": 0.2857142857142857,
         "dependent_instabilities": {
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
+            "Modules\\Auth\\Models\\": 0.06,
             "Modules\\Content\\Models\\": 0.375
         },
         "distance": 0.5050762722761053,
@@ -66894,7 +68061,7 @@
         "dependent_instabilities": {
             "Modules\\Content\\Events\\": 0.2857142857142857,
             "Modules\\Content\\Services\\": 0.9302325581395349,
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
+            "Modules\\Auth\\Models\\": 0.06,
             "Modules\\Content\\Models\\": 0.375
         },
         "distance": 0,
@@ -67376,9 +68543,9 @@
             "Modules\\Content\\Services\\ContentSchedulingService",
             "Modules\\Content\\Services\\ContentService",
             "Modules\\Content\\Services\\ContentStatisticsService",
-            "anonymous@0000000000000e690000000000000000",
-            "anonymous@00000000000031970000000000000000",
-            "anonymous@00000000000011290000000000000000"
+            "anonymous@000000000000242e0000000000000000",
+            "anonymous@0000000000002b480000000000000000",
+            "anonymous@00000000000022510000000000000000"
         ],
         "incoming_class_dependencies": [
             "Modules\\Content\\Jobs\\PublishScheduledContent",
@@ -67458,10 +68625,10 @@
             "Modules\\Content\\Contracts\\Repositories\\": 0.45454545454545453,
             "Modules\\Content\\Models\\": 0.375,
             "Modules\\Content\\DTOs\\": 0.16666666666666666,
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
+            "Modules\\Auth\\Models\\": 0.06,
             "Modules\\Content\\Events\\": 0.2857142857142857,
             "Modules\\Content\\Exceptions\\": 0.5,
-            "\\": 0.03508771929824561,
+            "\\": 0.03389830508474576,
             "Modules\\Content\\Repositories\\": 0.7647058823529411
         },
         "distance": 0.04933303124557309,
@@ -68337,8 +69504,8 @@
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
-    "anonymous@0000000000000e690000000000000000": {
-        "name": "anonymous@0000000000000e690000000000000000",
+    "anonymous@000000000000242e0000000000000000": {
+        "name": "anonymous@000000000000242e0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -68411,8 +69578,8 @@
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
-    "anonymous@00000000000031970000000000000000": {
-        "name": "anonymous@00000000000031970000000000000000",
+    "anonymous@0000000000002b480000000000000000": {
+        "name": "anonymous@0000000000002b480000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -68485,8 +69652,8 @@
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
-    "anonymous@00000000000011290000000000000000": {
-        "name": "anonymous@00000000000011290000000000000000",
+    "anonymous@00000000000022510000000000000000": {
+        "name": "anonymous@00000000000022510000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -69396,7 +70563,7 @@
         "abstraction": 0,
         "instability": 1,
         "dependent_instabilities": {
-            "\\": 0.03508771929824561
+            "\\": 0.03389830508474576
         },
         "distance": 0,
         "normalized_distance": 0,
@@ -69620,7 +70787,7 @@
         "name": "Modules\\Operations\\Services\\",
         "classes": [
             "Modules\\Operations\\Services\\OperationsService",
-            "anonymous@0000000000001ff70000000000000000"
+            "anonymous@0000000000001c0b0000000000000000"
         ],
         "incoming_class_dependencies": [
             "Modules\\Operations\\Http\\Controllers\\OperationsController"
@@ -69650,8 +70817,8 @@
         "violations": {},
         "_type": "Hal\\Metric\\PackageMetric"
     },
-    "anonymous@0000000000001ff70000000000000000": {
-        "name": "anonymous@0000000000001ff70000000000000000",
+    "anonymous@0000000000001c0b0000000000000000": {
+        "name": "anonymous@0000000000001c0b0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -69982,7 +71149,7 @@
         "instability": 0.5,
         "dependent_instabilities": {
             "Modules\\Search\\DTOs\\": 0.3333333333333333,
-            "Modules\\Auth\\Models\\": 0.06040268456375839
+            "Modules\\Auth\\Models\\": 0.06
         },
         "distance": 0.35355339059327373,
         "normalized_distance": 0.5,
@@ -70840,11 +72007,11 @@
         "classes": [
             "Modules\\Search\\Services\\SearchFilterBuilder",
             "Modules\\Search\\Services\\SearchService",
-            "anonymous@0000000000000c8f0000000000000000",
-            "anonymous@000000000000329e0000000000000000",
-            "anonymous@00000000000034fe0000000000000000",
-            "anonymous@0000000000002e310000000000000000",
-            "anonymous@00000000000027350000000000000000"
+            "anonymous@00000000000031be0000000000000000",
+            "anonymous@000000000000120a0000000000000000",
+            "anonymous@0000000000002dda0000000000000000",
+            "anonymous@0000000000000a1c0000000000000000",
+            "anonymous@00000000000006900000000000000000"
         ],
         "outgoing_class_dependencies": [
             "Modules\\Search\\Contracts\\Services\\SearchServiceInterface",
@@ -70870,8 +72037,8 @@
             "Modules\\Search\\Contracts\\Services\\": 0.5,
             "Modules\\Search\\Contracts\\Repositories\\": 0.4,
             "Modules\\Search\\DTOs\\": 0.3333333333333333,
-            "Modules\\Schemes\\Models\\": 0.11764705882352941,
-            "Modules\\Auth\\Models\\": 0.06040268456375839
+            "Modules\\Schemes\\Models\\": 0.11650485436893204,
+            "Modules\\Auth\\Models\\": 0.06
         },
         "distance": 0,
         "normalized_distance": 0,
@@ -70970,8 +72137,8 @@
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
-    "anonymous@0000000000000c8f0000000000000000": {
-        "name": "anonymous@0000000000000c8f0000000000000000",
+    "anonymous@00000000000031be0000000000000000": {
+        "name": "anonymous@00000000000031be0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -71044,8 +72211,8 @@
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
-    "anonymous@000000000000329e0000000000000000": {
-        "name": "anonymous@000000000000329e0000000000000000",
+    "anonymous@000000000000120a0000000000000000": {
+        "name": "anonymous@000000000000120a0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -71118,8 +72285,8 @@
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
-    "anonymous@00000000000034fe0000000000000000": {
-        "name": "anonymous@00000000000034fe0000000000000000",
+    "anonymous@0000000000002dda0000000000000000": {
+        "name": "anonymous@0000000000002dda0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -71194,8 +72361,8 @@
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
-    "anonymous@0000000000002e310000000000000000": {
-        "name": "anonymous@0000000000002e310000000000000000",
+    "anonymous@0000000000000a1c0000000000000000": {
+        "name": "anonymous@0000000000000a1c0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -71274,8 +72441,8 @@
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
-    "anonymous@00000000000027350000000000000000": {
-        "name": "anonymous@00000000000027350000000000000000",
+    "anonymous@00000000000006900000000000000000": {
+        "name": "anonymous@00000000000006900000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -71961,7 +73128,7 @@
         "abstraction": 1,
         "instability": 0.3333333333333333,
         "dependent_instabilities": {
-            "Modules\\Learning\\Models\\": 0.26506024096385544,
+            "Modules\\Learning\\Models\\": 0.2391304347826087,
             "Modules\\Grading\\Models\\": 0.26666666666666666
         },
         "distance": 0.23570226039551578,
@@ -72746,7 +73913,7 @@
             "Modules\\Gamification\\Listeners\\AwardBadgeForCourseCompleted",
             "Modules\\Gamification\\Listeners\\AwardXpForLessonCompleted",
             "Modules\\Gamification\\Listeners\\AwardXpForAssignmentSubmission",
-            "Modules\\Learning\\Services\\SubmissionService",
+            "Modules\\Learning\\Services\\Support\\SubmissionCreationProcessor",
             "Modules\\Common\\Database\\Seeders\\CategorySeeder",
             "Modules\\Common\\Database\\Seeders\\SystemSettingSeeder",
             "Modules\\Common\\Database\\Seeders\\CategorySeederEnhanced",
@@ -72766,7 +73933,7 @@
             "Modules\\Grading\\Services\\Support\\",
             "Modules\\Auth\\Services\\",
             "Modules\\Gamification\\Listeners\\",
-            "Modules\\Learning\\Services\\",
+            "Modules\\Learning\\Services\\Support\\",
             "Modules\\Common\\Database\\Seeders\\",
             "Modules\\Common\\Contracts\\Repositories\\",
             "Modules\\Common\\Repositories\\",
@@ -72797,7 +73964,7 @@
         "abstraction": 0,
         "instability": 0.30303030303030304,
         "dependent_instabilities": {
-            "\\": 0.03508771929824561
+            "\\": 0.03389830508474576
         },
         "distance": 0.49283199900880587,
         "normalized_distance": 0.696969696969697,
@@ -74883,7 +76050,7 @@
         "instability": 1,
         "dependent_instabilities": {
             "Modules\\Common\\Contracts\\Services\\": 0.3333333333333333,
-            "Modules\\Learning\\Events\\": 0.2631578947368421,
+            "Modules\\Learning\\Events\\": 0.23809523809523808,
             "Modules\\Grading\\Events\\": 0.3
         },
         "distance": 0,
@@ -75403,13 +76570,13 @@
             "Modules\\Common\\Services\\CategoryService",
             "Modules\\Common\\Services\\MasterDataService",
             "Modules\\Common\\Services\\AuditService",
-            "anonymous@0000000000001b030000000000000000",
-            "anonymous@0000000000002f4a0000000000000000",
-            "anonymous@00000000000039ce0000000000000000",
-            "anonymous@00000000000019ff0000000000000000",
-            "anonymous@0000000000000f720000000000000000",
-            "anonymous@0000000000001ba60000000000000000",
-            "anonymous@0000000000001a200000000000000000"
+            "anonymous@0000000000001a3f0000000000000000",
+            "anonymous@00000000000029d80000000000000000",
+            "anonymous@00000000000039c00000000000000000",
+            "anonymous@00000000000013cb0000000000000000",
+            "anonymous@0000000000002aeb0000000000000000",
+            "anonymous@00000000000010ef0000000000000000",
+            "anonymous@0000000000001b0a0000000000000000"
         ],
         "incoming_class_dependencies": [
             "Modules\\Common\\Http\\Controllers\\MasterDataController",
@@ -75470,12 +76637,12 @@
         "dependent_instabilities": {
             "Modules\\Common\\Contracts\\Services\\": 0.3333333333333333,
             "Modules\\Common\\Contracts\\Repositories\\": 0.625,
-            "Modules\\Learning\\Models\\": 0.26506024096385544,
+            "Modules\\Learning\\Models\\": 0.2391304347826087,
             "Modules\\Common\\Models\\": 0.30303030303030304,
             "Modules\\Grading\\Models\\": 0.26666666666666666,
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
+            "Modules\\Auth\\Models\\": 0.06,
             "Modules\\Common\\Repositories\\": 0.8666666666666667,
-            "\\": 0.03508771929824561
+            "\\": 0.03389830508474576
         },
         "distance": 0.04876598490941709,
         "normalized_distance": 0.06896551724137934,
@@ -75810,8 +76977,8 @@
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
-    "anonymous@0000000000001b030000000000000000": {
-        "name": "anonymous@0000000000001b030000000000000000",
+    "anonymous@0000000000001a3f0000000000000000": {
+        "name": "anonymous@0000000000001a3f0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -75884,8 +77051,8 @@
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
-    "anonymous@0000000000002f4a0000000000000000": {
-        "name": "anonymous@0000000000002f4a0000000000000000",
+    "anonymous@00000000000029d80000000000000000": {
+        "name": "anonymous@00000000000029d80000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -75958,8 +77125,8 @@
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
-    "anonymous@00000000000039ce0000000000000000": {
-        "name": "anonymous@00000000000039ce0000000000000000",
+    "anonymous@00000000000039c00000000000000000": {
+        "name": "anonymous@00000000000039c00000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -76053,8 +77220,8 @@
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
-    "anonymous@00000000000019ff0000000000000000": {
-        "name": "anonymous@00000000000019ff0000000000000000",
+    "anonymous@00000000000013cb0000000000000000": {
+        "name": "anonymous@00000000000013cb0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -76127,8 +77294,8 @@
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
-    "anonymous@0000000000000f720000000000000000": {
-        "name": "anonymous@0000000000000f720000000000000000",
+    "anonymous@0000000000002aeb0000000000000000": {
+        "name": "anonymous@0000000000002aeb0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -76205,8 +77372,8 @@
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
-    "anonymous@0000000000001ba60000000000000000": {
-        "name": "anonymous@0000000000001ba60000000000000000",
+    "anonymous@00000000000010ef0000000000000000": {
+        "name": "anonymous@00000000000010ef0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -76279,8 +77446,8 @@
         "violations": {},
         "_type": "Hal\\Metric\\ClassMetric"
     },
-    "anonymous@0000000000001a200000000000000000": {
-        "name": "anonymous@0000000000001a200000000000000000",
+    "anonymous@0000000000001b0a0000000000000000": {
+        "name": "anonymous@0000000000001b0a0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -76525,7 +77692,7 @@
         "abstraction": 1,
         "instability": 1,
         "dependent_instabilities": {
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
+            "Modules\\Auth\\Models\\": 0.06,
             "Modules\\Notifications\\Models\\": 0.6
         },
         "distance": 0.7071067811865475,
@@ -76634,8 +77801,8 @@
         "abstraction": 1,
         "instability": 0.3,
         "dependent_instabilities": {
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
-            "Modules\\Learning\\Models\\": 0.26506024096385544
+            "Modules\\Auth\\Models\\": 0.06,
+            "Modules\\Learning\\Models\\": 0.2391304347826087
         },
         "distance": 0.21213203435596428,
         "normalized_distance": 0.30000000000000004,
@@ -78101,8 +79268,8 @@
         "abstraction": 0,
         "instability": 1,
         "dependent_instabilities": {
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
-            "\\": 0.03508771929824561
+            "Modules\\Auth\\Models\\": 0.06,
+            "\\": 0.03389830508474576
         },
         "distance": 0,
         "normalized_distance": 0,
@@ -78207,7 +79374,7 @@
         "instability": 1,
         "dependent_instabilities": {
             "Modules\\Notifications\\Contracts\\Services\\": 0.3,
-            "Modules\\Learning\\Events\\": 0.2631578947368421,
+            "Modules\\Learning\\Events\\": 0.23809523809523808,
             "Modules\\Notifications\\Services\\": 0.6666666666666666,
             "Modules\\Schemes\\Events\\": 0.3333333333333333,
             "Modules\\Grading\\Events\\": 0.3
@@ -78553,7 +79720,7 @@
         "abstraction": 0,
         "instability": 1,
         "dependent_instabilities": {
-            "Modules\\Learning\\Models\\": 0.26506024096385544
+            "Modules\\Learning\\Models\\": 0.2391304347826087
         },
         "distance": 0,
         "normalized_distance": 0,
@@ -79038,8 +80205,8 @@
         "dependent_instabilities": {
             "Modules\\Notifications\\Contracts\\Services\\": 0.3,
             "Modules\\Notifications\\Models\\": 0.6,
-            "Modules\\Auth\\Models\\": 0.06040268456375839,
-            "Modules\\Learning\\Models\\": 0.26506024096385544,
+            "Modules\\Auth\\Models\\": 0.06,
+            "Modules\\Learning\\Models\\": 0.2391304347826087,
             "Modules\\Notifications\\DTOs\\": 0.6666666666666666,
             "Modules\\Notifications\\Repositories\\": 0
         },
