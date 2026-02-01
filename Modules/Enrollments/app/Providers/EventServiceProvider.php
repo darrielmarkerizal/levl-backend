@@ -8,7 +8,11 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvi
 
 class EventServiceProvider extends ServiceProvider
 {
-    protected $listen = [];
+    protected $listen = [
+        \Modules\Enrollments\Events\EnrollmentCreated::class => [
+            \Modules\Enrollments\Listeners\InitializeProgressForEnrollment::class,
+        ],
+    ];
 
     protected static $shouldDiscoverEvents = false;
 

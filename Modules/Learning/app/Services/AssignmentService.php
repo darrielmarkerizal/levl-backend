@@ -219,7 +219,7 @@ class AssignmentService implements AssignmentServiceInterface
         );
 
         if ($searchQuery && trim((string) $searchQuery) !== '') {
-            $ids = Assignment::search($searchQuery)->keys()->toArray();
+            $ids = Assignment::search($searchQuery)->take(1000)->keys()->toArray();
             $builder->whereIn('id', $ids ?: [0]);
         }
 
@@ -245,7 +245,7 @@ class AssignmentService implements AssignmentServiceInterface
         );
 
         if ($searchQuery && trim((string) $searchQuery) !== '') {
-            $ids = Assignment::search($searchQuery)->keys()->toArray();
+            $ids = Assignment::search($searchQuery)->take(1000)->keys()->toArray();
             $builder->whereIn('id', $ids ?: [0]);
         }
 

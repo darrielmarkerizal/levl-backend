@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Modules\Enrollments\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Modules\Auth\Models\User;
 use Modules\Schemes\Models\Course;
 
-class StudentEnrollmentApprovedMail extends Mailable
+class StudentEnrollmentApprovedMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Enrollments\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Modules\Auth\Models\User;
@@ -12,7 +13,7 @@ use Modules\Enrollments\Enums\EnrollmentStatus;
 use Modules\Enrollments\Models\Enrollment;
 use Modules\Schemes\Models\Course;
 
-class AdminEnrollmentNotificationMail extends Mailable
+class AdminEnrollmentNotificationMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
