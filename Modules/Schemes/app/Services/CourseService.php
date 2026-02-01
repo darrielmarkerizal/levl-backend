@@ -4,484 +4,125 @@ declare(strict_types=1);
 
 namespace Modules\Schemes\Services;
 
-use App\Exceptions\BusinessException;
-use App\Exceptions\DuplicateResourceException;
-use App\Support\CodeGenerator;
-use App\Support\Helpers\ArrayParser;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\QueryException;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
-use Modules\Schemes\Contracts\Repositories\CourseRepositoryInterface;
 use Modules\Schemes\Contracts\Services\CourseServiceInterface;
 use Modules\Schemes\DTOs\CreateCourseDTO;
 use Modules\Schemes\DTOs\UpdateCourseDTO;
 use Modules\Schemes\Models\Course;
-use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\QueryBuilder;
+use Modules\Schemes\Services\Support\CourseFinder;
+use Modules\Schemes\Services\Support\CourseLifecycleProcessor;
+use Modules\Schemes\Services\Support\CoursePublicationProcessor;
 
 class CourseService implements CourseServiceInterface
 {
-    use \App\Support\Traits\BuildsQueryBuilderRequest;
-
     public function __construct(
-        private readonly CourseRepositoryInterface $repository,
-        private readonly SchemesCacheService $cacheService
+        private readonly CourseFinder $finder,
+        private readonly CourseLifecycleProcessor $lifecycleProcessor,
+        private readonly CoursePublicationProcessor $publicationProcessor
     ) {}
 
     public function paginate(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        $perPage = max(1, $perPage);
-
-        return $this->buildQuery($filters)->paginate($perPage);
+        return $this->finder->paginate($filters, $perPage);
     }
 
     public function paginateForIndex(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        $perPage = max(1, $perPage);
-
-        return $this->buildQueryForIndex($filters)->paginate($perPage);
+        return $this->finder->paginateForIndex($filters, $perPage);
     }
 
     public function list(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        if (data_get($filters, 'status') === 'published') {
-            return $this->listPublic($perPage, $filters);
-        }
-
-        return $this->paginate($filters, $perPage);
+        return $this->finder->list($filters, $perPage);
     }
 
     public function listForIndex(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        if (data_get($filters, 'status') === 'published') {
-            return $this->listPublicForIndex($perPage, $filters);
-        }
-
-        return $this->paginateForIndex($filters, $perPage);
+        return $this->finder->listForIndex($filters, $perPage);
     }
 
     public function listPublic(int $perPage = 15, array $filters = []): LengthAwarePaginator
     {
-        $perPage = max(1, $perPage);
-        $page = request()->get('page', 1);
-
-        return $this->cacheService->getPublicCourses($page, $perPage, $filters, function () use ($filters, $perPage) {
-            return $this->buildQuery($filters)
-                ->where('status', 'published')
-                ->paginate($perPage);
-        });
+        return $this->finder->listPublic($perPage, $filters);
     }
 
     public function listPublicForIndex(int $perPage = 15, array $filters = []): LengthAwarePaginator
     {
-        $perPage = max(1, $perPage);
-        $page = request()->get('page', 1);
-
-        return $this->cacheService->getPublicCoursesForIndex($page, $perPage, $filters, function () use ($filters, $perPage) {
-            return $this->buildQueryForIndex($filters)
-                ->where('status', 'published')
-                ->paginate($perPage);
-        });
-    }
-
-    private function buildQuery(array $filters = []): QueryBuilder
-    {
-        $searchQuery = data_get($filters, 'search');
-        
-        // Strip manual filters before passing to QueryBuilder
-        $cleanFilters = \Illuminate\Support\Arr::except($filters, ['search', 'tag']);
-        $request = new \Illuminate\Http\Request($cleanFilters);
-
-        $builder = QueryBuilder::for(
-            Course::with(['instructor.media', 'instructor.roles', 'admins.media', 'admins.roles', 'media']),
-            $request
-        );
-
-        if ($searchQuery && trim((string) $searchQuery) !== '') {
-            $ids = Course::search($searchQuery)->keys()->toArray();
-            $builder->whereIn('id', $ids ?: [0]);
-        }
-
-        if ($tagFilter = data_get($filters, 'tag')) {
-            $tags = ArrayParser::parseFilter($tagFilter);
-            foreach ($tags as $tagValue) {
-                $value = trim((string) $tagValue);
-                if ($value === '') {
-                    continue;
-                }
-                $slug = Str::slug($value);
-                $builder->whereHas('tags', fn ($q) => $q->where(fn ($iq) => $iq->where('slug', $slug)->orWhere('slug', $value)->orWhereRaw('LOWER(name) = ?', [mb_strtolower($value)])));
-            }
-        }
-
-        return $builder
-            ->allowedFilters([
-                AllowedFilter::exact('status'),
-                AllowedFilter::exact('level_tag'),
-                AllowedFilter::exact('type'),
-                AllowedFilter::exact('category_id'),
-            ])
-            ->allowedIncludes(['tags', 'category', 'instructor', 'units', 'admins'])
-            ->allowedSorts(['id', 'code', 'title', 'created_at', 'updated_at', 'published_at'])
-            ->defaultSort('title');
-    }
-
-    private function buildQueryForIndex(array $filters = []): QueryBuilder
-    {
-        $searchQuery = data_get($filters, 'search');
-        
-        // Strip manual filters before passing to QueryBuilder
-        $cleanFilters = \Illuminate\Support\Arr::except($filters, ['search', 'tag']);
-        $request = new \Illuminate\Http\Request($cleanFilters);
-
-        $builder = QueryBuilder::for(
-            Course::with([
-                'admins:id,name,username,email,status,account_status',
-                'media:id,model_type,model_id,collection_name,file_name,disk',
-            ])->withCount('admins'),
-            $request
-        );
-
-        if ($searchQuery && trim((string) $searchQuery) !== '') {
-            $ids = Course::search($searchQuery)->keys()->toArray();
-            $builder->whereIn('id', $ids ?: [0]);
-        }
-
-        if ($tagFilter = data_get($filters, 'tag')) {
-            $tags = ArrayParser::parseFilter($tagFilter);
-            foreach ($tags as $tagValue) {
-                $value = trim((string) $tagValue);
-                if ($value === '') {
-                    continue;
-                }
-                $slug = Str::slug($value);
-                $builder->whereHas('tags', fn ($q) => $q->where(fn ($iq) => $iq->where('slug', $slug)->orWhere('slug', $value)->orWhereRaw('LOWER(name) = ?', [mb_strtolower($value)])));
-            }
-        }
-
-        return $builder
-            ->allowedFilters([
-                AllowedFilter::exact('status'),
-                AllowedFilter::exact('level_tag'),
-                AllowedFilter::exact('type'),
-                AllowedFilter::exact('category_id'),
-            ])
-            ->allowedIncludes(['tags'])
-            ->allowedSorts(['id', 'code', 'title', 'created_at', 'updated_at', 'published_at'])
-            ->defaultSort('title');
+        return $this->finder->listPublicForIndex($perPage, $filters);
     }
 
     public function find(int $id): ?Course
     {
-        return $this->cacheService->getCourse($id);
+        return $this->finder->find($id);
     }
 
     public function findOrFail(int $id): Course
     {
-        $course = $this->cacheService->getCourse($id);
-        if (! $course) {
-            throw new \Illuminate\Database\Eloquent\ModelNotFoundException;
-        }
-
-        return $course;
+        return $this->finder->findOrFail($id);
     }
 
     public function findBySlug(string $slug): ?Course
     {
-        return $this->cacheService->getCourseBySlug($slug);
+        return $this->finder->findBySlug($slug);
     }
 
     public function create(CreateCourseDTO|array $data, ?\Modules\Auth\Models\User $actor = null, array $files = []): Course
     {
-        try {
-            return DB::transaction(function () use ($data, $actor, $files) {
-                $attributes = $data instanceof CreateCourseDTO ? $data->toArrayWithoutNull() : $data;
-
-                if (! isset($attributes['code'])) {
-                    $attributes['code'] = $this->generateCourseCode();
-                }
-
-                if (! isset($attributes['instructor_id'])) {
-                    $attributes['instructor_id'] = null;
-                }
-
-                $tags = $attributes['tags'] ?? null;
-                $attributes = Arr::except($attributes, ['slug', 'tags']);
-
-                $course = $this->repository->create($attributes);
-
-                if ($tags) {
-                    $course->tags()->sync($tags);
-                }
-
-                if ($actor && $actor->hasRole(['Superadmin', 'Admin'])) {
-                    $course->admins()->syncWithoutDetaching([$actor->id]);
-                }
-
-                $this->handleMedia($course, $files);
-                $this->cacheService->invalidateListings();
-
-                $course = $course->fresh(['tags']);
-
-                if ($actor) {
-                    dispatch(new \App\Jobs\LogActivityJob([
-                        'log_name' => 'schemes',
-                        'causer_id' => $actor->id,
-                        'description' => "Created course: {$course->title} ({$course->code})",
-                        'properties' => ['course_id' => $course->id, 'action' => 'create'],
-                    ]));
-                }
-
-                return $course;
-            });
-        } catch (QueryException $e) {
-            throw new DuplicateResourceException($this->parseCourseDuplicates($e));
-        }
+        return $this->lifecycleProcessor->create($data, $actor, $files);
     }
 
     public function update(int $id, UpdateCourseDTO|array $data, array $files = []): Course
     {
-        try {
-            return DB::transaction(function () use ($id, $data, $files) {
-                $course = $this->repository->findByIdOrFail($id);
-                $attributes = $data instanceof UpdateCourseDTO ? $data->toArrayWithoutNull() : $data;
-
-                $tags = $attributes['tags'] ?? null;
-                $attributes = Arr::except($attributes, ['slug', 'tags']);
-
-                $this->repository->update($course, $attributes);
-
-                if ($tags !== null) {
-                    $course->tags()->sync($tags);
-                }
-
-                $this->handleMedia($course, $files);
-                $this->cacheService->invalidateCourse($course->id, $course->slug);
-
-                $updatedCourse = $course->fresh(['tags']);
-
-                $actor = auth()->user();
-                if ($actor) {
-                    dispatch(new \App\Jobs\LogActivityJob([
-                        'log_name' => 'schemes',
-                        'causer_id' => $actor->id,
-                        'description' => "Updated course: {$updatedCourse->title}",
-                        'properties' => ['course_id' => $course->id, 'action' => 'update', 'changes' => $attributes],
-                    ]));
-                }
-
-                return $updatedCourse;
-            });
-        } catch (QueryException $e) {
-            throw new DuplicateResourceException($this->parseCourseDuplicates($e));
-        }
+        $course = $this->findOrFail($id);
+        return $this->lifecycleProcessor->update($course, $data, $files);
     }
 
     public function delete(int $id): bool
     {
         $course = $this->findOrFail($id);
-        $deleted = $this->repository->delete($course);
-
-        if ($deleted) {
-            $actor = auth()->user();
-            if ($actor) {
-                dispatch(new \App\Jobs\LogActivityJob([
-                    'log_name' => 'schemes',
-                    'causer_id' => $actor->id,
-                    'description' => "Deleted course: {$course->title}",
-                    'properties' => ['course_id' => $course->id, 'action' => 'delete'],
-                ]));
-            }
-        }
-
-        return $deleted;
+        return $this->lifecycleProcessor->delete($course);
     }
 
     public function publish(int $id): Course
     {
         $course = $this->findOrFail($id);
-
-        if ($course->units()->count() === 0) {
-            throw new BusinessException(
-                __('messages.courses.cannot_publish_without_units'),
-                ['units' => [__('messages.courses.must_have_one_unit')]]
-            );
-        }
-
-        $publishedUnitsCount = $course->units()->where('status', 'published')->count();
-        if ($publishedUnitsCount === 0) {
-            throw new BusinessException(
-                __('messages.courses.cannot_publish_without_published_units'),
-                ['units' => [__('messages.courses.must_have_one_published_unit')]]
-            );
-        }
-
-        $hasLessons = $course->units()->whereHas('lessons')->exists();
-        if (! $hasLessons) {
-            throw new BusinessException(
-                __('messages.courses.cannot_publish_without_lessons'),
-                ['lessons' => [__('messages.courses.must_have_one_lesson')]]
-            );
-        }
-
-        $hasPublishedLessons = $course->units()
-            ->where('status', 'published')
-            ->whereHas('lessons', fn ($q) => $q->where('status', 'published'))
-            ->exists();
-
-        if (! $hasPublishedLessons) {
-            throw new BusinessException(
-                __('messages.courses.cannot_publish_without_published_lessons'),
-                ['lessons' => [__('messages.courses.must_have_one_published_lesson')]]
-            );
-        }
-
-        if ($course->enrollment_type === 'key_based' && empty($course->enrollment_key_hash)) {
-            throw new BusinessException(
-                __('messages.courses.cannot_publish_without_enrollment_key'),
-                ['enrollment_key' => [__('messages.courses.must_have_enrollment_key')]]
-            );
-        }
-
-        $this->repository->update($course, [
-            'status' => 'published',
-            'published_at' => now(),
-        ]);
-
-        $this->cacheService->invalidateCourse($course->id, $course->slug);
-
-        $actor = auth()->user();
-        if ($actor) {
-            dispatch(new \App\Jobs\LogActivityJob([
-                'log_name' => 'schemes',
-                'causer_id' => $actor->id,
-                'description' => "Published course: {$course->title}",
-                'properties' => ['course_id' => $course->id, 'action' => 'publish'],
-            ]));
-        }
-
-        return $course->fresh();
+        return $this->publicationProcessor->publish($course);
     }
 
     public function unpublish(int $id): Course
     {
-        $course = $this->repository->findByIdOrFail($id);
-
-        $this->repository->update($course, [
-            'status' => 'draft',
-            'published_at' => null,
-        ]);
-
-        $this->cacheService->invalidateCourse($course->id, $course->slug);
-
-        $actor = auth()->user();
-        if ($actor) {
-            dispatch(new \App\Jobs\LogActivityJob([
-                'log_name' => 'schemes',
-                'causer_id' => $actor->id,
-                'description' => "Unpublished course: {$course->title}",
-                'properties' => ['course_id' => $course->id, 'action' => 'unpublish'],
-            ]));
-        }
-
-        return $course->fresh();
+        $course = $this->findOrFail($id);
+        return $this->publicationProcessor->unpublish($course);
     }
 
     public function updateEnrollmentSettings(int $id, array $data): array
     {
-        $plainKey = null;
-
-        if ($data['enrollment_type'] === 'key_based' && empty($data['enrollment_key'])) {
-            $plainKey = $this->generateEnrollmentKey(12);
-            $data['enrollment_key'] = $plainKey;
-        } elseif ($data['enrollment_type'] === 'key_based' && ! empty($data['enrollment_key'])) {
-            $plainKey = $data['enrollment_key'];
-        }
-
-        if ($data['enrollment_type'] !== 'key_based') {
-            $data['enrollment_key'] = null;
-        }
-
-        $updated = $this->update($id, $data);
-
-        return [
-            'course' => $updated,
-            'enrollment_key' => $plainKey,
-        ];
-    }
-
-    private function handleMedia(Course $course, array $files): void
-    {
-        foreach (['thumbnail', 'banner'] as $collection) {
-            if (! empty($files[$collection])) {
-                $course->clearMediaCollection($collection);
-                $course->addMedia($files[$collection])->toMediaCollection($collection);
-            }
-        }
-    }
-
-    private function parseCourseDuplicates(QueryException $e): array
-    {
-        $message = $e->getMessage();
-        $errors = [];
-
-        if (preg_match('/courses?_code_unique/i', $message)) {
-            $errors['code'] = [__('messages.courses.code_exists')];
-        }
-
-        if (preg_match('/courses?_slug_unique/i', $message)) {
-            $errors['slug'] = [__('messages.courses.slug_exists')];
-        }
-
-        if (empty($errors)) {
-            if (preg_match('/Key \(([^)]+)\)=\([^)]+\) already exists/i', $message, $matches)) {
-                $column = $matches[1];
-                $errors[$column] = [__('messages.courses.duplicate_data_field', ['field' => $column])];
-            }
-        }
-
-        return $errors ?: ['general' => [__('messages.courses.duplicate_data')]];
-    }
-
-    private function generateCourseCode(): string
-    {
-        return CodeGenerator::generate('CRS-', 6, Course::class);
+        $course = $this->findOrFail($id);
+        return $this->lifecycleProcessor->updateEnrollmentSettings($course, $data);
     }
 
     public function uploadThumbnail(int $id, \Illuminate\Http\UploadedFile $file): Course
     {
         $course = $this->findOrFail($id);
-        $course->clearMediaCollection('thumbnail');
-        $course->addMedia($file)->toMediaCollection('thumbnail');
-
-        return $course->fresh();
+        return $this->lifecycleProcessor->uploadThumbnail($course, $file);
     }
 
     public function uploadBanner(int $id, \Illuminate\Http\UploadedFile $file): Course
     {
         $course = $this->findOrFail($id);
-        $course->clearMediaCollection('banner');
-        $course->addMedia($file)->toMediaCollection('banner');
-
-        return $course->fresh();
+        return $this->lifecycleProcessor->uploadBanner($course, $file);
     }
 
     public function deleteThumbnail(int $id): Course
     {
         $course = $this->findOrFail($id);
-        $course->clearMediaCollection('thumbnail');
-
-        return $course->fresh();
+        return $this->lifecycleProcessor->deleteThumbnail($course);
     }
 
     public function deleteBanner(int $id): Course
     {
         $course = $this->findOrFail($id);
-        $course->clearMediaCollection('banner');
-
-        return $course->fresh();
+        return $this->lifecycleProcessor->deleteBanner($course);
     }
 
     public function verifyEnrollmentKey(Course $course, string $plainKey): bool
@@ -494,17 +135,10 @@ class CourseService implements CourseServiceInterface
 
         return $hasher->verify($plainKey, $course->enrollment_key_hash);
     }
-
+    
     public function generateEnrollmentKey(int $length = 12): string
     {
-        $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        $key = '';
-
-        for ($i = 0; $i < $length; $i++) {
-            $key .= $characters[random_int(0, strlen($characters) - 1)];
-        }
-
-        return $key;
+        return $this->lifecycleProcessor->generateEnrollmentKey($length);
     }
 
     public function hasEnrollmentKey(Course $course): bool

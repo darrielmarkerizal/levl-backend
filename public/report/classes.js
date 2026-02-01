@@ -8333,9 +8333,9 @@ var classes = [
         "totalSystemComplexity": 1526.79,
         "package": "Modules\\Schemes\\Models\\",
         "pageRank": 0.02,
-        "afferentCoupling": 22,
+        "afferentCoupling": 26,
         "efferentCoupling": 4,
-        "instability": 0.15,
+        "instability": 0.13,
         "violations": {}
     },
     {
@@ -8458,9 +8458,9 @@ var classes = [
         "totalSystemComplexity": 1526.79,
         "package": "Modules\\Schemes\\Models\\",
         "pageRank": 0.03,
-        "afferentCoupling": 22,
+        "afferentCoupling": 24,
         "efferentCoupling": 4,
-        "instability": 0.15,
+        "instability": 0.14,
         "violations": {}
     },
     {
@@ -8750,10 +8750,10 @@ var classes = [
         "totalDataComplexity": 19.4,
         "totalSystemComplexity": 83843.4,
         "package": "Modules\\Schemes\\Models\\",
-        "pageRank": 0.05,
-        "afferentCoupling": 63,
+        "pageRank": 0.06,
+        "afferentCoupling": 70,
         "efferentCoupling": 9,
-        "instability": 0.13,
+        "instability": 0.11,
         "violations": {}
     },
     {
@@ -12794,11 +12794,1011 @@ var classes = [
         "violations": {}
     },
     {
+        "name": "Modules\\Schemes\\Services\\Support\\CourseFinder",
+        "interface": false,
+        "abstract": false,
+        "final": false,
+        "methods": [
+            {
+                "name": "__construct",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "paginate",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "paginateForIndex",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "list",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "listForIndex",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "listPublic",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "listPublicForIndex",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "find",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "findOrFail",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "findBySlug",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "buildQuery",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "buildQueryForIndex",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "applyTagFilter",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            }
+        ],
+        "nbMethodsIncludingGettersSetters": 13,
+        "nbMethods": 13,
+        "nbMethodsPrivate": 3,
+        "nbMethodsPublic": 10,
+        "nbMethodsGetter": 0,
+        "nbMethodsSetters": 0,
+        "wmc": 26,
+        "ccn": 14,
+        "ccnMethodMax": 5,
+        "externals": [
+            "Modules\\Schemes\\Contracts\\Repositories\\CourseRepositoryInterface",
+            "Modules\\Schemes\\Services\\SchemesCacheService",
+            "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
+            "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
+            "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
+            "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
+            "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
+            "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
+            "Modules\\Schemes\\Models\\Course",
+            "Illuminate\\Database\\Eloquent\\ModelNotFoundException",
+            "Spatie\\QueryBuilder\\QueryBuilder",
+            "Illuminate\\Support\\Arr",
+            "Illuminate\\Http\\Request",
+            "Modules\\Schemes\\Models\\Course",
+            "Spatie\\QueryBuilder\\QueryBuilder",
+            "Modules\\Schemes\\Models\\Course",
+            "Spatie\\QueryBuilder\\AllowedFilter",
+            "Spatie\\QueryBuilder\\AllowedFilter",
+            "Spatie\\QueryBuilder\\AllowedFilter",
+            "Spatie\\QueryBuilder\\AllowedFilter",
+            "Spatie\\QueryBuilder\\QueryBuilder",
+            "Illuminate\\Support\\Arr",
+            "Illuminate\\Http\\Request",
+            "Modules\\Schemes\\Models\\Course",
+            "Spatie\\QueryBuilder\\QueryBuilder",
+            "Modules\\Schemes\\Models\\Course",
+            "Spatie\\QueryBuilder\\AllowedFilter",
+            "Spatie\\QueryBuilder\\AllowedFilter",
+            "Spatie\\QueryBuilder\\AllowedFilter",
+            "Spatie\\QueryBuilder\\AllowedFilter",
+            "Spatie\\QueryBuilder\\QueryBuilder",
+            "App\\Support\\Helpers\\ArrayParser",
+            "Illuminate\\Support\\Str"
+        ],
+        "parents": [],
+        "implements": [],
+        "lcom": 2,
+        "length": 267,
+        "vocabulary": 55,
+        "volume": 1543.62,
+        "difficulty": 13.16,
+        "effort": 20319.12,
+        "level": 0.08,
+        "bugs": 0.51,
+        "time": 1129,
+        "intelligentContent": 117.27,
+        "number_operators": 52,
+        "number_operands": 215,
+        "number_operators_unique": 6,
+        "number_operands_unique": 49,
+        "cloc": 0,
+        "loc": 106,
+        "lloc": 106,
+        "mi": 31.61,
+        "mIwoC": 31.61,
+        "commentWeight": 0,
+        "kanDefect": 0.94,
+        "relativeStructuralComplexity": 1369,
+        "relativeDataComplexity": 0.44,
+        "relativeSystemComplexity": 1369.44,
+        "totalStructuralComplexity": 17797,
+        "totalDataComplexity": 5.68,
+        "totalSystemComplexity": 17802.68,
+        "package": "Modules\\Schemes\\Services\\Support\\",
+        "pageRank": 0,
+        "afferentCoupling": 1,
+        "efferentCoupling": 11,
+        "instability": 0.92,
+        "violations": {}
+    },
+    {
+        "name": "Modules\\Schemes\\Services\\Support\\ProgressionStateProcessor",
+        "interface": false,
+        "abstract": false,
+        "final": false,
+        "methods": [
+            {
+                "name": "markLessonCompleted",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "markLessonUncompleted",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "markUnitCompleted",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "getCourseProgressData",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "storeLessonCompletion",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "updateUnitProgress",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "updateCourseProgress",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            }
+        ],
+        "nbMethodsIncludingGettersSetters": 7,
+        "nbMethods": 7,
+        "nbMethodsPrivate": 3,
+        "nbMethodsPublic": 4,
+        "nbMethodsGetter": 0,
+        "nbMethodsSetters": 0,
+        "wmc": 75,
+        "ccn": 69,
+        "ccnMethodMax": 28,
+        "externals": [
+            "Modules\\Schemes\\Models\\Lesson",
+            "Modules\\Enrollments\\Models\\Enrollment",
+            "Modules\\Enrollments\\Models\\Enrollment",
+            "Modules\\Enrollments\\Models\\LessonProgress",
+            "Modules\\Schemes\\Events\\LessonCompleted",
+            "Modules\\Schemes\\Events\\UnitCompleted",
+            "Illuminate\\Support\\Facades\\DB",
+            "Illuminate\\Support\\Facades\\DB",
+            "Modules\\Schemes\\Models\\Lesson",
+            "Modules\\Enrollments\\Models\\Enrollment",
+            "Modules\\Enrollments\\Models\\LessonProgress",
+            "Illuminate\\Support\\Facades\\DB",
+            "Modules\\Schemes\\Models\\Unit",
+            "Modules\\Enrollments\\Models\\Enrollment",
+            "Illuminate\\Support\\Facades\\DB",
+            "Modules\\Schemes\\Models\\Course",
+            "Modules\\Enrollments\\Models\\Enrollment",
+            "Illuminate\\Support\\Facades\\DB",
+            "Modules\\Enrollments\\Models\\LessonProgress",
+            "Modules\\Enrollments\\Models\\UnitProgress",
+            "Modules\\Enrollments\\Models\\CourseProgress",
+            "Illuminate\\Database\\Eloquent\\Collection",
+            "Modules\\Schemes\\Models\\Lesson",
+            "Modules\\Enrollments\\Models\\Enrollment",
+            "Modules\\Enrollments\\Models\\LessonProgress",
+            "Illuminate\\Support\\Carbon",
+            "Illuminate\\Support\\Carbon",
+            "Modules\\Schemes\\Models\\Unit",
+            "Modules\\Enrollments\\Models\\Enrollment",
+            "Modules\\Enrollments\\Models\\LessonProgress",
+            "Modules\\Enrollments\\Models\\LessonProgress",
+            "Modules\\Enrollments\\Models\\UnitProgress",
+            "Illuminate\\Support\\Carbon",
+            "Illuminate\\Support\\Carbon",
+            "Modules\\Schemes\\Models\\Course",
+            "Modules\\Enrollments\\Models\\Enrollment",
+            "Modules\\Enrollments\\Models\\UnitProgress",
+            "Modules\\Enrollments\\Models\\UnitProgress",
+            "Modules\\Enrollments\\Models\\CourseProgress",
+            "Illuminate\\Support\\Carbon",
+            "Illuminate\\Support\\Carbon",
+            "Illuminate\\Support\\Carbon",
+            "Modules\\Schemes\\Events\\CourseCompleted"
+        ],
+        "parents": [],
+        "implements": [],
+        "lcom": 1,
+        "length": 661,
+        "vocabulary": 83,
+        "volume": 4213.9,
+        "difficulty": 36.21,
+        "effort": 152578.33,
+        "level": 0.03,
+        "bugs": 1.4,
+        "time": 8477,
+        "intelligentContent": 116.38,
+        "number_operators": 187,
+        "number_operands": 474,
+        "number_operators_unique": 11,
+        "number_operands_unique": 72,
+        "cloc": 0,
+        "loc": 225,
+        "lloc": 225,
+        "mi": 14.03,
+        "mIwoC": 14.03,
+        "commentWeight": 0,
+        "kanDefect": 2.59,
+        "relativeStructuralComplexity": 3600,
+        "relativeDataComplexity": 0.17,
+        "relativeSystemComplexity": 3600.17,
+        "totalStructuralComplexity": 25200,
+        "totalDataComplexity": 1.18,
+        "totalSystemComplexity": 25201.18,
+        "package": "Modules\\Schemes\\Services\\Support\\",
+        "pageRank": 0,
+        "afferentCoupling": 1,
+        "efferentCoupling": 13,
+        "instability": 0.93,
+        "violations": {}
+    },
+    {
+        "name": "Modules\\Schemes\\Services\\Support\\CourseLifecycleProcessor",
+        "interface": false,
+        "abstract": false,
+        "final": false,
+        "methods": [
+            {
+                "name": "__construct",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "create",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "update",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "delete",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "updateEnrollmentSettings",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "uploadThumbnail",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "uploadBanner",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "deleteThumbnail",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "deleteBanner",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "generateEnrollmentKey",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "handleMedia",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "parseCourseDuplicates",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "generateCourseCode",
+                "role": null,
+                "public": false,
+                "private": true,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            }
+        ],
+        "nbMethodsIncludingGettersSetters": 13,
+        "nbMethods": 13,
+        "nbMethodsPrivate": 3,
+        "nbMethodsPublic": 10,
+        "nbMethodsGetter": 0,
+        "nbMethodsSetters": 0,
+        "wmc": 42,
+        "ccn": 30,
+        "ccnMethodMax": 10,
+        "externals": [
+            "Modules\\Schemes\\Contracts\\Repositories\\CourseRepositoryInterface",
+            "Modules\\Schemes\\Services\\SchemesCacheService",
+            "Modules\\Schemes\\Models\\Course",
+            "Illuminate\\Support\\Arr",
+            "App\\Jobs\\LogActivityJob",
+            "Illuminate\\Support\\Facades\\DB",
+            "App\\Exceptions\\DuplicateResourceException",
+            "Modules\\Schemes\\Models\\Course",
+            "Modules\\Schemes\\Models\\Course",
+            "Illuminate\\Support\\Arr",
+            "App\\Jobs\\LogActivityJob",
+            "Illuminate\\Support\\Facades\\DB",
+            "App\\Exceptions\\DuplicateResourceException",
+            "Modules\\Schemes\\Models\\Course",
+            "App\\Jobs\\LogActivityJob",
+            "Modules\\Schemes\\Models\\Course",
+            "Modules\\Schemes\\Models\\Course",
+            "Modules\\Schemes\\Models\\Course",
+            "Illuminate\\Http\\UploadedFile",
+            "Modules\\Schemes\\Models\\Course",
+            "Modules\\Schemes\\Models\\Course",
+            "Illuminate\\Http\\UploadedFile",
+            "Modules\\Schemes\\Models\\Course",
+            "Modules\\Schemes\\Models\\Course",
+            "Modules\\Schemes\\Models\\Course",
+            "Modules\\Schemes\\Models\\Course",
+            "Modules\\Schemes\\Models\\Course",
+            "Illuminate\\Database\\QueryException",
+            "App\\Support\\CodeGenerator"
+        ],
+        "parents": [],
+        "implements": [],
+        "lcom": 6,
+        "length": 330,
+        "vocabulary": 74,
+        "volume": 2049.12,
+        "difficulty": 24.87,
+        "effort": 50963.59,
+        "level": 0.04,
+        "bugs": 0.68,
+        "time": 2831,
+        "intelligentContent": 82.39,
+        "number_operators": 73,
+        "number_operands": 257,
+        "number_operators_unique": 12,
+        "number_operands_unique": 62,
+        "cloc": 0,
+        "loc": 151,
+        "lloc": 151,
+        "mi": 25.25,
+        "mIwoC": 25.25,
+        "commentWeight": 0,
+        "kanDefect": 1.5,
+        "relativeStructuralComplexity": 576,
+        "relativeDataComplexity": 0.58,
+        "relativeSystemComplexity": 576.58,
+        "totalStructuralComplexity": 7488,
+        "totalDataComplexity": 7.6,
+        "totalSystemComplexity": 7495.6,
+        "package": "Modules\\Schemes\\Services\\Support\\",
+        "pageRank": 0,
+        "afferentCoupling": 1,
+        "efferentCoupling": 10,
+        "instability": 0.91,
+        "violations": {}
+    },
+    {
+        "name": "Modules\\Schemes\\Services\\Support\\ProgressionGatekeeper",
+        "interface": false,
+        "abstract": false,
+        "final": false,
+        "methods": [
+            {
+                "name": "__construct",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "validateLessonAccess",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "canAccessLesson",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            }
+        ],
+        "nbMethodsIncludingGettersSetters": 3,
+        "nbMethods": 3,
+        "nbMethodsPrivate": 0,
+        "nbMethodsPublic": 3,
+        "nbMethodsGetter": 0,
+        "nbMethodsSetters": 0,
+        "wmc": 23,
+        "ccn": 21,
+        "ccnMethodMax": 14,
+        "externals": [
+            "Modules\\Schemes\\Services\\Support\\ProgressionFinder",
+            "Modules\\Enrollments\\Models\\Enrollment",
+            "Modules\\Schemes\\Models\\Course",
+            "Modules\\Schemes\\Models\\Unit",
+            "Modules\\Schemes\\Models\\Lesson",
+            "Illuminate\\Database\\Eloquent\\ModelNotFoundException",
+            "Modules\\Auth\\Models\\User",
+            "Modules\\Enrollments\\Models\\Enrollment",
+            "App\\Exceptions\\BusinessException",
+            "Modules\\Schemes\\Models\\Lesson",
+            "Modules\\Enrollments\\Models\\Enrollment",
+            "Modules\\Enrollments\\Models\\UnitProgress",
+            "Illuminate\\Database\\Eloquent\\Collection",
+            "Modules\\Enrollments\\Models\\LessonProgress"
+        ],
+        "parents": [],
+        "implements": [],
+        "lcom": 2,
+        "length": 140,
+        "vocabulary": 44,
+        "volume": 764.32,
+        "difficulty": 10.67,
+        "effort": 8152.75,
+        "level": 0.09,
+        "bugs": 0.25,
+        "time": 453,
+        "intelligentContent": 71.66,
+        "number_operators": 44,
+        "number_operands": 96,
+        "number_operators_unique": 8,
+        "number_operands_unique": 36,
+        "cloc": 1,
+        "loc": 64,
+        "lloc": 63,
+        "mi": 47.36,
+        "mIwoC": 37.74,
+        "commentWeight": 9.62,
+        "kanDefect": 1.38,
+        "relativeStructuralComplexity": 529,
+        "relativeDataComplexity": 0.47,
+        "relativeSystemComplexity": 529.47,
+        "totalStructuralComplexity": 1587,
+        "totalDataComplexity": 1.42,
+        "totalSystemComplexity": 1588.42,
+        "package": "Modules\\Schemes\\Services\\Support\\",
+        "pageRank": 0,
+        "afferentCoupling": 1,
+        "efferentCoupling": 11,
+        "instability": 0.92,
+        "violations": {}
+    },
+    {
+        "name": "Modules\\Schemes\\Services\\Support\\CoursePublicationProcessor",
+        "interface": false,
+        "abstract": false,
+        "final": false,
+        "methods": [
+            {
+                "name": "__construct",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "publish",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "unpublish",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            }
+        ],
+        "nbMethodsIncludingGettersSetters": 3,
+        "nbMethods": 3,
+        "nbMethodsPrivate": 0,
+        "nbMethodsPublic": 3,
+        "nbMethodsGetter": 0,
+        "nbMethodsSetters": 0,
+        "wmc": 11,
+        "ccn": 9,
+        "ccnMethodMax": 8,
+        "externals": [
+            "Modules\\Schemes\\Contracts\\Repositories\\CourseRepositoryInterface",
+            "Modules\\Schemes\\Services\\SchemesCacheService",
+            "Modules\\Schemes\\Models\\Course",
+            "Modules\\Schemes\\Models\\Course",
+            "App\\Exceptions\\BusinessException",
+            "App\\Exceptions\\BusinessException",
+            "App\\Exceptions\\BusinessException",
+            "App\\Exceptions\\BusinessException",
+            "App\\Exceptions\\BusinessException",
+            "App\\Jobs\\LogActivityJob",
+            "Modules\\Schemes\\Models\\Course",
+            "Modules\\Schemes\\Models\\Course",
+            "App\\Jobs\\LogActivityJob"
+        ],
+        "parents": [],
+        "implements": [],
+        "lcom": 2,
+        "length": 108,
+        "vocabulary": 43,
+        "volume": 586.04,
+        "difficulty": 5.92,
+        "effort": 3469.95,
+        "level": 0.17,
+        "bugs": 0.2,
+        "time": 193,
+        "intelligentContent": 98.98,
+        "number_operators": 18,
+        "number_operands": 90,
+        "number_operators_unique": 5,
+        "number_operands_unique": 38,
+        "cloc": 0,
+        "loc": 45,
+        "lloc": 45,
+        "mi": 43.35,
+        "mIwoC": 43.35,
+        "commentWeight": 0,
+        "kanDefect": 0.64,
+        "relativeStructuralComplexity": 144,
+        "relativeDataComplexity": 0.26,
+        "relativeSystemComplexity": 144.26,
+        "totalStructuralComplexity": 432,
+        "totalDataComplexity": 0.77,
+        "totalSystemComplexity": 432.77,
+        "package": "Modules\\Schemes\\Services\\Support\\",
+        "pageRank": 0,
+        "afferentCoupling": 1,
+        "efferentCoupling": 5,
+        "instability": 0.83,
+        "violations": {}
+    },
+    {
+        "name": "Modules\\Schemes\\Services\\Support\\LessonFinder",
+        "interface": false,
+        "abstract": false,
+        "final": false,
+        "methods": [
+            {
+                "name": "__construct",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "paginate",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "find",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "findOrFail",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "getLessonForUser",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            }
+        ],
+        "nbMethodsIncludingGettersSetters": 5,
+        "nbMethods": 5,
+        "nbMethodsPrivate": 0,
+        "nbMethodsPublic": 5,
+        "nbMethodsGetter": 0,
+        "nbMethodsSetters": 0,
+        "wmc": 8,
+        "ccn": 4,
+        "ccnMethodMax": 4,
+        "externals": [
+            "Modules\\Schemes\\Contracts\\Repositories\\LessonRepositoryInterface",
+            "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
+            "Spatie\\QueryBuilder\\QueryBuilder",
+            "Spatie\\QueryBuilder\\AllowedFilter",
+            "Spatie\\QueryBuilder\\AllowedFilter",
+            "Modules\\Schemes\\Models\\Lesson",
+            "Modules\\Schemes\\Models\\Lesson",
+            "Modules\\Schemes\\Models\\Lesson",
+            "Modules\\Schemes\\Models\\Course",
+            "App\\Exceptions\\BusinessException"
+        ],
+        "parents": [],
+        "implements": [],
+        "lcom": 4,
+        "length": 59,
+        "vocabulary": 30,
+        "volume": 289.51,
+        "difficulty": 3.69,
+        "effort": 1068.95,
+        "level": 0.27,
+        "bugs": 0.1,
+        "time": 59,
+        "intelligentContent": 78.41,
+        "number_operators": 11,
+        "number_operands": 48,
+        "number_operators_unique": 4,
+        "number_operands_unique": 26,
+        "cloc": 0,
+        "loc": 33,
+        "lloc": 33,
+        "mi": 49.1,
+        "mIwoC": 49.1,
+        "commentWeight": 0,
+        "kanDefect": 0.29,
+        "relativeStructuralComplexity": 196,
+        "relativeDataComplexity": 0.39,
+        "relativeSystemComplexity": 196.39,
+        "totalStructuralComplexity": 980,
+        "totalDataComplexity": 1.93,
+        "totalSystemComplexity": 981.93,
+        "package": "Modules\\Schemes\\Services\\Support\\",
+        "pageRank": 0,
+        "afferentCoupling": 1,
+        "efferentCoupling": 7,
+        "instability": 0.88,
+        "violations": {}
+    },
+    {
+        "name": "Modules\\Schemes\\Services\\Support\\ProgressionFinder",
+        "interface": false,
+        "abstract": false,
+        "final": false,
+        "methods": [
+            {
+                "name": "getEnrollmentForCourse",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "validateAndGetProgress",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "getProgressForUser",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "getCourseProgressData",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            }
+        ],
+        "nbMethodsIncludingGettersSetters": 4,
+        "nbMethods": 4,
+        "nbMethodsPrivate": 0,
+        "nbMethodsPublic": 4,
+        "nbMethodsGetter": 0,
+        "nbMethodsSetters": 0,
+        "wmc": 8,
+        "ccn": 5,
+        "ccnMethodMax": 3,
+        "externals": [
+            "Modules\\Enrollments\\Models\\Enrollment",
+            "Modules\\Schemes\\Models\\Course",
+            "Modules\\Auth\\Models\\User",
+            "Illuminate\\Database\\Eloquent\\ModelNotFoundException",
+            "Modules\\Enrollments\\Models\\Enrollment",
+            "Illuminate\\Database\\Eloquent\\ModelNotFoundException",
+            "Modules\\Schemes\\Models\\Course",
+            "Illuminate\\Database\\Eloquent\\ModelNotFoundException",
+            "Modules\\Schemes\\Models\\Course",
+            "Modules\\Enrollments\\Models\\Enrollment"
+        ],
+        "parents": [],
+        "implements": [],
+        "lcom": 1,
+        "length": 68,
+        "vocabulary": 25,
+        "volume": 315.78,
+        "difficulty": 3.75,
+        "effort": 1184.18,
+        "level": 0.27,
+        "bugs": 0.11,
+        "time": 66,
+        "intelligentContent": 84.21,
+        "number_operators": 13,
+        "number_operands": 55,
+        "number_operators_unique": 3,
+        "number_operands_unique": 22,
+        "cloc": 30,
+        "loc": 70,
+        "lloc": 40,
+        "mi": 89.33,
+        "mIwoC": 46.88,
+        "commentWeight": 42.45,
+        "kanDefect": 0.43,
+        "relativeStructuralComplexity": 196,
+        "relativeDataComplexity": 0.48,
+        "relativeSystemComplexity": 196.48,
+        "totalStructuralComplexity": 784,
+        "totalDataComplexity": 1.93,
+        "totalSystemComplexity": 785.93,
+        "package": "Modules\\Schemes\\Services\\Support\\",
+        "pageRank": 0,
+        "afferentCoupling": 2,
+        "efferentCoupling": 4,
+        "instability": 0.67,
+        "violations": {}
+    },
+    {
+        "name": "Modules\\Schemes\\Services\\Support\\LessonOrderingProcessor",
+        "interface": false,
+        "abstract": false,
+        "final": false,
+        "methods": [
+            {
+                "name": "__construct",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "create",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "update",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "delete",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "validateHierarchy",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "publish",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
+            {
+                "name": "unpublish",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            }
+        ],
+        "nbMethodsIncludingGettersSetters": 7,
+        "nbMethods": 7,
+        "nbMethodsPrivate": 0,
+        "nbMethodsPublic": 7,
+        "nbMethodsGetter": 0,
+        "nbMethodsSetters": 0,
+        "wmc": 20,
+        "ccn": 14,
+        "ccnMethodMax": 6,
+        "externals": [
+            "Modules\\Schemes\\Contracts\\Repositories\\LessonRepositoryInterface",
+            "Modules\\Schemes\\Services\\SchemesCacheService",
+            "Modules\\Schemes\\Models\\Lesson",
+            "Modules\\Schemes\\Models\\Lesson",
+            "Modules\\Schemes\\Models\\Lesson",
+            "Illuminate\\Support\\Arr",
+            "Illuminate\\Support\\Facades\\DB",
+            "Modules\\Schemes\\Models\\Lesson",
+            "Modules\\Schemes\\Models\\Lesson",
+            "Modules\\Schemes\\Models\\Lesson",
+            "Modules\\Schemes\\Models\\Lesson",
+            "Illuminate\\Support\\Arr",
+            "Illuminate\\Support\\Facades\\DB",
+            "Modules\\Schemes\\Models\\Lesson",
+            "Modules\\Schemes\\Models\\Lesson",
+            "Illuminate\\Support\\Facades\\DB",
+            "Modules\\Schemes\\Models\\Lesson",
+            "Illuminate\\Database\\Eloquent\\ModelNotFoundException",
+            "Modules\\Schemes\\Models\\Unit",
+            "Illuminate\\Database\\Eloquent\\ModelNotFoundException",
+            "Modules\\Schemes\\Models\\Lesson",
+            "Modules\\Schemes\\Models\\Lesson",
+            "Modules\\Schemes\\Models\\Lesson",
+            "Modules\\Schemes\\Models\\Lesson"
+        ],
+        "parents": [],
+        "implements": [],
+        "lcom": 3,
+        "length": 181,
+        "vocabulary": 39,
+        "volume": 956.66,
+        "difficulty": 24.14,
+        "effort": 23091.74,
+        "level": 0.04,
+        "bugs": 0.32,
+        "time": 1283,
+        "intelligentContent": 39.63,
+        "number_operators": 41,
+        "number_operands": 140,
+        "number_operators_unique": 10,
+        "number_operands_unique": 29,
+        "cloc": 0,
+        "loc": 80,
+        "lloc": 80,
+        "mi": 35.73,
+        "mIwoC": 35.73,
+        "commentWeight": 0,
+        "kanDefect": 0.64,
+        "relativeStructuralComplexity": 324,
+        "relativeDataComplexity": 0.51,
+        "relativeSystemComplexity": 324.51,
+        "totalStructuralComplexity": 2268,
+        "totalDataComplexity": 3.58,
+        "totalSystemComplexity": 2271.58,
+        "package": "Modules\\Schemes\\Services\\Support\\",
+        "pageRank": 0,
+        "afferentCoupling": 1,
+        "efferentCoupling": 7,
+        "instability": 0.88,
+        "violations": {}
+    },
+    {
         "name": "Modules\\Schemes\\Services\\ProgressionService",
         "interface": false,
         "abstract": false,
         "final": false,
         "methods": [
+            {
+                "name": "__construct",
+                "role": null,
+                "public": true,
+                "private": false,
+                "_type": "Hal\\Metric\\FunctionMetric"
+            },
             {
                 "name": "validateLessonAccess",
                 "role": null,
@@ -12868,140 +13868,78 @@ var classes = [
                 "public": true,
                 "private": false,
                 "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "storeLessonCompletion",
-                "role": null,
-                "public": false,
-                "private": true,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "updateUnitProgress",
-                "role": null,
-                "public": false,
-                "private": true,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "updateCourseProgress",
-                "role": null,
-                "public": false,
-                "private": true,
-                "_type": "Hal\\Metric\\FunctionMetric"
             }
         ],
-        "nbMethodsIncludingGettersSetters": 13,
-        "nbMethods": 13,
-        "nbMethodsPrivate": 3,
-        "nbMethodsPublic": 10,
+        "nbMethodsIncludingGettersSetters": 11,
+        "nbMethods": 11,
+        "nbMethodsPrivate": 0,
+        "nbMethodsPublic": 11,
         "nbMethodsGetter": 0,
         "nbMethodsSetters": 0,
-        "wmc": 106,
-        "ccn": 94,
-        "ccnMethodMax": 28,
+        "wmc": 14,
+        "ccn": 4,
+        "ccnMethodMax": 3,
         "externals": [
+            "Modules\\Schemes\\Services\\Support\\ProgressionFinder",
+            "Modules\\Schemes\\Services\\Support\\ProgressionGatekeeper",
+            "Modules\\Schemes\\Services\\Support\\ProgressionStateProcessor",
             "Modules\\Enrollments\\Models\\Enrollment",
             "Modules\\Schemes\\Models\\Course",
             "Modules\\Schemes\\Models\\Unit",
             "Modules\\Schemes\\Models\\Lesson",
+            "Modules\\Schemes\\Models\\Course",
             "Illuminate\\Database\\Eloquent\\ModelNotFoundException",
+            "Modules\\Schemes\\Models\\Course",
             "Modules\\Auth\\Models\\User",
-            "Modules\\Enrollments\\Models\\Enrollment",
-            "App\\Exceptions\\BusinessException",
-            "Modules\\Schemes\\Models\\Course",
             "Illuminate\\Database\\Eloquent\\ModelNotFoundException",
-            "Modules\\Schemes\\Models\\Course",
-            "Modules\\Auth\\Models\\User",
             "Illuminate\\Database\\Eloquent\\ModelNotFoundException",
-            "Modules\\Enrollments\\Models\\Enrollment",
-            "Illuminate\\Database\\Eloquent\\ModelNotFoundException",
-            "Modules\\Enrollments\\Models\\Enrollment",
-            "Modules\\Schemes\\Models\\Lesson",
-            "Modules\\Enrollments\\Models\\Enrollment",
-            "Modules\\Enrollments\\Models\\Enrollment",
-            "Modules\\Enrollments\\Models\\LessonProgress",
-            "Modules\\Schemes\\Events\\LessonCompleted",
-            "Modules\\Schemes\\Events\\UnitCompleted",
-            "Illuminate\\Support\\Facades\\DB",
-            "Illuminate\\Support\\Facades\\DB",
             "Modules\\Schemes\\Models\\Lesson",
             "Modules\\Enrollments\\Models\\Enrollment",
             "Modules\\Schemes\\Models\\Lesson",
             "Modules\\Enrollments\\Models\\Enrollment",
-            "Modules\\Enrollments\\Models\\LessonProgress",
-            "Illuminate\\Support\\Facades\\DB",
+            "Modules\\Schemes\\Models\\Lesson",
+            "Modules\\Enrollments\\Models\\Enrollment",
             "Modules\\Schemes\\Models\\Unit",
             "Modules\\Enrollments\\Models\\Enrollment",
-            "Illuminate\\Support\\Facades\\DB",
             "Modules\\Schemes\\Models\\Lesson",
             "Modules\\Enrollments\\Models\\Enrollment",
-            "Modules\\Enrollments\\Models\\UnitProgress",
-            "Illuminate\\Database\\Eloquent\\Collection",
-            "Modules\\Enrollments\\Models\\LessonProgress",
             "Modules\\Schemes\\Models\\Course",
-            "Modules\\Enrollments\\Models\\Enrollment",
-            "Illuminate\\Support\\Facades\\DB",
-            "Modules\\Enrollments\\Models\\LessonProgress",
-            "Modules\\Enrollments\\Models\\UnitProgress",
-            "Modules\\Enrollments\\Models\\CourseProgress",
-            "Illuminate\\Database\\Eloquent\\Collection",
-            "Modules\\Schemes\\Models\\Lesson",
-            "Modules\\Enrollments\\Models\\Enrollment",
-            "Modules\\Enrollments\\Models\\LessonProgress",
-            "Illuminate\\Support\\Carbon",
-            "Illuminate\\Support\\Carbon",
-            "Modules\\Schemes\\Models\\Unit",
-            "Modules\\Enrollments\\Models\\Enrollment",
-            "Modules\\Enrollments\\Models\\LessonProgress",
-            "Modules\\Enrollments\\Models\\LessonProgress",
-            "Modules\\Enrollments\\Models\\UnitProgress",
-            "Illuminate\\Support\\Carbon",
-            "Illuminate\\Support\\Carbon",
-            "Modules\\Schemes\\Models\\Course",
-            "Modules\\Enrollments\\Models\\Enrollment",
-            "Modules\\Enrollments\\Models\\UnitProgress",
-            "Modules\\Enrollments\\Models\\UnitProgress",
-            "Modules\\Enrollments\\Models\\CourseProgress",
-            "Illuminate\\Support\\Carbon",
-            "Illuminate\\Support\\Carbon",
-            "Illuminate\\Support\\Carbon",
-            "Modules\\Schemes\\Events\\CourseCompleted"
+            "Modules\\Enrollments\\Models\\Enrollment"
         ],
         "parents": [],
         "implements": [],
-        "lcom": 1,
-        "length": 853,
-        "vocabulary": 107,
-        "volume": 5750.47,
-        "difficulty": 35.01,
-        "effort": 201296.45,
-        "level": 0.03,
-        "bugs": 1.92,
-        "time": 11183,
-        "intelligentContent": 164.27,
-        "number_operators": 242,
-        "number_operands": 611,
-        "number_operators_unique": 11,
-        "number_operands_unique": 96,
-        "cloc": 0,
-        "loc": 309,
-        "lloc": 309,
-        "mi": 6.72,
-        "mIwoC": 6.72,
-        "commentWeight": 0,
-        "kanDefect": 4.03,
-        "relativeStructuralComplexity": 5476,
-        "relativeDataComplexity": 0.3,
-        "relativeSystemComplexity": 5476.3,
-        "totalStructuralComplexity": 71188,
-        "totalDataComplexity": 3.88,
-        "totalSystemComplexity": 71191.88,
+        "lcom": 2,
+        "length": 86,
+        "vocabulary": 18,
+        "volume": 358.61,
+        "difficulty": 7.4,
+        "effort": 2653.74,
+        "level": 0.14,
+        "bugs": 0.12,
+        "time": 147,
+        "intelligentContent": 48.46,
+        "number_operators": 12,
+        "number_operands": 74,
+        "number_operators_unique": 3,
+        "number_operands_unique": 15,
+        "cloc": 7,
+        "loc": 66,
+        "lloc": 59,
+        "mi": 67.11,
+        "mIwoC": 42.95,
+        "commentWeight": 24.17,
+        "kanDefect": 0.36,
+        "relativeStructuralComplexity": 64,
+        "relativeDataComplexity": 0.93,
+        "relativeSystemComplexity": 64.93,
+        "totalStructuralComplexity": 704,
+        "totalDataComplexity": 10.22,
+        "totalSystemComplexity": 714.22,
         "package": "Modules\\Schemes\\Services\\",
         "pageRank": 0,
         "afferentCoupling": 4,
-        "efferentCoupling": 16,
-        "instability": 0.8,
+        "efferentCoupling": 9,
+        "instability": 0.69,
         "violations": {}
     },
     {
@@ -13107,9 +14045,9 @@ var classes = [
         "totalSystemComplexity": 490.8,
         "package": "Modules\\Schemes\\Services\\",
         "pageRank": 0,
-        "afferentCoupling": 2,
+        "afferentCoupling": 5,
         "efferentCoupling": 3,
-        "instability": 0.6,
+        "instability": 0.38,
         "violations": {}
     },
     {
@@ -13165,20 +14103,6 @@ var classes = [
                 "role": null,
                 "public": true,
                 "private": false,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "buildQuery",
-                "role": null,
-                "public": false,
-                "private": true,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "buildQueryForIndex",
-                "role": null,
-                "public": false,
-                "private": true,
                 "_type": "Hal\\Metric\\FunctionMetric"
             },
             {
@@ -13245,27 +14169,6 @@ var classes = [
                 "_type": "Hal\\Metric\\FunctionMetric"
             },
             {
-                "name": "handleMedia",
-                "role": null,
-                "public": false,
-                "private": true,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "parseCourseDuplicates",
-                "role": null,
-                "public": false,
-                "private": true,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
-                "name": "generateCourseCode",
-                "role": null,
-                "public": false,
-                "private": true,
-                "_type": "Hal\\Metric\\FunctionMetric"
-            },
-            {
                 "name": "uploadThumbnail",
                 "role": null,
                 "public": true,
@@ -13315,74 +14218,31 @@ var classes = [
                 "_type": "Hal\\Metric\\FunctionMetric"
             }
         ],
-        "nbMethodsIncludingGettersSetters": 28,
-        "nbMethods": 28,
-        "nbMethodsPrivate": 5,
+        "nbMethodsIncludingGettersSetters": 23,
+        "nbMethods": 23,
+        "nbMethodsPrivate": 0,
         "nbMethodsPublic": 23,
         "nbMethodsGetter": 0,
         "nbMethodsSetters": 0,
-        "wmc": 81,
-        "ccn": 54,
-        "ccnMethodMax": 10,
+        "wmc": 24,
+        "ccn": 2,
+        "ccnMethodMax": 2,
         "externals": [
             "Modules\\Schemes\\Contracts\\Services\\CourseServiceInterface",
-            "Modules\\Schemes\\Contracts\\Repositories\\CourseRepositoryInterface",
-            "Modules\\Schemes\\Services\\SchemesCacheService",
+            "Modules\\Schemes\\Services\\Support\\CourseFinder",
+            "Modules\\Schemes\\Services\\Support\\CourseLifecycleProcessor",
+            "Modules\\Schemes\\Services\\Support\\CoursePublicationProcessor",
             "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
             "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
             "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
             "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
             "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
             "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
-            "Spatie\\QueryBuilder\\QueryBuilder",
-            "Illuminate\\Support\\Arr",
-            "Illuminate\\Http\\Request",
             "Modules\\Schemes\\Models\\Course",
-            "Spatie\\QueryBuilder\\QueryBuilder",
             "Modules\\Schemes\\Models\\Course",
-            "App\\Support\\Helpers\\ArrayParser",
-            "Illuminate\\Support\\Str",
-            "Spatie\\QueryBuilder\\AllowedFilter",
-            "Spatie\\QueryBuilder\\AllowedFilter",
-            "Spatie\\QueryBuilder\\AllowedFilter",
-            "Spatie\\QueryBuilder\\AllowedFilter",
-            "Spatie\\QueryBuilder\\QueryBuilder",
-            "Illuminate\\Support\\Arr",
-            "Illuminate\\Http\\Request",
             "Modules\\Schemes\\Models\\Course",
-            "Spatie\\QueryBuilder\\QueryBuilder",
             "Modules\\Schemes\\Models\\Course",
-            "App\\Support\\Helpers\\ArrayParser",
-            "Illuminate\\Support\\Str",
-            "Spatie\\QueryBuilder\\AllowedFilter",
-            "Spatie\\QueryBuilder\\AllowedFilter",
-            "Spatie\\QueryBuilder\\AllowedFilter",
-            "Spatie\\QueryBuilder\\AllowedFilter",
             "Modules\\Schemes\\Models\\Course",
-            "Illuminate\\Database\\Eloquent\\ModelNotFoundException",
-            "Modules\\Schemes\\Models\\Course",
-            "Illuminate\\Support\\Arr",
-            "App\\Jobs\\LogActivityJob",
-            "Illuminate\\Support\\Facades\\DB",
-            "App\\Exceptions\\DuplicateResourceException",
-            "Modules\\Schemes\\Models\\Course",
-            "Illuminate\\Support\\Arr",
-            "App\\Jobs\\LogActivityJob",
-            "Illuminate\\Support\\Facades\\DB",
-            "App\\Exceptions\\DuplicateResourceException",
-            "App\\Jobs\\LogActivityJob",
-            "Modules\\Schemes\\Models\\Course",
-            "App\\Exceptions\\BusinessException",
-            "App\\Exceptions\\BusinessException",
-            "App\\Exceptions\\BusinessException",
-            "App\\Exceptions\\BusinessException",
-            "App\\Exceptions\\BusinessException",
-            "App\\Jobs\\LogActivityJob",
-            "Modules\\Schemes\\Models\\Course",
-            "App\\Jobs\\LogActivityJob",
-            "Modules\\Schemes\\Models\\Course",
-            "Illuminate\\Database\\QueryException",
-            "App\\Support\\CodeGenerator",
             "Modules\\Schemes\\Models\\Course",
             "Illuminate\\Http\\UploadedFile",
             "Modules\\Schemes\\Models\\Course",
@@ -13397,36 +14257,36 @@ var classes = [
             "Modules\\Schemes\\Contracts\\Services\\CourseServiceInterface"
         ],
         "lcom": 4,
-        "length": 767,
-        "vocabulary": 131,
-        "volume": 5394.64,
-        "difficulty": 30.55,
-        "effort": 164831.05,
-        "level": 0.03,
-        "bugs": 1.8,
-        "time": 9157,
-        "intelligentContent": 176.56,
-        "number_operators": 161,
-        "number_operands": 606,
-        "number_operators_unique": 12,
-        "number_operands_unique": 119,
-        "cloc": 2,
-        "loc": 314,
-        "lloc": 312,
-        "mi": 18.36,
-        "mIwoC": 12.2,
-        "commentWeight": 6.17,
-        "kanDefect": 3.15,
-        "relativeStructuralComplexity": 4761,
-        "relativeDataComplexity": 0.49,
-        "relativeSystemComplexity": 4761.49,
-        "totalStructuralComplexity": 133308,
-        "totalDataComplexity": 13.81,
-        "totalSystemComplexity": 133321.81,
+        "length": 166,
+        "vocabulary": 21,
+        "volume": 729.12,
+        "difficulty": 11,
+        "effort": 8020.37,
+        "level": 0.09,
+        "bugs": 0.24,
+        "time": 446,
+        "intelligentContent": 66.28,
+        "number_operators": 34,
+        "number_operands": 132,
+        "number_operators_unique": 3,
+        "number_operands_unique": 18,
+        "cloc": 0,
+        "loc": 108,
+        "lloc": 108,
+        "mi": 35.33,
+        "mIwoC": 35.33,
+        "commentWeight": 0,
+        "kanDefect": 0.22,
+        "relativeStructuralComplexity": 441,
+        "relativeDataComplexity": 1.12,
+        "relativeSystemComplexity": 442.12,
+        "totalStructuralComplexity": 10143,
+        "totalDataComplexity": 25.82,
+        "totalSystemComplexity": 10168.82,
         "package": "Modules\\Schemes\\Services\\",
         "pageRank": 0,
         "afferentCoupling": 0,
-        "efferentCoupling": 19,
+        "efferentCoupling": 7,
         "instability": 1,
         "violations": {}
     },
@@ -13515,47 +14375,32 @@ var classes = [
             },
             {
                 "name": "getRepository",
-                "role": "getter",
+                "role": null,
+                "public": true,
+                "private": false,
                 "_type": "Hal\\Metric\\FunctionMetric"
             }
         ],
         "nbMethodsIncludingGettersSetters": 12,
-        "nbMethods": 11,
+        "nbMethods": 12,
         "nbMethodsPrivate": 0,
-        "nbMethodsPublic": 11,
-        "nbMethodsGetter": 1,
+        "nbMethodsPublic": 12,
+        "nbMethodsGetter": 0,
         "nbMethodsSetters": 0,
-        "wmc": 27,
-        "ccn": 17,
-        "ccnMethodMax": 6,
+        "wmc": 12,
+        "ccn": 1,
+        "ccnMethodMax": 1,
         "externals": [
             "Modules\\Schemes\\Contracts\\Services\\LessonServiceInterface",
-            "Modules\\Schemes\\Contracts\\Repositories\\LessonRepositoryInterface",
-            "Modules\\Schemes\\Models\\Lesson",
-            "Illuminate\\Database\\Eloquent\\ModelNotFoundException",
-            "Modules\\Schemes\\Models\\Unit",
-            "Illuminate\\Database\\Eloquent\\ModelNotFoundException",
+            "Modules\\Schemes\\Services\\Support\\LessonFinder",
+            "Modules\\Schemes\\Services\\Support\\LessonOrderingProcessor",
             "Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
-            "Spatie\\QueryBuilder\\QueryBuilder",
-            "Spatie\\QueryBuilder\\AllowedFilter",
-            "Spatie\\QueryBuilder\\AllowedFilter",
             "Modules\\Schemes\\Models\\Lesson",
             "Modules\\Schemes\\Models\\Lesson",
             "Modules\\Schemes\\Models\\Course",
-            "App\\Exceptions\\BusinessException",
             "Modules\\Schemes\\Models\\Lesson",
             "Modules\\Schemes\\Models\\Lesson",
             "Modules\\Schemes\\Models\\Lesson",
-            "Modules\\Schemes\\Models\\Lesson",
-            "Illuminate\\Support\\Arr",
-            "Illuminate\\Support\\Facades\\DB",
-            "Modules\\Schemes\\Models\\Lesson",
-            "Modules\\Schemes\\Models\\Lesson",
-            "Modules\\Schemes\\Models\\Lesson",
-            "Illuminate\\Support\\Arr",
-            "Illuminate\\Support\\Facades\\DB",
-            "Modules\\Schemes\\Models\\Lesson",
-            "Illuminate\\Support\\Facades\\DB",
             "Modules\\Schemes\\Models\\Lesson",
             "Modules\\Schemes\\Models\\Lesson",
             "Modules\\Schemes\\Contracts\\Repositories\\LessonRepositoryInterface"
@@ -13564,38 +14409,38 @@ var classes = [
         "implements": [
             "Modules\\Schemes\\Contracts\\Services\\LessonServiceInterface"
         ],
-        "lcom": 5,
-        "length": 254,
-        "vocabulary": 55,
-        "volume": 1468.47,
-        "difficulty": 21.89,
-        "effort": 32143.08,
-        "level": 0.05,
-        "bugs": 0.49,
-        "time": 1786,
-        "intelligentContent": 67.09,
-        "number_operators": 57,
-        "number_operands": 197,
-        "number_operators_unique": 10,
-        "number_operands_unique": 45,
+        "lcom": 3,
+        "length": 75,
+        "vocabulary": 16,
+        "volume": 300,
+        "difficulty": 4.36,
+        "effort": 1307.14,
+        "level": 0.23,
+        "bugs": 0.1,
+        "time": 73,
+        "intelligentContent": 68.85,
+        "number_operators": 14,
+        "number_operands": 61,
+        "number_operators_unique": 2,
+        "number_operands_unique": 14,
         "cloc": 0,
-        "loc": 114,
-        "lloc": 114,
-        "mi": 30.67,
-        "mIwoC": 30.67,
+        "loc": 55,
+        "lloc": 55,
+        "mi": 44.56,
+        "mIwoC": 44.56,
         "commentWeight": 0,
-        "kanDefect": 0.78,
-        "relativeStructuralComplexity": 1024,
-        "relativeDataComplexity": 0.44,
-        "relativeSystemComplexity": 1024.44,
-        "totalStructuralComplexity": 12288,
-        "totalDataComplexity": 5.3,
-        "totalSystemComplexity": 12293.3,
+        "kanDefect": 0.15,
+        "relativeStructuralComplexity": 100,
+        "relativeDataComplexity": 1.06,
+        "relativeSystemComplexity": 101.06,
+        "totalStructuralComplexity": 1200,
+        "totalDataComplexity": 12.73,
+        "totalSystemComplexity": 1212.73,
         "package": "Modules\\Schemes\\Services\\",
         "pageRank": 0,
         "afferentCoupling": 1,
-        "efferentCoupling": 12,
-        "instability": 0.92,
+        "efferentCoupling": 7,
+        "instability": 0.88,
         "violations": {}
     },
     {
@@ -13759,7 +14604,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@0000000000001cb70000000000000000",
+        "name": "anonymous@00000000000008720000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -13838,7 +14683,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@000000000000176a0000000000000000",
+        "name": "anonymous@0000000000001fb00000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -13911,7 +14756,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000019bf0000000000000000",
+        "name": "anonymous@0000000000001f1d0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -13984,7 +14829,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@0000000000001c5e0000000000000000",
+        "name": "anonymous@00000000000003ca0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -14057,7 +14902,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000019a90000000000000000",
+        "name": "anonymous@0000000000001f330000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -14134,7 +14979,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@0000000000001a0f0000000000000000",
+        "name": "anonymous@0000000000001ed00000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -15655,8 +16500,8 @@ var classes = [
         "totalDataComplexity": 7.5,
         "totalSystemComplexity": 1217.5,
         "package": "Modules\\Enrollments\\Models\\",
-        "pageRank": 0.01,
-        "afferentCoupling": 33,
+        "pageRank": 0.02,
+        "afferentCoupling": 36,
         "efferentCoupling": 3,
         "instability": 0.08,
         "violations": {}
@@ -15727,9 +16572,9 @@ var classes = [
         "totalSystemComplexity": 4,
         "package": "Modules\\Enrollments\\Models\\",
         "pageRank": 0,
-        "afferentCoupling": 2,
+        "afferentCoupling": 3,
         "efferentCoupling": 1,
-        "instability": 0.33,
+        "instability": 0.25,
         "violations": {}
     },
     {
@@ -15798,9 +16643,9 @@ var classes = [
         "totalSystemComplexity": 4,
         "package": "Modules\\Enrollments\\Models\\",
         "pageRank": 0,
-        "afferentCoupling": 1,
+        "afferentCoupling": 2,
         "efferentCoupling": 1,
-        "instability": 0.5,
+        "instability": 0.33,
         "violations": {}
     },
     {
@@ -17581,7 +18426,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@0000000000000bf90000000000000000",
+        "name": "anonymous@00000000000015bf0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -17654,7 +18499,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000035910000000000000000",
+        "name": "anonymous@00000000000033930000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -17727,7 +18572,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000035f90000000000000000",
+        "name": "anonymous@00000000000033fb0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -17800,7 +18645,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000035b70000000000000000",
+        "name": "anonymous@00000000000033b90000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -21614,7 +22459,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000019b10000000000000000",
+        "name": "anonymous@0000000000001f2b0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -21687,7 +22532,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@0000000000002b9f0000000000000000",
+        "name": "anonymous@00000000000029a10000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -21760,7 +22605,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000025ff0000000000000000",
+        "name": "anonymous@00000000000026c50000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -21833,7 +22678,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000026eb0000000000000000",
+        "name": "anonymous@00000000000027b10000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -21907,7 +22752,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@0000000000002c2f0000000000000000",
+        "name": "anonymous@0000000000002a310000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -21981,7 +22826,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@000000000000349b0000000000000000",
+        "name": "anonymous@000000000000329d0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -22054,7 +22899,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000019b50000000000000000",
+        "name": "anonymous@0000000000001f2a0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -22132,7 +22977,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000031430000000000000000",
+        "name": "anonymous@0000000000002f450000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -22206,7 +23051,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@000000000000338a0000000000000000",
+        "name": "anonymous@000000000000318c0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -22280,7 +23125,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@000000000000338f0000000000000000",
+        "name": "anonymous@00000000000031910000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -22353,7 +23198,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@000000000000349e0000000000000000",
+        "name": "anonymous@00000000000032a00000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -22426,7 +23271,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@000000000000310c0000000000000000",
+        "name": "anonymous@0000000000002f0e0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -22499,7 +23344,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000027210000000000000000",
+        "name": "anonymous@00000000000027e70000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -22572,7 +23417,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@0000000000002c3e0000000000000000",
+        "name": "anonymous@0000000000002a400000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -22645,7 +23490,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000032380000000000000000",
+        "name": "anonymous@000000000000303a0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -22718,7 +23563,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000027200000000000000000",
+        "name": "anonymous@00000000000027e60000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -22792,7 +23637,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000034050000000000000000",
+        "name": "anonymous@00000000000032070000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -22865,7 +23710,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000031660000000000000000",
+        "name": "anonymous@0000000000002f680000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -22939,7 +23784,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@0000000000002c890000000000000000",
+        "name": "anonymous@0000000000002a8b0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -26275,8 +27120,8 @@ var classes = [
         "totalDataComplexity": 12.54,
         "totalSystemComplexity": 11887.54,
         "package": "Modules\\Auth\\Models\\",
-        "pageRank": 0.11,
-        "afferentCoupling": 138,
+        "pageRank": 0.1,
+        "afferentCoupling": 140,
         "efferentCoupling": 5,
         "instability": 0.03,
         "violations": {}
@@ -34262,7 +35107,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@0000000000002d080000000000000000",
+        "name": "anonymous@0000000000002b0a0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -34335,7 +35180,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000007fc0000000000000000",
+        "name": "anonymous@0000000000000ee80000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -34408,7 +35253,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@0000000000000e820000000000000000",
+        "name": "anonymous@000000000000229a0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -34481,7 +35326,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@0000000000002c060000000000000000",
+        "name": "anonymous@0000000000002a080000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -34554,7 +35399,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000012db0000000000000000",
+        "name": "anonymous@00000000000025240000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -34627,7 +35472,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000025fa0000000000000000",
+        "name": "anonymous@00000000000026c00000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -34700,7 +35545,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@0000000000000b990000000000000000",
+        "name": "anonymous@0000000000000d220000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -34773,7 +35618,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@000000000000314e0000000000000000",
+        "name": "anonymous@0000000000002f500000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -34846,7 +35691,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@000000000000099b0000000000000000",
+        "name": "anonymous@0000000000000e240000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -34919,7 +35764,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@000000000000278e0000000000000000",
+        "name": "anonymous@00000000000007e90000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -34998,7 +35843,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000033aa0000000000000000",
+        "name": "anonymous@00000000000031ac0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -35071,7 +35916,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@000000000000115f0000000000000000",
+        "name": "anonymous@00000000000005110000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -35144,7 +35989,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000020430000000000000000",
+        "name": "anonymous@00000000000015310000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -35217,7 +36062,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000009e10000000000000000",
+        "name": "anonymous@000000000000159a0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -39305,7 +40150,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@0000000000002f830000000000000000",
+        "name": "anonymous@0000000000002d850000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -39378,7 +40223,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000013150000000000000000",
+        "name": "anonymous@000000000000251c0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -39452,7 +40297,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000029680000000000000000",
+        "name": "anonymous@0000000000000d6a0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -39527,7 +40372,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@0000000000000fa80000000000000000",
+        "name": "anonymous@00000000000019aa0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -39612,7 +40457,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000026060000000000000000",
+        "name": "anonymous@00000000000026cc0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -39685,7 +40530,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000027540000000000000000",
+        "name": "anonymous@000000000000281a0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -39762,7 +40607,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000032480000000000000000",
+        "name": "anonymous@000000000000304a0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -39835,7 +40680,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000023fc0000000000000000",
+        "name": "anonymous@0000000000001a5c0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -39908,7 +40753,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@0000000000000f960000000000000000",
+        "name": "anonymous@00000000000017290000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -39982,7 +40827,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000016710000000000000000",
+        "name": "anonymous@00000000000004180000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -40055,7 +40900,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000003d80000000000000000",
+        "name": "anonymous@00000000000022310000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -40128,7 +40973,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@000000000000356d0000000000000000",
+        "name": "anonymous@000000000000336f0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -40201,7 +41046,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000009010000000000000000",
+        "name": "anonymous@00000000000022800000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -40274,7 +41119,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000036140000000000000000",
+        "name": "anonymous@00000000000034160000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -40347,7 +41192,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@0000000000002e520000000000000000",
+        "name": "anonymous@0000000000002c540000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -40421,7 +41266,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000004f20000000000000000",
+        "name": "anonymous@00000000000022640000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -40494,7 +41339,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000033be0000000000000000",
+        "name": "anonymous@00000000000031c00000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -51059,7 +51904,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@0000000000002d750000000000000000",
+        "name": "anonymous@0000000000002b770000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -51132,7 +51977,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000006b00000000000000000",
+        "name": "anonymous@00000000000022d80000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -51205,7 +52050,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000026850000000000000000",
+        "name": "anonymous@000000000000274b0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -51280,7 +52125,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@000000000000040c0000000000000000",
+        "name": "anonymous@00000000000022ed0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -51353,7 +52198,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000023420000000000000000",
+        "name": "anonymous@0000000000001b160000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -51440,7 +52285,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@0000000000001bb00000000000000000",
+        "name": "anonymous@0000000000000f2e0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -51513,7 +52358,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@0000000000002d100000000000000000",
+        "name": "anonymous@0000000000002b120000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -51586,7 +52431,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000031080000000000000000",
+        "name": "anonymous@0000000000002f0a0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -51659,7 +52504,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000016ee0000000000000000",
+        "name": "anonymous@0000000000000e810000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -57396,7 +58241,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@000000000000242e0000000000000000",
+        "name": "anonymous@0000000000000c2e0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -57469,7 +58314,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@0000000000002b480000000000000000",
+        "name": "anonymous@000000000000294a0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -57542,7 +58387,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000022510000000000000000",
+        "name": "anonymous@0000000000001c070000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -58523,7 +59368,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@0000000000001c0b0000000000000000",
+        "name": "anonymous@00000000000014a30000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -59451,7 +60296,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000031be0000000000000000",
+        "name": "anonymous@0000000000002fc00000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -59524,7 +60369,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@000000000000120a0000000000000000",
+        "name": "anonymous@0000000000000f880000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -59597,7 +60442,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@0000000000002dda0000000000000000",
+        "name": "anonymous@0000000000002bdc0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -59672,7 +60517,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@0000000000000a1c0000000000000000",
+        "name": "anonymous@000000000000235c0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -59751,7 +60596,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000006900000000000000000",
+        "name": "anonymous@00000000000023f90000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -63461,7 +64306,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@0000000000001a3f0000000000000000",
+        "name": "anonymous@0000000000001e9c0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -63534,7 +64379,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000029d80000000000000000",
+        "name": "anonymous@0000000000000b940000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -63607,7 +64452,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000039c00000000000000000",
+        "name": "anonymous@00000000000037c20000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -63701,7 +64546,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000013cb0000000000000000",
+        "name": "anonymous@000000000000100c0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -63774,7 +64619,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@0000000000002aeb0000000000000000",
+        "name": "anonymous@00000000000028ed0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -63851,7 +64696,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@00000000000010ef0000000000000000",
+        "name": "anonymous@0000000000000e780000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
@@ -63924,7 +64769,7 @@ var classes = [
         "violations": {}
     },
     {
-        "name": "anonymous@0000000000001b0a0000000000000000",
+        "name": "anonymous@0000000000000acc0000000000000000",
         "interface": false,
         "abstract": false,
         "final": false,
