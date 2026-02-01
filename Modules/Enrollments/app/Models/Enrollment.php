@@ -15,16 +15,12 @@ class Enrollment extends Model
 {
     use HasFactory, LogsActivity, Searchable;
 
-    /**
-     * Get activity log options for this model.
-     */
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
             ->logAll()
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            // CRITICAL: Disable log for created event to prevent overhead
             ->dontLogIfAttributesChangedOnly(['created_at', 'updated_at'])
             ->setDescriptionForEvent(fn (string $eventName) => match ($eventName) {
                 'created' => 'Enrollment baru telah dibuat',
@@ -82,7 +78,6 @@ class Enrollment extends Model
 
     public function toSearchableArray(): array
     {
-        // PENTING: Jangan load relasi di sini untuk menghindari N+1 yang berat
         return [
             'id' => $this->id,
             'status' => $this->status,
@@ -93,14 +88,9 @@ class Enrollment extends Model
 
     public function shouldBeSearchable(): bool
     {
-        // CRITICAL: Disable sync secara default untuk mencegah memory exhaustion
-        // Data akan di-sync via scheduled job atau manual command jika perlu
-        return false; 
+        return false;
     }
 
-    /**
-     * Create a new factory instance for the model.
-     */
     protected static function newFactory()
     {
         return \Modules\Enrollments\Database\Factories\EnrollmentFactory::new();

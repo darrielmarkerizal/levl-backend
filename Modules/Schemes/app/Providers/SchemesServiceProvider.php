@@ -6,6 +6,7 @@ namespace Modules\Schemes\Providers;
 
 use App\Support\Traits\RegistersModuleConfig;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Nwidart\Modules\Traits\PathNamespace;
 
@@ -17,9 +18,6 @@ class SchemesServiceProvider extends ServiceProvider
 
     protected string $nameLower = 'schemes';
 
-    /**
-     * Boot the application events.
-     */
     public function boot(): void
     {
         $this->registerCommands();
@@ -31,92 +29,83 @@ class SchemesServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
     }
 
-    /**
-     * Register policies.
-     */
     protected function registerPolicies(): void
     {
-        \Illuminate\Support\Facades\Gate::policy(
-            \Modules\Schemes\Models\Course::class,
-            \Modules\Schemes\Policies\CoursePolicy::class
-        );
-        \Illuminate\Support\Facades\Gate::policy(
-            \Modules\Schemes\Models\Unit::class,
-            \Modules\Schemes\Policies\UnitPolicy::class
-        );
-        \Illuminate\Support\Facades\Gate::policy(
-            \Modules\Schemes\Models\Lesson::class,
-            \Modules\Schemes\Policies\LessonPolicy::class
-        );
+        Gate::policy(\Modules\Schemes\Models\Course::class, \Modules\Schemes\Policies\CoursePolicy::class);
+        Gate::policy(\Modules\Schemes\Models\Unit::class, \Modules\Schemes\Policies\UnitPolicy::class);
+        Gate::policy(\Modules\Schemes\Models\Lesson::class, \Modules\Schemes\Policies\LessonPolicy::class);
     }
 
-    /**
-     * Register the service provider.
-     */
     public function register(): void
     {
         $this->app->register(EventServiceProvider::class);
         $this->app->register(RouteServiceProvider::class);
 
-        // Bind service interfaces
-        $this->app->bind(
+        $this->app->singleton(
+            \Modules\Schemes\Services\SchemesCacheService::class,
+            \Modules\Schemes\Services\SchemesCacheService::class
+        );
+
+        $this->app->singleton(
+            \Modules\Schemes\Contracts\Repositories\CourseRepositoryInterface::class,
+            \Modules\Schemes\Repositories\CourseRepository::class
+        );
+
+        $this->app->singleton(
+            \Modules\Schemes\Contracts\Repositories\LessonRepositoryInterface::class,
+            \Modules\Schemes\Repositories\LessonRepository::class
+        );
+
+        $this->app->singleton(
+            \Modules\Schemes\Contracts\Repositories\UnitRepositoryInterface::class,
+            \Modules\Schemes\Repositories\UnitRepository::class
+        );
+
+        $this->app->singleton(
+            \Modules\Schemes\Contracts\Repositories\LessonBlockRepositoryInterface::class,
+            \Modules\Schemes\Repositories\LessonBlockRepository::class
+        );
+
+        $this->app->singleton(
+            \Modules\Schemes\Contracts\Repositories\TagRepositoryInterface::class,
+            \Modules\Schemes\Repositories\TagRepository::class
+        );
+
+        $this->app->scoped(
             \Modules\Schemes\Contracts\Services\CourseServiceInterface::class,
             \Modules\Schemes\Services\CourseService::class
         );
-        $this->app->bind(
+
+        $this->app->scoped(
             \Modules\Schemes\Contracts\Services\UnitServiceInterface::class,
             \Modules\Schemes\Services\UnitService::class
         );
-        $this->app->bind(
+
+        $this->app->scoped(
             \Modules\Schemes\Contracts\Services\LessonServiceInterface::class,
             \Modules\Schemes\Services\LessonService::class
         );
 
-        // Bind repositories
-        $this->app->bind(
-            \Modules\Schemes\Contracts\Repositories\CourseRepositoryInterface::class,
-            \Modules\Schemes\Repositories\CourseRepository::class
+        $this->app->scoped(
+            \Modules\Schemes\Services\LessonBlockService::class,
+            \Modules\Schemes\Services\LessonBlockService::class
         );
-        $this->app->bind(
-            \Modules\Schemes\Contracts\Repositories\LessonRepositoryInterface::class,
-            \Modules\Schemes\Repositories\LessonRepository::class
+
+        $this->app->scoped(
+            \Modules\Schemes\Services\TagService::class,
+            \Modules\Schemes\Services\TagService::class
         );
-        $this->app->bind(
-            \Modules\Schemes\Contracts\Repositories\UnitRepositoryInterface::class,
-            \Modules\Schemes\Repositories\UnitRepository::class
-        );
-        $this->app->bind(
-            \Modules\Schemes\Contracts\Repositories\LessonBlockRepositoryInterface::class,
-            \Modules\Schemes\Repositories\LessonBlockRepository::class
-        );
-        $this->app->bind(
-            \Modules\Schemes\Contracts\Repositories\TagRepositoryInterface::class,
-            \Modules\Schemes\Repositories\TagRepository::class
+
+        $this->app->scoped(
+            \Modules\Schemes\Services\ProgressionService::class,
+            \Modules\Schemes\Services\ProgressionService::class
         );
     }
 
-    /**
-     * Register commands in the format of Command::class
-     */
-    protected function registerCommands(): void
-    {
-        // $this->commands([]);
-    }
+    protected function registerCommands(): void {}
 
-    /**
-     * Register command Schedules.
-     */
-    protected function registerCommandSchedules(): void
-    {
-        // $this->app->booted(function () {
-        //     $schedule = $this->app->make(Schedule::class);
-        //     $schedule->command('inspire')->hourly();
-        // });
-    }
+    protected function registerCommandSchedules(): void {}
 
-    /**
-     * Register translations.
-     */
     public function registerTranslations(): void
     {
         $langPath = resource_path('lang/modules/'.$this->nameLower);
@@ -130,17 +119,11 @@ class SchemesServiceProvider extends ServiceProvider
         }
     }
 
-    /**
-     * Register config.
-     */
     protected function registerConfig(): void
     {
         $this->registerModuleConfig();
     }
 
-    /**
-     * Register views.
-     */
     public function registerViews(): void
     {
         $viewPath = resource_path('views/modules/'.$this->nameLower);
@@ -153,9 +136,6 @@ class SchemesServiceProvider extends ServiceProvider
         Blade::componentNamespace(config('modules.namespace').'\\'.$this->name.'\\View\\Components', $this->nameLower);
     }
 
-    /**
-     * Get the services provided by the provider.
-     */
     public function provides(): array
     {
         return [];

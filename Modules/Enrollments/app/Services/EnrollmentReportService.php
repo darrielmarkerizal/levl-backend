@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Enrollments\Services;
 
 use Modules\Auth\Models\User;
@@ -50,7 +52,7 @@ class EnrollmentReportService implements EnrollmentReportServiceInterface
         if ($courseId) {
             $query->where('course_id', $courseId);
         } elseif (! $user->hasRole('Superadmin')) {
-            
+
             $courseIds = Course::query()
                 ->where(function ($q) use ($user) {
                     $q->where('instructor_id', $user->id)
@@ -91,7 +93,7 @@ class EnrollmentReportService implements EnrollmentReportServiceInterface
         ];
     }
 
-    public function getDetailedEnrollmentsQuery(Course $course)
+    public function getDetailedEnrollmentsQuery(Course $course): \Illuminate\Database\Eloquent\Builder
     {
         return Enrollment::query()
             ->where('course_id', $course->id)

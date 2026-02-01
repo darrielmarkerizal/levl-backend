@@ -5,12 +5,7 @@ declare(strict_types=1);
 namespace Modules\Auth\Services;
 
 use App\Exceptions\BusinessException;
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Modules\Auth\Contracts\Repositories\AuthRepositoryInterface;
@@ -20,8 +15,6 @@ use Modules\Auth\DTOs\RegisterDTO;
 use Modules\Auth\Enums\UserStatus;
 use Modules\Auth\Models\User;
 use Modules\Auth\Support\TokenPairDTO;
-use Modules\Common\Models\Audit;
-use Laravel\Socialite\Facades\Socialite;
 use Tymon\JWTAuth\JWTAuth;
 
 class AuthService implements AuthServiceInterface
@@ -93,8 +86,7 @@ class AuthService implements AuthServiceInterface
             $cfg = $this->throttle->getRateLimitConfig();
             $m = intdiv($retryAfter, 60);
             $s = $retryAfter % 60;
-            $retryIn = $m > 0 ? $m.' '.trans_choice('messages.minutes', $m).($s > 0 ? ' '.$s.' '.trans_choice('messages.seconds', $s) : '') : $s.' '.trans_choice('messages.seconds', $s);
-            $retryIn = $m > 0 ? $m.' menit'.($s > 0 ? ' '.$s.' detik' : '') : $s.' detik'; 
+            $retryIn = $m > 0 ? $m.' menit'.($s > 0 ? ' '.$s.' detik' : '') : $s.' detik';
             throw ValidationException::withMessages([
                 'login' => __('messages.auth.throttle_message', ['max' => $cfg['max'], 'decay' => $cfg['decay'], 'retryIn' => $retryIn]),
             ]);
@@ -144,8 +136,6 @@ class AuthService implements AuthServiceInterface
 
         $this->throttle->clearAttempts($login, $ip);
 
-        
-        
         dispatch(new \App\Jobs\LogActivityJob([
             'log_name' => 'auth',
             'causer_id' => $user->id,
@@ -159,10 +149,9 @@ class AuthService implements AuthServiceInterface
         ]));
 
         $userArray = $user->toArray();
-        $userArray['roles'] = $user->getRoleNames()->values();
+        $userArray['roles'] = $roles->values();
         $userArray['avatar_url'] = $user->avatar_url;
-        $userArray['status'] =
-          $user->status instanceof UserStatus ? $user->status->value : (string) $user->status;
+        $userArray['status'] = $user->status instanceof UserStatus ? $user->status->value : (string) $user->status;
 
         $response = ['user' => $userArray] + $pair->toArray();
 
@@ -252,8 +241,6 @@ class AuthService implements AuthServiceInterface
 
     public function logout(User $user, string $currentJwt, ?string $refreshToken = null): void
     {
-        
-        
         dispatch(new \App\Jobs\LogActivityJob([
             'log_name' => 'auth',
             'causer_id' => $user->id,
@@ -383,7 +370,7 @@ class AuthService implements AuthServiceInterface
         foreach ($roles as $role) {
             $user = User::where('email', strtolower($role).'@example.com')->first();
 
-            if (!$user) {
+            if (! $user) {
                 $user = $this->authRepository->createUser([
                     'name' => $role,
                     'email' => strtolower($role).'@example.com',

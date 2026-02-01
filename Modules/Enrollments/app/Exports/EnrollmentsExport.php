@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Enrollments\Exports;
 
 use Illuminate\Database\Eloquent\Builder;
@@ -10,24 +12,15 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 
 class EnrollmentsExport implements FromQuery, WithHeadings, WithMapping, WithTitle
 {
-    protected Builder $query;
+    public function __construct(
+        private readonly Builder $query
+    ) {}
 
-    public function __construct(Builder $query)
-    {
-        $this->query = $query;
-    }
-
-    /**
-     * @return Builder
-     */
-    public function query()
+    public function query(): Builder
     {
         return $this->query;
     }
 
-    /**
-     * @return array
-     */
     public function headings(): array
     {
         return [
@@ -41,10 +34,6 @@ class EnrollmentsExport implements FromQuery, WithHeadings, WithMapping, WithTit
         ];
     }
 
-    /**
-     * @param mixed $enrollment
-     * @return array
-     */
     public function map($enrollment): array
     {
         $progress = $enrollment->courseProgress;
@@ -60,9 +49,6 @@ class EnrollmentsExport implements FromQuery, WithHeadings, WithMapping, WithTit
         ];
     }
 
-    /**
-     * @return string
-     */
     public function title(): string
     {
         return 'Enrollments';

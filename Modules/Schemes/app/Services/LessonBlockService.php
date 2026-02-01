@@ -24,7 +24,7 @@ class LessonBlockService
     public function validateHierarchy(int $courseId, int $unitId, int $lessonId): void
     {
         $lesson = \Modules\Schemes\Models\Lesson::with('unit')->findOrFail($lessonId);
-        
+
         if (
             (int) $lesson->unit?->course_id !== $courseId ||
             (int) $lesson->unit_id !== $unitId
@@ -50,7 +50,6 @@ class LessonBlockService
     {
         return DB::transaction(function () use ($lessonId, $data, $mediaFile) {
             if (isset($data['order'])) {
-                
                 LessonBlock::where('lesson_id', $lessonId)
                     ->where('order', '>=', $data['order'])
                     ->increment('order');
@@ -86,9 +85,9 @@ class LessonBlockService
     {
         return DB::transaction(function () use ($lessonId, $blockId, $data, $mediaFile) {
             $block = $this->repository->findByLessonAndId($lessonId, $blockId);
-            
-            if (!$block) {
-                throw new \Illuminate\Database\Eloquent\ModelNotFoundException();
+
+            if (! $block) {
+                throw new \Illuminate\Database\Eloquent\ModelNotFoundException;
             }
 
             $update = [
@@ -96,25 +95,24 @@ class LessonBlockService
                 'content' => data_get($data, 'content', $block->content),
             ];
 
-            
             if (isset($data['order']) && $data['order'] != $block->order) {
                 $newOrder = $data['order'];
                 $currentOrder = $block->order;
 
                 if ($newOrder < $currentOrder) {
-                    
+
                     LessonBlock::where('lesson_id', $lessonId)
                         ->where('order', '>=', $newOrder)
                         ->where('order', '<', $currentOrder)
                         ->increment('order');
                 } elseif ($newOrder > $currentOrder) {
-                    
+
                     LessonBlock::where('lesson_id', $lessonId)
                         ->where('order', '>', $currentOrder)
                         ->where('order', '<=', $newOrder)
                         ->decrement('order');
                 }
-                
+
                 $update['order'] = $newOrder;
             }
 
@@ -141,16 +139,16 @@ class LessonBlockService
     {
         return DB::transaction(function () use ($lessonId, $blockId) {
             $block = $this->repository->findByLessonAndId($lessonId, $blockId);
-            
-            if (!$block) {
-                throw new \Illuminate\Database\Eloquent\ModelNotFoundException();
+
+            if (! $block) {
+                throw new \Illuminate\Database\Eloquent\ModelNotFoundException;
             }
 
             $deletedOrder = $block->order;
             $deleted = (bool) $block->delete();
 
             if ($deleted) {
-                
+
                 LessonBlock::where('lesson_id', $lessonId)
                     ->where('order', '>', $deletedOrder)
                     ->decrement('order');

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Enrollments\Mail;
 
 use Illuminate\Bus\Queueable;
@@ -20,7 +22,7 @@ class StudentEnrollmentApprovedMail extends Mailable
 
     public function build(): self
     {
-        return $this->subject('Permintaan Enrollment Disetujui - ' . $this->course->title)
+        return $this->subject('Permintaan Enrollment Disetujui - '.$this->course->title)
             ->view('enrollments::emails.student-enrollment-approved')
             ->with([
                 'student' => $this->student,
@@ -29,4 +31,3 @@ class StudentEnrollmentApprovedMail extends Mailable
             ]);
     }
 }
-

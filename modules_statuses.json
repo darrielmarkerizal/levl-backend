@@ -11,5 +11,6 @@
     "Forums": true,
     "Content": true,
     "Search": true,
-    "Questions": true
+    "Questions": true,
+    "Benchmark": true
 }

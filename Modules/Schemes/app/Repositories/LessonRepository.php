@@ -12,21 +12,11 @@ use Modules\Schemes\Models\Lesson;
 
 class LessonRepository extends BaseRepository implements LessonRepositoryInterface
 {
-    /**
-     * Allowed filter keys.
-     *
-     * @var array<int, string>
-     */
     protected array $allowedFilters = [
         'status',
         'content_type',
     ];
 
-    /**
-     * Allowed sort fields.
-     *
-     * @var array<int, string>
-     */
     protected array $allowedSorts = [
         'id',
         'title',
@@ -38,9 +28,6 @@ class LessonRepository extends BaseRepository implements LessonRepositoryInterfa
         'published_at',
     ];
 
-    /**
-     * Default sort field.
-     */
     protected string $defaultSort = 'order';
 
     protected function model(): string

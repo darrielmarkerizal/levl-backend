@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Enrollments\Models;
 
 use Database\Factories\CourseProgressFactory;
@@ -38,24 +40,18 @@ class CourseProgress extends Model
         return $this->belongsTo(Enrollment::class);
     }
 
-    /**
-     * Get the course through enrollment.
-     */
     public function course()
     {
         return $this->hasOneThrough(
             \Modules\Schemes\Models\Course::class,
             Enrollment::class,
-            'id', // Foreign key on enrollments table
-            'id', // Foreign key on courses table
-            'enrollment_id', // Local key on course_progress table
-            'course_id', // Local key on enrollments table
+            'id',
+            'id',
+            'enrollment_id',
+            'course_id',
         );
     }
 
-    /**
-     * Get course_id via enrollment relationship.
-     */
     public function getCourseIdAttribute()
     {
         return $this->enrollment?->course_id;

@@ -56,14 +56,11 @@ class AuthenticationService implements AuthenticationServiceInterface
             );
         }
 
-        
         $wasAutoVerified = $this->autoVerifyPrivilegedUser($user);
 
-        
         return DB::transaction(function () use ($user, $ip, $userAgent, $login, $wasAutoVerified) {
             $this->throttle->clearAttempts($login, $ip);
 
-            
             $loginType = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
             event(new UserLoggedIn($user, $ip, $userAgent, $loginType));
 
@@ -74,7 +71,7 @@ class AuthenticationService implements AuthenticationServiceInterface
     public function generateTokens(User $user, string $ip, ?string $userAgent, bool $wasAutoVerified = false): array
     {
         $token = $this->jwt->fromUser($user);
-        
+
         $deviceId = hash('sha256', ($ip ?? '').($userAgent ?? '').$user->id);
         $refresh = $this->authRepository->createRefreshToken(
             userId: $user->id,
@@ -94,7 +91,7 @@ class AuthenticationService implements AuthenticationServiceInterface
 
         $response = ['user' => $userArray] + $pair->toArray();
         if ($wasAutoVerified) {
-            $response['message'] = 'Login berhasil. Akun Anda telah otomatis diverifikasi.';
+            $response['message'] = __('messages.auth.login_success_auto_verified');
         }
 
         return $response;
@@ -108,17 +105,13 @@ class AuthenticationService implements AuthenticationServiceInterface
             if ($refreshToken) {
                 $this->authRepository->revokeRefreshToken($refreshToken, $user->id);
             } else {
-                
-                
-                
-                
                 $this->authRepository->revokeAllUserRefreshTokens($user->id);
             }
-            
+
             activity('auth')
                 ->causedBy($user)
                 ->withProperties(['action' => 'logout'])
-                ->log('Pengguna logout');
+                ->log(__('messages.auth.log_user_logout'));
         });
     }
 
@@ -127,22 +120,21 @@ class AuthenticationService implements AuthenticationServiceInterface
         return DB::transaction(function () use ($refreshToken, $ip, $userAgent) {
             $record = $this->authRepository->findValidRefreshRecord($refreshToken);
             if (! $record) {
-                throw ValidationException::withMessages(['refresh_token' => 'Refresh token tidak valid.']);
+                throw ValidationException::withMessages(['refresh_token' => __('messages.auth.refresh_token_invalid')]);
             }
 
             $user = $record->user;
-            if (!$user || $user->status !== UserStatus::Active) {
-                throw ValidationException::withMessages(['refresh_token' => 'Akun tidak aktif.']);
+            if (! $user || $user->status !== UserStatus::Active) {
+                throw ValidationException::withMessages(['refresh_token' => __('messages.auth.account_not_active')]);
             }
 
             if ($record->isReplaced()) {
-                
                 $chain = $this->authRepository->findReplacedTokenChain($record->id);
                 $deviceIds = collect($chain)->pluck('device_id')->unique()->filter()->toArray();
                 foreach ($deviceIds as $deviceId) {
                     $this->authRepository->revokeAllUserRefreshTokensByDevice($user->id, $deviceId);
                 }
-                throw ValidationException::withMessages(['refresh_token' => 'Refresh token reuse detected. Sesi dicabut.']);
+                throw ValidationException::withMessages(['refresh_token' => __('messages.auth.refresh_token_compromised')]);
             }
 
             $deviceId = $record->device_id ?? hash('sha256', ($ip ?? '').($userAgent ?? '').$user->id);
@@ -173,20 +165,23 @@ class AuthenticationService implements AuthenticationServiceInterface
             $user->email_verified_at = now();
             $user->status = UserStatus::Active;
             $user->save();
+
             return true;
         }
+
         return false;
     }
 
-    private function throwThrottledException(string $login, string $ip): void
+    private function throwThrottledException(string $login, string $ip): never
     {
         $retryAfter = $this->throttle->getRetryAfterSeconds($login, $ip);
+        $cfg = $this->throttle->getRateLimitConfig();
         $s = $retryAfter % 60;
         $m = intdiv($retryAfter, 60);
-        $retryIn = $m > 0 ? $m . ' menit ' . $s . ' detik' : $s . ' detik';
-        
+        $retryIn = $m > 0 ? $m.' menit'.($s > 0 ? ' '.$s.' detik' : '') : $s.' detik';
+
         throw ValidationException::withMessages([
-            'login' => "Terlalu banyak percobaan. Coba lagi dalam {$retryIn}.",
+            'login' => __('messages.auth.throttle_message', ['max' => $cfg['max'], 'decay' => $cfg['decay'], 'retryIn' => $retryIn]),
         ]);
     }
 

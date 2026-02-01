@@ -9,11 +9,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class EnrollmentResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
         return [
@@ -23,7 +18,7 @@ class EnrollmentResource extends JsonResource
             'completed_at' => $this->completed_at?->toISOString(),
             'created_at' => $this->created_at->toISOString(),
             'updated_at' => $this->updated_at->toISOString(),
-            
+
             // Relationships (when loaded)
             'user' => $this->whenLoaded('user', function () {
                 return [
@@ -32,7 +27,7 @@ class EnrollmentResource extends JsonResource
                     'email' => $this->user->email,
                 ];
             }),
-            
+
             'course' => $this->whenLoaded('course', function () {
                 return [
                     'id' => $this->course->id,

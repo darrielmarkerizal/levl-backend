@@ -23,6 +23,7 @@ class AuthRepository extends BaseRepository implements AuthRepositoryInterface
         return $this->query()
             ->where(fn ($q) => $q->where('email', $login)->orWhere('username', $login))
             ->where('status', UserStatus::Active)
+            ->with('roles:id,name')
             ->first();
     }
 
@@ -30,7 +31,7 @@ class AuthRepository extends BaseRepository implements AuthRepositoryInterface
     {
         return $this->query()
             ->where(fn ($q) => $q->where('email', $login)->orWhere('username', $login))
-            ->with('roles:id,name')  // Eager load roles to prevent N+1
+            ->with('roles:id,name')
             ->first();
     }
 
@@ -43,6 +44,7 @@ class AuthRepository extends BaseRepository implements AuthRepositoryInterface
             'password' => $data['password'],
             'status' => $data['status'] ?? UserStatus::Pending->value,
             'email_verified_at' => $data['email_verified_at'] ?? null,
+            'is_password_set' => $data['is_password_set'] ?? true,
         ]);
     }
 
@@ -108,7 +110,11 @@ class AuthRepository extends BaseRepository implements AuthRepositoryInterface
     {
         $hashed = hash('sha256', $plainToken);
 
-        return JwtRefreshToken::query()->where('token', $hashed)->valid()->first();
+        return JwtRefreshToken::query()
+            ->where('token', $hashed)
+            ->valid()
+            ->with('user:id,name,email,status')
+            ->first();
     }
 
     public function revokeAllUserRefreshTokensByDevice(int $userId, string $deviceId): void

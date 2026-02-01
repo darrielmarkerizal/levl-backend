@@ -9,7 +9,6 @@ use App\Exceptions\DuplicateResourceException;
 use App\Support\CodeGenerator;
 use App\Support\Helpers\ArrayParser;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -34,17 +33,15 @@ class CourseService implements CourseServiceInterface
     public function paginate(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
         $perPage = max(1, $perPage);
-        $query = $this->buildQuery($filters);
 
-        return $query->paginate($perPage);
+        return $this->buildQuery($filters)->paginate($perPage);
     }
 
     public function paginateForIndex(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
         $perPage = max(1, $perPage);
-        $query = $this->buildQueryForIndex($filters);
 
-        return $query->paginate($perPage);
+        return $this->buildQueryForIndex($filters)->paginate($perPage);
     }
 
     public function list(array $filters = [], int $perPage = 15): LengthAwarePaginator
@@ -70,13 +67,11 @@ class CourseService implements CourseServiceInterface
         $perPage = max(1, $perPage);
         $page = request()->get('page', 1);
 
-
         return $this->cacheService->getPublicCourses($page, $perPage, $filters, function () use ($filters, $perPage) {
             return $this->buildQuery($filters)
                 ->where('status', 'published')
                 ->paginate($perPage);
         });
-
     }
 
     public function listPublicForIndex(int $perPage = 15, array $filters = []): LengthAwarePaginator
@@ -108,7 +103,9 @@ class CourseService implements CourseServiceInterface
             $tags = ArrayParser::parseFilter($tagFilter);
             foreach ($tags as $tagValue) {
                 $value = trim((string) $tagValue);
-                if ($value === '') continue;
+                if ($value === '') {
+                    continue;
+                }
                 $slug = Str::slug($value);
                 $builder->whereHas('tags', fn ($q) => $q->where(fn ($iq) => $iq->where('slug', $slug)->orWhere('slug', $value)->orWhereRaw('LOWER(name) = ?', [mb_strtolower($value)])));
             }
@@ -130,18 +127,19 @@ class CourseService implements CourseServiceInterface
     {
         $builder = QueryBuilder::for(
             Course::with([
-                'admins:id,name,username,email,status,account_status',  // Only load basic admin info
-                'media:id,model_type,model_id,collection_name,file_name,disk' // Load only essential media fields that exist
-            ])->withCount('admins'), // Load admin count instead of full details
+                'admins:id,name,username,email,status,account_status',
+                'media:id,model_type,model_id,collection_name,file_name,disk',
+            ])->withCount('admins'),
             $this->buildQueryBuilderRequest($filters)
         );
 
-        // Only apply tag filter, skip search functionality for performance
         if ($tagFilter = data_get($filters, 'tag')) {
             $tags = ArrayParser::parseFilter($tagFilter);
             foreach ($tags as $tagValue) {
                 $value = trim((string) $tagValue);
-                if ($value === '') continue;
+                if ($value === '') {
+                    continue;
+                }
                 $slug = Str::slug($value);
                 $builder->whereHas('tags', fn ($q) => $q->where(fn ($iq) => $iq->where('slug', $slug)->orWhere('slug', $value)->orWhereRaw('LOWER(name) = ?', [mb_strtolower($value)])));
             }
@@ -154,7 +152,7 @@ class CourseService implements CourseServiceInterface
                 AllowedFilter::exact('type'),
                 AllowedFilter::exact('category_id'),
             ])
-            ->allowedIncludes(['tags']) // Only allow basic includes for index
+            ->allowedIncludes(['tags'])
             ->allowedSorts(['id', 'code', 'title', 'created_at', 'updated_at', 'published_at'])
             ->defaultSort('title');
     }
@@ -207,13 +205,10 @@ class CourseService implements CourseServiceInterface
                 }
 
                 $this->handleMedia($course, $files);
-
-                
                 $this->cacheService->invalidateListings();
 
                 $course = $course->fresh(['tags']);
 
-                
                 if ($actor) {
                     dispatch(new \App\Jobs\LogActivityJob([
                         'log_name' => 'schemes',
@@ -247,16 +242,13 @@ class CourseService implements CourseServiceInterface
                 }
 
                 $this->handleMedia($course, $files);
-
-                
                 $this->cacheService->invalidateCourse($course->id, $course->slug);
 
                 $updatedCourse = $course->fresh(['tags']);
 
-                
-                $actor = auth()->user(); 
+                $actor = auth()->user();
                 if ($actor) {
-                     dispatch(new \App\Jobs\LogActivityJob([
+                    dispatch(new \App\Jobs\LogActivityJob([
                         'log_name' => 'schemes',
                         'causer_id' => $actor->id,
                         'description' => "Updated course: {$updatedCourse->title}",
@@ -274,25 +266,23 @@ class CourseService implements CourseServiceInterface
     public function delete(int $id): bool
     {
         $course = $this->findOrFail($id);
-
         $deleted = $this->repository->delete($course);
-        
+
         if ($deleted) {
-             $actor = auth()->user();
-             if ($actor) {
-                 dispatch(new \App\Jobs\LogActivityJob([
+            $actor = auth()->user();
+            if ($actor) {
+                dispatch(new \App\Jobs\LogActivityJob([
                     'log_name' => 'schemes',
-                    'causer_id' => $actor->id, 
+                    'causer_id' => $actor->id,
                     'description' => "Deleted course: {$course->title}",
                     'properties' => ['course_id' => $course->id, 'action' => 'delete'],
-                 ]));
-             }
+                ]));
+            }
         }
 
         return $deleted;
     }
 
-    
     public function publish(int $id): Course
     {
         $course = $this->findOrFail($id);
@@ -348,12 +338,12 @@ class CourseService implements CourseServiceInterface
 
         $actor = auth()->user();
         if ($actor) {
-             dispatch(new \App\Jobs\LogActivityJob([
+            dispatch(new \App\Jobs\LogActivityJob([
                 'log_name' => 'schemes',
                 'causer_id' => $actor->id,
                 'description' => "Published course: {$course->title}",
                 'properties' => ['course_id' => $course->id, 'action' => 'publish'],
-             ]));
+            ]));
         }
 
         return $course->fresh();
@@ -372,12 +362,12 @@ class CourseService implements CourseServiceInterface
 
         $actor = auth()->user();
         if ($actor) {
-             dispatch(new \App\Jobs\LogActivityJob([
+            dispatch(new \App\Jobs\LogActivityJob([
                 'log_name' => 'schemes',
                 'causer_id' => $actor->id,
                 'description' => "Unpublished course: {$course->title}",
                 'properties' => ['course_id' => $course->id, 'action' => 'unpublish'],
-             ]));
+            ]));
         }
 
         return $course->fresh();
@@ -424,13 +414,12 @@ class CourseService implements CourseServiceInterface
         if (preg_match('/courses?_code_unique/i', $message)) {
             $errors['code'] = [__('messages.courses.code_exists')];
         }
-        
+
         if (preg_match('/courses?_slug_unique/i', $message)) {
             $errors['slug'] = [__('messages.courses.slug_exists')];
         }
 
         if (empty($errors)) {
-            
             if (preg_match('/Key \(([^)]+)\)=\([^)]+\) already exists/i', $message, $matches)) {
                 $column = $matches[1];
                 $errors[$column] = [__('messages.courses.duplicate_data_field', ['field' => $column])];
@@ -448,7 +437,6 @@ class CourseService implements CourseServiceInterface
     public function uploadThumbnail(int $id, \Illuminate\Http\UploadedFile $file): Course
     {
         $course = $this->findOrFail($id);
-
         $course->clearMediaCollection('thumbnail');
         $course->addMedia($file)->toMediaCollection('thumbnail');
 
@@ -458,7 +446,6 @@ class CourseService implements CourseServiceInterface
     public function uploadBanner(int $id, \Illuminate\Http\UploadedFile $file): Course
     {
         $course = $this->findOrFail($id);
-
         $course->clearMediaCollection('banner');
         $course->addMedia($file)->toMediaCollection('banner');
 
@@ -473,7 +460,6 @@ class CourseService implements CourseServiceInterface
         return $course->fresh();
     }
 
-    
     public function deleteBanner(int $id): Course
     {
         $course = $this->findOrFail($id);
@@ -482,20 +468,17 @@ class CourseService implements CourseServiceInterface
         return $course->fresh();
     }
 
-    
     public function verifyEnrollmentKey(Course $course, string $plainKey): bool
     {
         if (empty($course->enrollment_key_hash)) {
             return false;
         }
 
-        
         $hasher = app(\App\Contracts\EnrollmentKeyHasherInterface::class);
 
         return $hasher->verify($plainKey, $course->enrollment_key_hash);
     }
 
-    
     public function generateEnrollmentKey(int $length = 12): string
     {
         $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -508,7 +491,6 @@ class CourseService implements CourseServiceInterface
         return $key;
     }
 
-    
     public function hasEnrollmentKey(Course $course): bool
     {
         return ! empty($course->enrollment_key_hash);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Auth\Services;
 
 use Illuminate\Support\Facades\Cache;
@@ -7,27 +9,26 @@ use Modules\Auth\Models\User;
 
 class UserCacheService
 {
-    private const TTL_USER = 3600;        
-    private const TTL_ROLES = 3600;       
-    private const TTL_PERMISSIONS = 3600; 
-    private const TTL_STATS = 1800;       
-    
-    
+    private const TTL_USER = 3600;
+
+    private const TTL_ROLES = 3600;
+
+    private const TTL_PERMISSIONS = 3600;
+
     public function getUser(int $id): ?User
     {
         return Cache::tags(['users'])
             ->remember("user.{$id}", self::TTL_USER, function () use ($id) {
                 return User::select([
-                        'id', 'name', 'email', 'username',
-                        'status', 'account_status', 'created_at', 'email_verified_at',
-                        'is_password_set'
-                    ])
+                    'id', 'name', 'email', 'username',
+                    'status', 'account_status', 'created_at', 'email_verified_at',
+                    'is_password_set',
+                ])
                     ->with(['roles:id,name,guard_name', 'media'])
                     ->find($id);
             });
     }
-    
-    
+
     public function getUserByEmail(string $email): ?User
     {
         return Cache::tags(['users'])
@@ -37,8 +38,7 @@ class UserCacheService
                     ->first();
             });
     }
-    
-    
+
     public function getUserByUsername(string $username): ?User
     {
         return Cache::tags(['users'])
@@ -48,8 +48,7 @@ class UserCacheService
                     ->first();
             });
     }
-    
-    
+
     public function getUserRoles(int $userId): array
     {
         return Cache::tags(['users', 'roles'])
@@ -57,8 +56,7 @@ class UserCacheService
                 return User::with('roles:id,name')->find($userId)?->roles->pluck('name')->toArray() ?? [];
             });
     }
-    
-    
+
     public function getUserPermissions(int $userId): array
     {
         return Cache::tags(['users', 'permissions'])
@@ -66,8 +64,7 @@ class UserCacheService
                 return User::with('permissions')->find($userId)?->getAllPermissions()->pluck('name')->toArray() ?? [];
             });
     }
-    
-    
+
     public function invalidateUser(int $userId): void
     {
         Cache::tags(['users'])->forget("user.{$userId}");
@@ -75,20 +72,17 @@ class UserCacheService
         Cache::tags(['users'])->forget("user.{$userId}.permissions");
         Cache::tags(['users'])->forget("user.{$userId}.stats");
     }
-    
-    
+
     public function invalidateUserByEmail(string $email): void
     {
         Cache::tags(['users'])->forget("user.email.{$email}");
     }
-    
-    
+
     public function invalidateUserByUsername(string $username): void
     {
         Cache::tags(['users'])->forget("user.username.{$username}");
     }
-    
-    
+
     public function invalidateAllUsers(): void
     {
         Cache::tags(['users'])->flush();

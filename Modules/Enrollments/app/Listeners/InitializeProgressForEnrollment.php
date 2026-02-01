@@ -1,34 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Enrollments\Listeners;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\DB;
 use Modules\Enrollments\Enums\EnrollmentStatus;
-use Modules\Enrollments\Enums\ProgressStatus;
 use Modules\Enrollments\Events\EnrollmentCreated;
-use Modules\Enrollments\Models\CourseProgress;
-use Modules\Enrollments\Models\LessonProgress;
-use Modules\Enrollments\Models\UnitProgress;
 
 class InitializeProgressForEnrollment implements ShouldQueue
 {
     use InteractsWithQueue;
 
-    /**
-     * Handle the event.
-     */
     public function handle(EnrollmentCreated $event): void
     {
-        // PENTING: Jangan load model! Hanya ambil ID
         $enrollmentId = $event->enrollment->id;
         $courseId = $event->enrollment->course_id;
         $status = $event->enrollment->status;
-        
+
         $this->initializeProgress($enrollmentId, $courseId);
 
-        // Jika enrollment langsung completed (jarang terjadi), update status via raw query
         if ($status === EnrollmentStatus::Completed) {
             DB::table('enrollments')
                 ->where('id', $enrollmentId)
@@ -45,7 +38,6 @@ class InitializeProgressForEnrollment implements ShouldQueue
         $now = now()->toDateTimeString();
 
         DB::transaction(function () use ($enrollmentId, $courseId, $now) {
-            // 1. Bulk Insert Unit Progress using insert() - more efficient
             $units = DB::table('units')
                 ->select('id')
                 ->where('course_id', $courseId)
@@ -53,24 +45,20 @@ class InitializeProgressForEnrollment implements ShouldQueue
                 ->get();
 
             if ($units->isNotEmpty()) {
-                $unitRecords = $units->map(function ($unit) use ($enrollmentId, $now) {
-                    return [
-                        'enrollment_id' => $enrollmentId,
-                        'unit_id' => $unit->id,
-                        'status' => 'not_started',
-                        'progress_percent' => 0,
-                        'created_at' => $now,
-                        'updated_at' => $now,
-                    ];
-                })->toArray();
+                $unitRecords = $units->map(fn ($unit) => [
+                    'enrollment_id' => $enrollmentId,
+                    'unit_id' => $unit->id,
+                    'status' => 'not_started',
+                    'progress_percent' => 0,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ])->toArray();
 
-                // Chunk by 1000 to avoid memory issues
                 foreach (array_chunk($unitRecords, 1000) as $chunk) {
                     DB::table('unit_progress')->insertOrIgnore($chunk);
                 }
             }
 
-            // 2. Bulk Insert Lesson Progress
             $lessons = DB::table('lessons')
                 ->select('lessons.id')
                 ->join('units', 'lessons.unit_id', '=', 'units.id')
@@ -81,24 +69,20 @@ class InitializeProgressForEnrollment implements ShouldQueue
                 ->get();
 
             if ($lessons->isNotEmpty()) {
-                $lessonRecords = $lessons->map(function ($lesson) use ($enrollmentId, $now) {
-                    return [
-                        'enrollment_id' => $enrollmentId,
-                        'lesson_id' => $lesson->id,
-                        'status' => 'not_started',
-                        'progress_percent' => 0,
-                        'created_at' => $now,
-                        'updated_at' => $now,
-                    ];
-                })->toArray();
+                $lessonRecords = $lessons->map(fn ($lesson) => [
+                    'enrollment_id' => $enrollmentId,
+                    'lesson_id' => $lesson->id,
+                    'status' => 'not_started',
+                    'progress_percent' => 0,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ])->toArray();
 
-                // Chunk by 1000 to avoid memory issues
                 foreach (array_chunk($lessonRecords, 1000) as $chunk) {
                     DB::table('lesson_progress')->insertOrIgnore($chunk);
                 }
             }
 
-            // 3. Create Course Progress
             DB::table('course_progress')->insertOrIgnore([
                 'enrollment_id' => $enrollmentId,
                 'status' => 'not_started',
@@ -108,9 +92,4 @@ class InitializeProgressForEnrollment implements ShouldQueue
             ]);
         });
     }
-
-    // Legacy methods kept but unused to satisfy interface if any
-    private function ensureUnitProgressExists(int $enrollmentId, int $unitId): void {}
-    private function ensureLessonProgressExists(int $enrollmentId, int $lessonId): void {}
-    private function ensureCourseProgressExists(int $enrollmentId, int $courseId): void {}
 }

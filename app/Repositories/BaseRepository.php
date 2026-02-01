@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repositories;
 
 use App\Contracts\BaseRepositoryInterface;
@@ -11,7 +13,6 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 abstract class BaseRepository implements BaseRepositoryInterface
 {
-
     abstract protected function model(): string;
 
     protected array $allowedFilters = [];
@@ -31,7 +32,7 @@ abstract class BaseRepository implements BaseRepositoryInterface
             ->getSubject();
     }
 
-    public function filteredPaginate(Builder $query, array $params, array $allowedFilters = [], array $allowedSorts = [], string $defaultSort = 'id', int $perPage = 15)
+    public function filteredPaginate(Builder $query, array $params, array $allowedFilters = [], array $allowedSorts = [], string $defaultSort = 'id', int $perPage = 15): LengthAwarePaginator
     {
         return QueryBuilder::for($query)
             ->allowedFilters($allowedFilters ?: $this->allowedFilters)
@@ -55,18 +56,12 @@ abstract class BaseRepository implements BaseRepositoryInterface
         return $this->query()->findOrFail($id);
     }
 
-    /**
-     * @return Model
-     */
-    public function create(array $attributes)
+    public function create(array $attributes): Model
     {
         return $this->model()::create($attributes);
     }
 
-    /**
-     * @return Model
-     */
-    public function update(Model $model, array $attributes)
+    public function update(Model $model, array $attributes): Model
     {
         $model->fill($attributes);
         $model->save();
@@ -97,30 +92,16 @@ abstract class BaseRepository implements BaseRepositoryInterface
             ->get();
     }
 
-
-    /**
-     * Get allowed filters for this repository.
-     *
-     * @return array<int, string>
-     */
     public function getAllowedFilters(): array
     {
         return $this->allowedFilters;
     }
 
-    /**
-     * Get allowed sorts for this repository.
-     *
-     * @return array<int, string>
-     */
     public function getAllowedSorts(): array
     {
         return $this->allowedSorts;
     }
 
-    /**
-     * Get default sort for this repository.
-     */
     public function getDefaultSort(): string
     {
         return $this->defaultSort;

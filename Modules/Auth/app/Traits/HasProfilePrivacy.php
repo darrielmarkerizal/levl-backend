@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace Modules\Auth\Traits;
 
 use Modules\Auth\Models\ProfilePrivacySetting;
@@ -12,30 +11,28 @@ trait HasProfilePrivacy
 {
     public function canBeViewedBy(User $viewer): bool
     {
-        // Admin can view all profiles
         if ($viewer->hasRole('Admin') || $viewer->hasRole('Superadmin')) {
             return true;
         }
 
-        // User can view their own profile
         if ($this->id === $viewer->id) {
             return true;
         }
 
-        $privacySettings = $this->privacySettings;
+        $privacySettings = $this->relationLoaded('privacySettings')
+            ? $this->privacySettings
+            : $this->privacySettings()->first();
 
         if (! $privacySettings) {
-            return true; // Default to public if no settings
+            return true;
         }
 
-        // Check profile visibility
         if ($privacySettings->profile_visibility === ProfilePrivacySetting::VISIBILITY_PRIVATE) {
             return false;
         }
 
-        // TODO: Implement friends_only check when social features are added
         if ($privacySettings->profile_visibility === ProfilePrivacySetting::VISIBILITY_FRIENDS) {
-            return false; // For now, treat as private
+            return false;
         }
 
         return true;
@@ -43,24 +40,20 @@ trait HasProfilePrivacy
 
     public function getVisibleFieldsFor(User $viewer): array
     {
-        // Admin can see all fields
         if ($viewer->hasRole('Admin') || $viewer->hasRole('Superadmin')) {
             return ['*'];
         }
 
-        // User can see all their own fields
         if ($this->id === $viewer->id) {
             return ['*'];
         }
 
-        $privacySettings = $this->privacySettings;
+        $privacySettings = $this->relationLoaded('privacySettings')
+            ? $this->privacySettings
+            : $this->privacySettings()->first();
 
         if (! $privacySettings) {
-            return ['name', 'avatar_url', 'bio']; // Default visible fields
-        }
-
-        if (! $privacySettings) {
-            return ['name', 'avatar_url', 'bio']; // Default visible fields
+            return ['name', 'avatar_url', 'bio'];
         }
 
         $visibleFields = ['name', 'avatar_url', 'bio'];

@@ -66,7 +66,7 @@ class LessonService implements LessonServiceInterface
         if ($user?->hasRole('Student')) {
             $progression = app(ProgressionService::class);
             $enrollment = $progression->getEnrollmentForCourse($course->id, $user->id);
-            if (!$enrollment || !$progression->canAccessLesson($lesson, $enrollment)) {
+            if (! $enrollment || ! $progression->canAccessLesson($lesson, $enrollment)) {
                 throw new \App\Exceptions\BusinessException(__('messages.lessons.locked_prerequisite'), 403);
             }
         }
@@ -86,7 +86,6 @@ class LessonService implements LessonServiceInterface
             $attributes['unit_id'] = $unitId;
 
             if (isset($attributes['order'])) {
-                
                 Lesson::where('unit_id', $unitId)
                     ->where('order', '>=', $attributes['order'])
                     ->increment('order');
@@ -107,20 +106,19 @@ class LessonService implements LessonServiceInterface
             $lesson = $this->repository->findByIdOrFail($id);
             $attributes = $data instanceof UpdateLessonDTO ? $data->toArrayWithoutNull() : $data;
 
-            
             if (isset($attributes['order']) && $attributes['order'] != $lesson->order) {
                 $newOrder = $attributes['order'];
                 $currentOrder = $lesson->order;
                 $unitId = $lesson->unit_id;
 
                 if ($newOrder < $currentOrder) {
-                    
+
                     Lesson::where('unit_id', $unitId)
                         ->where('order', '>=', $newOrder)
                         ->where('order', '<', $currentOrder)
                         ->increment('order');
                 } elseif ($newOrder > $currentOrder) {
-                    
+
                     Lesson::where('unit_id', $unitId)
                         ->where('order', '>', $currentOrder)
                         ->where('order', '<=', $newOrder)
@@ -144,7 +142,7 @@ class LessonService implements LessonServiceInterface
             $deleted = $this->repository->delete($lesson);
 
             if ($deleted) {
-                
+
                 Lesson::where('unit_id', $unitId)
                     ->where('order', '>', $deletedOrder)
                     ->decrement('order');
@@ -159,7 +157,6 @@ class LessonService implements LessonServiceInterface
         $lesson = $this->repository->findByIdOrFail($id);
         $lesson->update(['status' => 'published']);
 
-        
         $courseId = $lesson->unit->course_id;
         app(\Modules\Schemes\Services\SchemesCacheService::class)->invalidateCourse($courseId);
 
@@ -171,7 +168,6 @@ class LessonService implements LessonServiceInterface
         $lesson = $this->repository->findByIdOrFail($id);
         $lesson->update(['status' => 'draft']);
 
-        
         $courseId = $lesson->unit->course_id;
         app(\Modules\Schemes\Services\SchemesCacheService::class)->invalidateCourse($courseId);
 
