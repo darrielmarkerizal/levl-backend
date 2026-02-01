@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<ruleset name="Hardcoded String Detector">
+    <description>Detects potential hardcoded strings by checking for Generic String usage.</description>
+
+    <!--
+    This is a "noisy" rule that flags many valid strings (like config keys), 
+    but it's the closest standard sniff for detecting string literals.
+    -->
+    <rule ref="Generic.Strings.UnnecessaryStringConcat"/>
+
+    <!-- Custom Sniff -->
+    <rule ref="tests/phpcs/Sniffs/Hardcoded/NoHardcodedStringSniff.php"/>
+    
+    <file>app</file>
+    <file>Modules</file>
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/storage/*</exclude-pattern>
+    <exclude-pattern>*/tests/*</exclude-pattern>
+    <exclude-pattern>*/database/*</exclude-pattern>
+    <exclude-pattern>*/config/*</exclude-pattern>
+</ruleset>

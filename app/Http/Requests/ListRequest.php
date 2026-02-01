@@ -26,15 +26,15 @@ class ListRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'filter.array' => 'Filter harus berupa array.',
-            'filter.*.string' => 'Setiap nilai filter harus berupa string.',
-            'sort.regex' => 'Format sort tidak valid. Gunakan format: field_name atau -field_name untuk descending.',
-            'page.integer' => 'Halaman harus berupa angka.',
-            'page.min' => 'Halaman minimal 1.',
-            'per_page.integer' => 'Per page harus berupa angka.',
-            'per_page.min' => 'Per page minimal 1.',
-            'per_page.max' => 'Per page maksimal 100.',
-            'search.string' => 'Pencarian harus berupa string.',
+            'filter.array' => __('messages.validations.filter_array'),
+            'filter.*.string' => __('messages.validations.filter_string'),
+            'sort.regex' => __('messages.validations.sort_regex'),
+            'page.integer' => __('messages.validations.page_integer'),
+            'page.min' => __('messages.validations.page_min'),
+            'per_page.integer' => __('messages.validations.per_page_integer'),
+            'per_page.min' => __('messages.validations.per_page_min'),
+            'per_page.max' => __('messages.validations.per_page_max'),
+            'search.string' => __('messages.validations.search_string'),
         ];
     }
 

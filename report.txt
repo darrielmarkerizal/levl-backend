@@ -1,0 +1,176 @@
+Laravel Hard-Coded String Detector v2 - Laporan
+Folder: app Modules routes resources config database
+Total file: 1027 | Total masalah:       57
+
+==============================
+[Hard-coded URL                               ] config/scalar.php baris 63
+    Context: 'cdn' => 'https://cdn.jsdelivr.net/npm/@scalar/api-reference',
+
+[Hard-coded URL                               ] config/scalar.php baris 95
+    Context: 'proxyUrl' => 'https://proxy.scalar.com',
+
+[Magic Number di Logic                        ] Modules/Forums/database/seeders/ForumSeeder.php baris 20
+    Context: $users = User::limit(10)->get();
+
+[Magic Number di Logic                        ] Modules/Forums/database/seeders/ForumSeeder.php baris 21
+    Context: $courses = Course::limit(3)->get();
+
+[Magic Number di Logic                        ] Modules/Forums/app/Repositories/ForumStatisticsRepository.php baris 109
+    Context: $query->orderBy('created_at', 'asc')->limit(1);
+
+[Magic Number di Logic                        ] Modules/Schemes/database/migrations/2025_12_03_210000_add_enrollment_key_hash_to_courses_table.php baris 26
+    Context: ->chunk(100, function ($courses) {
+
+[Magic Number di Logic                        ] Modules/Schemes/database/seeders/CourseSeeder.php baris 33
+    Context: })->limit(200)->get();
+
+[Magic Number di Logic                        ] Modules/Schemes/app/Models/Course.php baris 183
+    Context: ->limit(1),
+
+[Magic Number di Logic                        ] Modules/Schemes/app/Models/Course.php baris 188
+    Context: ->limit(1),
+
+[Magic Number di Logic                        ] Modules/Enrollments/database/seeders/EnrollmentSeeder.php baris 22
+    Context: ->limit(800)
+
+[Magic Number di Logic                        ] Modules/Enrollments/database/seeders/EnrollmentSeeder.php baris 158
+    Context: ->limit(30)
+
+[Magic Number di Logic                        ] Modules/Enrollments/database/seeders/EnrollmentSeeder.old.php baris 22
+    Context: })->limit(800)->get();
+
+[Magic Number di Logic                        ] Modules/Enrollments/app/Services/EnrollmentService.php baris 47
+    Context: $ids = Enrollment::search($searchQuery)->take(1000)->keys()->toArray();
+
+[Magic Number di Logic                        ] Modules/Enrollments/app/Services/EnrollmentService.php baris 84
+    Context: $ids = Enrollment::search($searchQuery)->take(1000)->keys()->toArray();
+
+[Magic Number di Logic                        ] Modules/Enrollments/app/Services/EnrollmentService.php baris 120
+    Context: $ids = Enrollment::search($searchQuery)->take(1000)->keys()->toArray();
+
+[Magic Number di Logic                        ] Modules/Enrollments/app/Services/EnrollmentService.php baris 165
+    Context: $ids = Enrollment::search($searchQuery)->take(1000)->keys()->toArray();
+
+[Magic Number di Logic                        ] Modules/Enrollments/app/Services/EnrollmentService.php baris 209
+    Context: $ids = Enrollment::search($searchQuery)->take(1000)->keys()->toArray();
+
+[Magic Number di Logic                        ] Modules/Enrollments/app/Services/EnrollmentService.php baris 243
+    Context: $ids = Enrollment::search($searchQuery)->take(1000)->keys()->toArray();
+
+[Magic Number di Logic                        ] Modules/Enrollments/app/Services/EnrollmentService.php baris 275
+    Context: $ids = Enrollment::search($searchQuery)->take(1000)->keys()->toArray();
+
+[Magic Number di Logic                        ] Modules/Enrollments/app/Services/EnrollmentService.php baris 319
+    Context: $ids = Enrollment::search($searchQuery)->take(1000)->keys()->toArray();
+
+[Magic Number di Logic                        ] Modules/Auth/database/seeders/OtpCodeSeeder.php baris 48
+    Context: 'expires_at' => now()->addMinutes(60),
+
+[Magic Number di Logic                        ] Modules/Auth/database/seeders/OtpCodeSeeder.php baris 173
+    Context: 'expires_at' => now()->addHours(24),
+
+[Magic Number di Logic                        ] Modules/Auth/database/seeders/ProfileAuditLogSeeder.php baris 22
+    Context: ->limit(500)
+
+[Magic Number di Logic                        ] Modules/Auth/database/seeders/JwtRefreshTokenSeeder.php baris 57
+    Context: 'idle_expires_at' => now()->addDays(14),
+
+[Magic Number di Logic                        ] Modules/Auth/database/seeders/JwtRefreshTokenSeeder.php baris 58
+    Context: 'absolute_expires_at' => now()->addDays(90),
+
+[Magic Number di Logic                        ] Modules/Auth/database/seeders/PasswordResetTokenSeeder.php baris 20
+    Context: ->limit(8)
+
+[Magic Number di Logic                        ] Modules/Auth/database/seeders/PasswordResetTokenSeeder.php baris 36
+    Context: ->limit(15)
+
+[Magic Number di Logic                        ] Modules/Auth/database/factories/OtpCodeFactory.php baris 32
+    Context: 'expires_at' => now()->addMinutes(10),
+
+[Magic Number di Logic                        ] Modules/Auth/database/factories/OtpCodeFactory.php baris 95
+    Context: 'expires_at' => now()->addMinutes(10),
+
+[Magic Number di Logic                        ] Modules/Auth/database/factories/JwtRefreshTokenFactory.php baris 33
+    Context: 'expires_at' => now()->addDays(30),
+
+[Magic Number di Logic                        ] Modules/Auth/database/factories/JwtRefreshTokenFactory.php baris 34
+    Context: 'idle_expires_at' => now()->addDays(7),
+
+[Magic Number di Logic                        ] Modules/Auth/database/factories/JwtRefreshTokenFactory.php baris 35
+    Context: 'absolute_expires_at' => now()->addDays(90),
+
+[Magic Number di Logic                        ] Modules/Auth/database/factories/JwtRefreshTokenFactory.php baris 77
+    Context: 'expires_at' => now()->addDays(30),
+
+[Magic Number di Logic                        ] Modules/Auth/database/factories/JwtRefreshTokenFactory.php baris 78
+    Context: 'idle_expires_at' => now()->addDays(7),
+
+[Magic Number di Logic                        ] Modules/Auth/database/factories/JwtRefreshTokenFactory.php baris 79
+    Context: 'absolute_expires_at' => now()->addDays(90),
+
+[Magic Number di Logic                        ] Modules/Auth/app/Repositories/BenchmarkRepository.php baris 22
+    Context: ->limit(1000)
+
+[Magic Number di Logic                        ] Modules/Auth/app/Services/AuthenticationService.php baris 149
+    Context: $record->update(['last_used_at' => now(), 'idle_expires_at' => now()->addDays(14)]);
+
+[Magic Number di Logic                        ] Modules/Auth/app/Services/AuthService.php baris 230
+    Context: 'idle_expires_at' => now()->addDays(14),
+
+[Magic Number di Logic                        ] Modules/Learning/database/seeders/AssignmentAndSubmissionSeeder.php baris 24
+    Context: $this->deadlineAt = now()->addDays(14)->toDateTimeString();
+
+[Magic Number di Logic                        ] Modules/Learning/database/seeders/QuestionOptionAnswerSubmissionSeeder.php baris 57
+    Context: $userIds = \DB::table('users')->limit(50)->pluck('id')->toArray();
+
+[Magic Number di Logic                        ] Modules/Learning/database/seeders/QuestionSeederEnhanced.php baris 401
+    Context: ->limit(100)
+
+[Magic Number di Logic                        ] Modules/Learning/database/seeders/QuestionAndAnswerSeeder.php baris 218
+    Context: ->limit(100) // Update only 100 to avoid overloading
+
+[Magic Number di Logic                        ] Modules/Learning/database/seeders/ComprehensiveAssessmentSeeder.php baris 33
+    Context: $this->userIds = DB::table('users')->limit(50)->pluck('id')->toArray();
+
+[Magic Number di Logic                        ] Modules/Learning/database/factories/AssignmentFactory.php baris 36
+    Context: 'deadline_at' => now()->addDays(7),
+
+[Magic Number di Logic                        ] Modules/Learning/database/factories/AssignmentFactory.php baris 143
+    Context: 'available_from' => now()->addDays(1),
+
+[Magic Number di Logic                        ] Modules/Learning/app/Repositories/AssignmentRepository.php baris 186
+    Context: ->limit(100);
+
+[Magic Number di Logic                        ] Modules/Learning/app/Services/AssignmentService.php baris 222
+    Context: $ids = Assignment::search($searchQuery)->take(1000)->keys()->toArray();
+
+[Magic Number di Logic                        ] Modules/Learning/app/Services/AssignmentService.php baris 248
+    Context: $ids = Assignment::search($searchQuery)->take(1000)->keys()->toArray();
+
+[Magic Number di Logic                        ] Modules/Content/database/factories/NewsFactory.php baris 53
+    Context: 'scheduled_at' => now()->addDays(1),
+
+[Magic Number di Logic                        ] database/migrations/2026_01_28_064441_consolidate_logging_tables.php baris 17
+    Context: DB::table('user_activities')->orderBy('id')->chunk(100, function ($rows) {
+
+[Magic Number di Logic                        ] database/migrations/2026_01_28_064441_consolidate_logging_tables.php baris 43
+    Context: DB::table('audit_logs')->orderBy('id')->chunk(100, function ($rows) {
+
+[Magic Number di Logic                        ] database/migrations/2026_01_28_064441_consolidate_logging_tables.php baris 66
+    Context: DB::table('profile_audit_logs')->orderBy('id')->chunk(100, function ($rows) {
+
+[URL di Config tanpa env()                    ] config/scalar.php baris 63
+    Context: 'cdn' => 'https://cdn.jsdelivr.net/npm/@scalar/api-reference',
+
+[URL di Config tanpa env()                    ] config/scalar.php baris 95
+    Context: 'proxyUrl' => 'https://proxy.scalar.com',
+
+[Hard-coded UI / Error Message                ] Modules/Enrollments/app/Exports/EnrollmentsExport.php baris 54
+    Context: return 'Enrollments';
+
+[Hard-coded UI / Error Message                ] Modules/Operations/app/Http/Middleware/AuditLogMiddleware.php baris 76
+    Context: return 'Enrollment';
+
+[Hard-coded UI / Error Message                ] Modules/Operations/app/Http/Middleware/AuditLogMiddleware.php baris 79
+    Context: return 'Course';
+

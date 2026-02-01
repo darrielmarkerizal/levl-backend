@@ -15,7 +15,7 @@ class EnsurePermission
         if (!$user) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Tidak terotorisasi.',
+                'message' => __('messages.unauthenticated'),
             ], 401);
         }
 
@@ -27,7 +27,7 @@ class EnsurePermission
 
         return response()->json([
             'status' => 'error',
-            'message' => 'Akses ditolak. Anda tidak memiliki izin untuk melakukan aksi ini.',
+            'message' => __('messages.forbidden'),
         ], 403);
     }
 }
