@@ -2,58 +2,89 @@
 
 use App\Http\Controllers\Api\ActivityLogController;
 use Illuminate\Support\Facades\Route;
+use Modules\Common\Http\Controllers\AchievementsController;
 use Modules\Common\Http\Controllers\AuditLogController;
+use Modules\Common\Http\Controllers\BadgesController;
+use Modules\Common\Http\Controllers\LevelConfigsController;
 use Modules\Common\Http\Controllers\MasterDataController;
 use Modules\Schemes\Http\Controllers\TagController;
 
 Route::prefix('v1')->group(function () {
     Route::middleware(['auth:api', 'role:Superadmin'])
-        ->prefix('activity-logs')
         ->name('activity-logs.')
         ->group(function () {
-            Route::get('/', [ActivityLogController::class, 'index'])->name('index');
-            Route::get('/{id}', [ActivityLogController::class, 'show'])->name('show');
+            Route::get('activity-logs', [ActivityLogController::class, 'index'])->name('index');
+            Route::get('activity-logs/{id}', [ActivityLogController::class, 'show'])->name('show');
         });
 
-    // Audit Log Routes (Requirement 20.7)
-    // Restricted to Admin and Superadmin roles
     Route::middleware(['auth:api', 'role:Admin|Superadmin'])
-        ->prefix('audit-logs')
         ->name('audit-logs.')
         ->group(function () {
-            Route::get('/actions', [AuditLogController::class, 'actions'])->name('actions');
-            Route::get('/', [AuditLogController::class, 'index'])->name('index');
-            Route::get('/{id}', [AuditLogController::class, 'show'])->name('show');
+            Route::get('audit-logs', [AuditLogController::class, 'index'])->name('index');
+            Route::get('audit-logs/{id}', [AuditLogController::class, 'show'])->name('show');
+            Route::get('audit-logs/meta/actions', [AuditLogController::class, 'actions'])->name('actions');
         });
 
-    Route::prefix('master-data')
-        ->name('master-data.')
-        ->group(function () {
-            // Public Routes
-            Route::get('/', [MasterDataController::class, 'types'])->name('index');
-            Route::get('tags', [TagController::class, 'index'])->name('tags.index');
-            Route::get('tags/{tag:slug}', [TagController::class, 'show'])->name('tags.show');
-            Route::get('{type}/items', [MasterDataController::class, 'index'])->name('items.index');
-            Route::get('{type}/items/{id}', [MasterDataController::class, 'show'])->name('items.show');
+    Route::prefix('tags')->name('tags.')->group(function () {
+        Route::get('/', [TagController::class, 'index'])->name('index');
+        Route::get('/{tag:slug}', [TagController::class, 'show'])->name('show');
+        
+        Route::middleware(['auth:api', 'role:Superadmin'])->group(function () {
+            Route::post('/', [TagController::class, 'store'])->name('store');
+            Route::put('/{tag:slug}', [TagController::class, 'update'])->name('update');
+            Route::delete('/{tag:slug}', [TagController::class, 'destroy'])->name('destroy');
+        });
+    });
 
-            // Superadmin Routes
+    Route::prefix('master-data')->name('master-data.')->group(function () {
+        Route::get('types', [MasterDataController::class, 'types'])->name('types.index');
+        
+        Route::middleware(['auth:api'])->group(function () {
+            Route::get('types/{type}', [MasterDataController::class, 'get'])->name('types.show');
+        });
+
+        Route::prefix('types/{type}/items')->name('items.')->group(function () {
+            Route::get('/', [MasterDataController::class, 'index'])->name('index');
+            Route::get('/{id}', [MasterDataController::class, 'show'])->name('show');
+            
             Route::middleware(['auth:api', 'role:Superadmin'])->group(function () {
-                Route::post('tags', [TagController::class, 'store'])->name('tags.store');
-                Route::put('tags/{tag:slug}', [TagController::class, 'update'])->name('tags.update');
-                Route::delete('tags/{tag:slug}', [TagController::class, 'destroy'])->name('tags.destroy');
-
-                Route::post('{type}/items', [MasterDataController::class, 'store'])->name('items.store');
-                Route::put('{type}/items/{id}', [MasterDataController::class, 'update'])->name(
-                    'items.update',
-                );
-                Route::delete('{type}/items/{id}', [MasterDataController::class, 'destroy'])->name(
-                    'items.destroy',
-                );
-            });
-
-            // Authenticated Routes (Dynamic Master Data)
-            Route::middleware(['auth:api'])->group(function () {
-                Route::get('{type}', [MasterDataController::class, 'get'])->name('get');
+                Route::post('/', [MasterDataController::class, 'store'])->name('store');
+                Route::put('/{id}', [MasterDataController::class, 'update'])->name('update');
+                Route::delete('/{id}', [MasterDataController::class, 'destroy'])->name('destroy');
             });
         });
+    });
+
+    Route::prefix('badges')->name('badges.')->group(function () {
+        Route::get('/', [BadgesController::class, 'index'])->name('index');
+        Route::get('/{badge}', [BadgesController::class, 'show'])->name('show');
+
+        Route::middleware(['auth:api'])->group(function () {
+            Route::post('/', [BadgesController::class, 'store'])->name('store');
+            Route::put('/{badge}', [BadgesController::class, 'update'])->name('update');
+            Route::delete('/{badge}', [BadgesController::class, 'destroy'])->name('destroy');
+        });
+    });
+
+    Route::prefix('level-configs')->name('level-configs.')->group(function () {
+        Route::get('/', [LevelConfigsController::class, 'index'])->name('index');
+        Route::get('/{level_config}', [LevelConfigsController::class, 'show'])->name('show');
+
+        Route::middleware(['auth:api'])->group(function () {
+            Route::post('/', [LevelConfigsController::class, 'store'])->name('store');
+            Route::put('/{level_config}', [LevelConfigsController::class, 'update'])->name('update');
+            Route::delete('/{level_config}', [LevelConfigsController::class, 'destroy'])->name('destroy');
+        });
+    });
+
+    Route::prefix('achievements')->name('achievements.')->group(function () {
+        Route::get('/', [AchievementsController::class, 'index'])->name('index');
+        Route::get('/{achievement}', [AchievementsController::class, 'show'])->name('show');
+
+        Route::middleware(['auth:api'])->group(function () {
+            Route::post('/', [AchievementsController::class, 'store'])->name('store');
+            Route::put('/{achievement}', [AchievementsController::class, 'update'])->name('update');
+            Route::delete('/{achievement}', [AchievementsController::class, 'destroy'])->name('destroy');
+        });
+    });
 });

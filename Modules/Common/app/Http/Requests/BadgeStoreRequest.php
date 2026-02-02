@@ -1,0 +1,31 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Modules\Common\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+use Modules\Common\Http\Requests\Concerns\HasApiValidation;
+use Modules\Gamification\Enums\BadgeType;
+
+class BadgeStoreRequest extends FormRequest
+{
+    use HasApiValidation;
+
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        return [
+            'code' => ['required', 'string', 'max:50', 'unique:badges,code'],
+            'name' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:1000'],
+            'type' => ['required', 'string', 'in:'.implode(',', array_column(BadgeType::cases(), 'value'))],
+            'threshold' => ['nullable', 'integer', 'min:1'],
+            'icon' => ['nullable', 'file', 'mimes:jpeg,png,svg,webp', 'max:2048'],
+        ];
+    }
+}

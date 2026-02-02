@@ -23,6 +23,7 @@ class AuditRepository implements AuditRepositoryInterface
         $request = new Request(['filter' => $filters]);
 
         return QueryBuilder::for(AuditLog::class, $request)
+            ->with(['actor', 'subject'])
             ->allowedFilters([
                 AllowedFilter::exact('action'),
                 AllowedFilter::exact('actor_id'),
@@ -48,6 +49,7 @@ class AuditRepository implements AuditRepositoryInterface
     public function findBySubject(string $subjectType, int $subjectId): Collection
     {
         return AuditLog::query()
+            ->with(['actor', 'subject'])
             ->where('subject_type', $subjectType)
             ->where('subject_id', $subjectId)
             ->orderBy('created_at', 'desc')
@@ -64,6 +66,7 @@ class AuditRepository implements AuditRepositoryInterface
     public function findByActor(string $actorType, int $actorId): Collection
     {
         return AuditLog::query()
+            ->with(['actor', 'subject'])
             ->where('actor_type', $actorType)
             ->where('actor_id', $actorId)
             ->orderBy('created_at', 'desc')
@@ -79,6 +82,7 @@ class AuditRepository implements AuditRepositoryInterface
     public function findByAction(string $action): Collection
     {
         return AuditLog::query()
+            ->with(['actor', 'subject'])
             ->where('action', $action)
             ->orderBy('created_at', 'desc')
             ->get();

@@ -8,11 +8,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Modules\Common\Contracts\Services\AuditServiceInterface;
 use Modules\Learning\Events\OverrideGranted;
 
-/**
- * Listener to log instructor override grants in the audit log.
- *
- * Requirements: 24.5 - THE System SHALL log all overrides in Audit_Log
- */
 class LogOverrideGranted implements ShouldQueue
 {
     /**

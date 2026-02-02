@@ -8,11 +8,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Modules\Common\Contracts\Services\AuditServiceInterface;
 use Modules\Learning\Events\SubmissionCreated;
 
-/**
- * Listener to log submission creation in the audit log.
- *
- * Requirements: 20.1 - THE System SHALL log all submission creations
- */
 class LogSubmissionCreated implements ShouldQueue
 {
     /**

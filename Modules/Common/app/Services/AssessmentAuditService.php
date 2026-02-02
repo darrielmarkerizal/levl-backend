@@ -54,198 +54,142 @@ class AssessmentAuditService implements AuditServiceInterface
      */
     public function logSubmissionCreated(Submission $submission): void
     {
-        $actor = $this->getActor($submission->user_id);
-
         AuditLog::logAction(
             action: self::ACTION_SUBMISSION_CREATED,
             subject: $submission,
-            actor: $actor,
-            context: [
-                'assignment_id' => $submission->assignment_id,
-                'student_id' => $submission->user_id,
-                'attempt_number' => $submission->attempt_number,
-                'state' => $submission->state ? $submission->state->value : 'in_progress',
-                'is_late' => $submission->is_late ?? false,
-                'submitted_at' => $submission->submitted_at ? $submission->submitted_at->toIso8601String() : null,
-            ]
+            actor: User::find($submission->user_id),
+            context: $this->buildSubmissionContext($submission)
         );
     }
 
-    /**
-     * Log submission state transition.
-     *
-     * Requirements: 20.1, 9.8
-     *
-     * @param  Submission  $submission  The submission being transitioned
-     * @param  string  $oldState  The previous state
-     * @param  string  $newState  The new state
-     * @param  int  $actorId  The ID of the user performing the transition
-     */
     public function logStateTransition(Submission $submission, string $oldState, string $newState, int $actorId): void
     {
-        $actor = $this->getActor($actorId);
-
         AuditLog::logAction(
             action: self::ACTION_STATE_TRANSITION,
             subject: $submission,
-            actor: $actor,
-            context: [
-                'assignment_id' => $submission->assignment_id,
-                'student_id' => $submission->user_id,
-                'old_state' => $oldState,
-                'new_state' => $newState,
-                'actor_id' => $actorId,
-                'transitioned_at' => now()->toIso8601String(),
-            ]
+            actor: User::find($actorId),
+            context: $this->buildStateTransitionContext($submission, $oldState, $newState, $actorId)
         );
     }
 
-    /**
-     * Log grading action.
-     *
-     * Requirements: 20.2
-     *
-     * @param  Grade  $grade  The grade being recorded
-     * @param  int  $instructorId  The ID of the instructor performing the grading
-     */
     public function logGrading(Grade $grade, int $instructorId): void
     {
-        $actor = $this->getActor($instructorId);
-
         AuditLog::logAction(
             action: self::ACTION_GRADING,
             subject: $grade,
-            actor: $actor,
-            context: [
-                'submission_id' => $grade->submission_id,
-                'student_id' => $grade->user_id,
-                'instructor_id' => $instructorId,
-                'score' => (float) $grade->score,
-                'max_score' => (float) ($grade->max_score ?? 100),
-                'is_draft' => $grade->is_draft ?? false,
-                'feedback' => $grade->feedback,
-                'graded_at' => $grade->graded_at?->toIso8601String() ?? now()->toIso8601String(),
-            ]
+            actor: User::find($instructorId),
+            context: $this->buildGradingContext($grade, $instructorId)
         );
     }
 
-    /**
-     * Log answer key change.
-     *
-     * Requirements: 20.3
-     *
-     * @param  Question  $question  The question with changed answer key
-     * @param  array  $oldKey  The previous answer key
-     * @param  array  $newKey  The new answer key
-     * @param  int  $instructorId  The ID of the instructor making the change
-     */
     public function logAnswerKeyChange(Question $question, array $oldKey, array $newKey, int $instructorId): void
     {
-        $actor = $this->getActor($instructorId);
-
         AuditLog::logAction(
             action: self::ACTION_ANSWER_KEY_CHANGE,
             subject: $question,
-            actor: $actor,
-            context: [
-                'assignment_id' => $question->assignment_id,
-                'question_id' => $question->id,
-                'question_type' => $question->type instanceof \Modules\Learning\Enums\QuestionType ? $question->type->value : $question->type,
-                'instructor_id' => $instructorId,
-                'old_answer_key' => $oldKey,
-                'new_answer_key' => $newKey,
-                'changed_at' => now()->toIso8601String(),
-            ]
+            actor: User::find($instructorId),
+            context: $this->buildAnswerKeyChangeContext($question, $oldKey, $newKey, $instructorId)
         );
     }
 
-    /**
-     * Log grade override.
-     *
-     * Requirements: 20.4
-     *
-     * @param  Grade  $grade  The grade being overridden
-     * @param  float  $oldScore  The original score
-     * @param  float  $newScore  The new override score
-     * @param  string  $reason  The reason for the override
-     * @param  int  $instructorId  The ID of the instructor performing the override
-     */
     public function logGradeOverride(Grade $grade, float $oldScore, float $newScore, string $reason, int $instructorId): void
     {
-        $actor = $this->getActor($instructorId);
-
         AuditLog::logAction(
             action: self::ACTION_GRADE_OVERRIDE,
             subject: $grade,
-            actor: $actor,
-            context: [
-                'submission_id' => $grade->submission_id,
-                'student_id' => $grade->user_id,
-                'instructor_id' => $instructorId,
-                'old_score' => $oldScore,
-                'new_score' => $newScore,
-                'reason' => $reason,
-                'overridden_at' => now()->toIso8601String(),
-            ]
+            actor: User::find($instructorId),
+            context: $this->buildGradeOverrideContext($grade, $oldScore, $newScore, $reason, $instructorId)
         );
     }
 
-    /**
-     * Log instructor override grant (prerequisites, attempts, deadlines).
-     *
-     * Requirements: 24.5
-     *
-     * @param  int  $assignmentId  The assignment ID
-     * @param  int  $studentId  The student ID
-     * @param  string  $overrideType  The type of override (prerequisite, deadline, attempts)
-     * @param  string  $reason  The reason for the override
-     * @param  int  $instructorId  The ID of the instructor granting the override
-     */
     public function logOverrideGrant(int $assignmentId, int $studentId, string $overrideType, string $reason, int $instructorId): void
     {
-        $actor = $this->getActor($instructorId);
-
-        // Create a context array for the override
         AuditLog::logAction(
             action: self::ACTION_OVERRIDE_GRANT,
-            subject: null, // No specific model subject for override grants
-            actor: $actor,
-            context: [
-                'assignment_id' => $assignmentId,
-                'student_id' => $studentId,
-                'instructor_id' => $instructorId,
-                'override_type' => $overrideType,
-                'reason' => $reason,
-                'granted_at' => now()->toIso8601String(),
-            ]
+            subject: null,
+            actor: User::find($instructorId),
+            context: $this->buildOverrideGrantContext($assignmentId, $studentId, $overrideType, $reason, $instructorId)
         );
     }
 
-    /**
-     * Search and filter audit logs.
-     *
-     * Requirements: 20.7
-     *
-     * @param  array  $filters  Search filters (action, actor_id, subject_type, subject_id, date_range)
-     * @return Collection<int, AuditLog> Collection of matching audit logs
-     */
     public function search(array $filters): Collection
     {
         return $this->auditRepository->search($filters);
     }
 
-    /**
-     * Get the actor model for audit logging.
-     *
-     * @param  int|null  $userId  The user ID
-     * @return User|null The user model or null
-     */
-    private function getActor(?int $userId): ?User
+    private function buildSubmissionContext(Submission $submission): array
     {
-        if ($userId === null) {
-            return null;
-        }
+        return [
+            'assignment_id' => $submission->assignment_id,
+            'student_id' => $submission->user_id,
+            'attempt_number' => $submission->attempt_number,
+            'state' => $submission->state ? $submission->state->value : 'in_progress',
+            'is_late' => $submission->is_late ?? false,
+            'submitted_at' => $submission->submitted_at?->toIso8601String(),
+        ];
+    }
 
-        return User::find($userId);
+    private function buildStateTransitionContext(Submission $submission, string $oldState, string $newState, int $actorId): array
+    {
+        return [
+            'assignment_id' => $submission->assignment_id,
+            'student_id' => $submission->user_id,
+            'old_state' => $oldState,
+            'new_state' => $newState,
+            'actor_id' => $actorId,
+            'transitioned_at' => now()->toIso8601String(),
+        ];
+    }
+
+    private function buildGradingContext(Grade $grade, int $instructorId): array
+    {
+        return [
+            'submission_id' => $grade->submission_id,
+            'student_id' => $grade->user_id,
+            'instructor_id' => $instructorId,
+            'score' => (float) $grade->score,
+            'max_score' => (float) ($grade->max_score ?? 100),
+            'is_draft' => $grade->is_draft ?? false,
+            'feedback' => $grade->feedback,
+            'graded_at' => $grade->graded_at?->toIso8601String() ?? now()->toIso8601String(),
+        ];
+    }
+
+    private function buildAnswerKeyChangeContext(Question $question, array $oldKey, array $newKey, int $instructorId): array
+    {
+        return [
+            'assignment_id' => $question->assignment_id,
+            'question_id' => $question->id,
+            'question_type' => $question->type instanceof \Modules\Learning\Enums\QuestionType ? $question->type->value : $question->type,
+            'instructor_id' => $instructorId,
+            'old_answer_key' => $oldKey,
+            'new_answer_key' => $newKey,
+            'changed_at' => now()->toIso8601String(),
+        ];
+    }
+
+    private function buildGradeOverrideContext(Grade $grade, float $oldScore, float $newScore, string $reason, int $instructorId): array
+    {
+        return [
+            'submission_id' => $grade->submission_id,
+            'student_id' => $grade->user_id,
+            'instructor_id' => $instructorId,
+            'old_score' => $oldScore,
+            'new_score' => $newScore,
+            'reason' => $reason,
+            'overridden_at' => now()->toIso8601String(),
+        ];
+    }
+
+    private function buildOverrideGrantContext(int $assignmentId, int $studentId, string $overrideType, string $reason, int $instructorId): array
+    {
+        return [
+            'assignment_id' => $assignmentId,
+            'student_id' => $studentId,
+            'instructor_id' => $instructorId,
+            'override_type' => $overrideType,
+            'reason' => $reason,
+            'granted_at' => now()->toIso8601String(),
+        ];
     }
 }

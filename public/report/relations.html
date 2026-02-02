@@ -49,7 +49,7 @@
 <div class="page">
     <div class="content content-first">
         <div class="report-details">
-            Created at 2026-02-01 12:06:07        , with PHPMetrics v2.9.1 (<a href="https://twitter.com/Halleck45">Jean-François Lépine</a>).
+            Created at 2026-02-02 09:34:09        , with PHPMetrics v2.9.1 (<a href="https://twitter.com/Halleck45">Jean-François Lépine</a>).
         </div>
 
         
@@ -1927,7 +1927,7 @@
         "relations": []
     },
     {
-        "name": "\\anonymous@00000000000008720000000000000000",
+        "name": "\\anonymous@0000000000000a8d0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -1935,7 +1935,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000001fb00000000000000000",
+        "name": "\\anonymous@0000000000001fb50000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -1943,7 +1943,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000001f1d0000000000000000",
+        "name": "\\anonymous@0000000000001f220000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -1951,7 +1951,7 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000003ca0000000000000000",
+        "name": "\\anonymous@0000000000000ea80000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -1959,7 +1959,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000001f330000000000000000",
+        "name": "\\anonymous@0000000000001f380000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -1967,7 +1967,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000001ed00000000000000000",
+        "name": "\\anonymous@0000000000001ed50000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -2231,44 +2231,53 @@
         "size": 3000,
         "relations": [
             "\\Modules\\Enrollments\\Contracts\\Services\\EnrollmentServiceInterface",
-            "\\Modules\\Enrollments\\Contracts\\Repositories\\EnrollmentRepositoryInterface",
-            "\\App\\Contracts\\EnrollmentKeyHasherInterface",
+            "\\Modules\\Enrollments\\Services\\Support\\EnrollmentFinder",
+            "\\Modules\\Enrollments\\Services\\Support\\EnrollmentLifecycleProcessor",
             "\\Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
-            "\\Illuminate\\Support\\Arr",
-            "\\Illuminate\\Http\\Request",
-            "\\Spatie\\QueryBuilder\\QueryBuilder",
+            "\\Modules\\Auth\\Models\\User",
             "\\Modules\\Enrollments\\Models\\Enrollment",
-            "\\Spatie\\QueryBuilder\\AllowedSort",
-            "\\Spatie\\QueryBuilder\\AllowedFilter",
-            "\\Modules\\Schemes\\Models\\Course",
+            "\\Modules\\Schemes\\Models\\Course"
+        ]
+    },
+    {
+        "name": "\\Modules\\Enrollments\\Services\\Support\\EnrollmentFinder",
+        "size": 3000,
+        "relations": [
+            "\\Modules\\Enrollments\\Contracts\\Repositories\\EnrollmentRepositoryInterface",
+            "\\Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
+            "\\Spatie\\QueryBuilder\\QueryBuilder",
             "\\Modules\\Auth\\Models\\User",
             "\\App\\Exceptions\\BusinessException",
-            "\\Illuminate\\Support\\Facades\\DB",
+            "\\Modules\\Enrollments\\Models\\Enrollment",
+            "\\Modules\\Schemes\\Models\\Course",
+            "\\Illuminate\\Http\\Request",
+            "\\Illuminate\\Support\\Arr",
+            "\\Spatie\\QueryBuilder\\AllowedFilter",
+            "\\Spatie\\QueryBuilder\\AllowedSort",
+            "\\Illuminate\\Database\\Eloquent\\Collection"
+        ]
+    },
+    {
+        "name": "\\Modules\\Enrollments\\Services\\Support\\EnrollmentLifecycleProcessor",
+        "size": 3000,
+        "relations": [
+            "\\Modules\\Enrollments\\Contracts\\Repositories\\EnrollmentRepositoryInterface",
+            "\\App\\Contracts\\EnrollmentKeyHasherInterface",
+            "\\Modules\\Auth\\Models\\User",
+            "\\Modules\\Schemes\\Models\\Course",
+            "\\App\\Exceptions\\BusinessException",
             "\\Illuminate\\Support\\Carbon",
+            "\\Modules\\Enrollments\\Models\\Enrollment",
+            "\\Modules\\Enrollments\\Events\\EnrollmentCreated",
+            "\\Illuminate\\Support\\Facades\\DB",
             "\\Illuminate\\Support\\Facades\\Mail",
             "\\Modules\\Enrollments\\Mail\\StudentEnrollmentApprovedMail",
             "\\Modules\\Enrollments\\Mail\\StudentEnrollmentDeclinedMail",
             "\\Modules\\Enrollments\\Mail\\StudentEnrollmentActiveMail",
             "\\Modules\\Enrollments\\Mail\\StudentEnrollmentPendingMail",
             "\\Modules\\Enrollments\\Mail\\AdminEnrollmentNotificationMail",
-            "\\App\\Support\\Helpers\\UrlHelper",
-            "\\Modules\\Enrollments\\Events\\EnrollmentCreated"
+            "\\App\\Support\\Helpers\\UrlHelper"
         ]
-    },
-    {
-        "name": "\\App\\Contracts\\EnrollmentKeyHasherInterface",
-        "size": 3000,
-        "relations": []
-    },
-    {
-        "name": "\\Spatie\\QueryBuilder\\AllowedSort",
-        "size": 3000,
-        "relations": []
-    },
-    {
-        "name": "\\App\\Support\\Helpers\\UrlHelper",
-        "size": 3000,
-        "relations": []
     },
     {
         "name": "\\Modules\\Enrollments\\Services\\EnrollmentReportService",
@@ -2283,7 +2292,22 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000015bf0000000000000000",
+        "name": "\\Spatie\\QueryBuilder\\AllowedSort",
+        "size": 3000,
+        "relations": []
+    },
+    {
+        "name": "\\App\\Contracts\\EnrollmentKeyHasherInterface",
+        "size": 3000,
+        "relations": []
+    },
+    {
+        "name": "\\App\\Support\\Helpers\\UrlHelper",
+        "size": 3000,
+        "relations": []
+    },
+    {
+        "name": "\\anonymous@0000000000000ee70000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -2291,7 +2315,7 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000033930000000000000000",
+        "name": "\\anonymous@00000000000006950000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -2299,7 +2323,7 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000033fb0000000000000000",
+        "name": "\\anonymous@00000000000018550000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -2307,7 +2331,7 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000033b90000000000000000",
+        "name": "\\anonymous@000000000000150f0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -2685,7 +2709,7 @@
         "relations": []
     },
     {
-        "name": "\\anonymous@0000000000001f2b0000000000000000",
+        "name": "\\anonymous@00000000000023590000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -2693,7 +2717,7 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000029a10000000000000000",
+        "name": "\\anonymous@00000000000019ce0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -2701,7 +2725,7 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000026c50000000000000000",
+        "name": "\\anonymous@000000000000080a0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -2709,7 +2733,7 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000027b10000000000000000",
+        "name": "\\anonymous@0000000000001efa0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -2717,7 +2741,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000002a310000000000000000",
+        "name": "\\anonymous@0000000000001d7e0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -2725,7 +2749,7 @@
         ]
     },
     {
-        "name": "\\anonymous@000000000000329d0000000000000000",
+        "name": "\\anonymous@0000000000001c460000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -2733,7 +2757,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000001f2a0000000000000000",
+        "name": "\\anonymous@000000000000235b0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -2741,7 +2765,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000002f450000000000000000",
+        "name": "\\anonymous@00000000000011da0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -2749,7 +2773,7 @@
         ]
     },
     {
-        "name": "\\anonymous@000000000000318c0000000000000000",
+        "name": "\\anonymous@00000000000022b50000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -2757,7 +2781,7 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000031910000000000000000",
+        "name": "\\anonymous@000000000000229a0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -2765,7 +2789,7 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000032a00000000000000000",
+        "name": "\\anonymous@0000000000001c490000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -2773,7 +2797,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000002f0e0000000000000000",
+        "name": "\\anonymous@00000000000002100000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -2781,7 +2805,7 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000027e70000000000000000",
+        "name": "\\anonymous@0000000000001e550000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -2789,7 +2813,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000002a400000000000000000",
+        "name": "\\anonymous@0000000000001d8a0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -2797,7 +2821,7 @@
         ]
     },
     {
-        "name": "\\anonymous@000000000000303a0000000000000000",
+        "name": "\\anonymous@0000000000000c850000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -2805,7 +2829,7 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000027e60000000000000000",
+        "name": "\\anonymous@0000000000001e520000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -2813,7 +2837,7 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000032070000000000000000",
+        "name": "\\anonymous@0000000000000ea50000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -2821,7 +2845,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000002f680000000000000000",
+        "name": "\\anonymous@00000000000006e70000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -2829,7 +2853,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000002a8b0000000000000000",
+        "name": "\\anonymous@0000000000001dd30000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -3871,6 +3895,27 @@
         "relations": []
     },
     {
+        "name": "\\Modules\\Auth\\Services\\Support\\VerificationTokenManager",
+        "size": 3000,
+        "relations": [
+            "\\Modules\\Auth\\Models\\User",
+            "\\Modules\\Auth\\Models\\OtpCode",
+            "\\Modules\\Common\\Models\\SystemSetting",
+            "\\Illuminate\\Support\\Str",
+            "\\Illuminate\\Support\\Facades\\Mail",
+            "\\Modules\\Auth\\Mail\\VerifyEmailLinkMail",
+            "\\Modules\\Auth\\Mail\\ChangeEmailVerificationMail"
+        ]
+    },
+    {
+        "name": "\\Modules\\Auth\\Services\\Support\\VerificationValidator",
+        "size": 3000,
+        "relations": [
+            "\\Modules\\Auth\\Models\\OtpCode",
+            "\\Modules\\Auth\\Models\\User"
+        ]
+    },
+    {
         "name": "\\Modules\\Auth\\Services\\AuthenticationService",
         "size": 3000,
         "relations": []
@@ -3897,26 +3942,52 @@
         "size": 3000,
         "relations": [
             "\\Modules\\Auth\\Contracts\\Services\\AuthServiceInterface",
+            "\\Modules\\Auth\\Services\\Support\\AuthRegistrationProcessor",
+            "\\Modules\\Auth\\Services\\Support\\AuthSessionProcessor",
+            "\\Modules\\Auth\\Services\\Support\\AuthCredentialProcessor",
+            "\\Modules\\Auth\\Services\\EmailVerificationService",
+            "\\Modules\\Auth\\Models\\User"
+        ]
+    },
+    {
+        "name": "\\Modules\\Auth\\Services\\Support\\AuthRegistrationProcessor",
+        "size": 3000,
+        "relations": [
             "\\Modules\\Auth\\Contracts\\Repositories\\AuthRepositoryInterface",
             "\\Tymon\\JWTAuth\\JWTAuth",
             "\\Modules\\Auth\\Services\\EmailVerificationService",
-            "\\Modules\\Auth\\Services\\LoginThrottlingService",
             "\\Illuminate\\Support\\Facades\\Hash",
             "\\Modules\\Auth\\Support\\TokenPairDTO",
             "\\Illuminate\\Support\\Facades\\DB",
-            "\\Illuminate\\Validation\\ValidationException",
-            "\\App\\Exceptions\\BusinessException",
-            "\\App\\Jobs\\LogActivityJob",
             "\\Modules\\Auth\\Models\\User",
-            "\\Illuminate\\Support\\Facades\\Cache",
-            "\\App\\Jobs\\CreateAuditJob",
             "\\Illuminate\\Support\\Str"
         ]
     },
     {
-        "name": "\\App\\Jobs\\CreateAuditJob",
+        "name": "\\Modules\\Auth\\Services\\Support\\AuthSessionProcessor",
         "size": 3000,
-        "relations": []
+        "relations": [
+            "\\Modules\\Auth\\Contracts\\Repositories\\AuthRepositoryInterface",
+            "\\Tymon\\JWTAuth\\JWTAuth",
+            "\\Modules\\Auth\\Services\\EmailVerificationService",
+            "\\Modules\\Auth\\Services\\LoginThrottlingService",
+            "\\Illuminate\\Validation\\ValidationException",
+            "\\Illuminate\\Support\\Facades\\Hash",
+            "\\App\\Exceptions\\BusinessException",
+            "\\Modules\\Auth\\Support\\TokenPairDTO",
+            "\\App\\Jobs\\LogActivityJob",
+            "\\Modules\\Auth\\Models\\User"
+        ]
+    },
+    {
+        "name": "\\Modules\\Auth\\Services\\Support\\AuthCredentialProcessor",
+        "size": 3000,
+        "relations": [
+            "\\Modules\\Auth\\Models\\User",
+            "\\Illuminate\\Support\\Facades\\Cache",
+            "\\Illuminate\\Support\\Facades\\Hash",
+            "\\App\\Jobs\\CreateAuditJob"
+        ]
     },
     {
         "name": "\\Modules\\Auth\\Contracts\\Services\\UserActivityServiceInterface",
@@ -3985,27 +4056,29 @@
         "relations": []
     },
     {
+        "name": "\\Modules\\Auth\\Services\\Support\\UserFinder",
+        "size": 3000,
+        "relations": []
+    },
+    {
+        "name": "\\Modules\\Auth\\Services\\Support\\UserLifecycleProcessor",
+        "size": 3000,
+        "relations": []
+    },
+    {
+        "name": "\\App\\Jobs\\CreateAuditJob",
+        "size": 3000,
+        "relations": []
+    },
+    {
         "name": "\\Modules\\Auth\\Services\\UserManagementService",
         "size": 3000,
         "relations": [
             "\\Modules\\Auth\\Contracts\\Services\\UserManagementServiceInterface",
-            "\\Modules\\Auth\\Contracts\\Repositories\\AuthRepositoryInterface",
-            "\\Modules\\Auth\\Contracts\\UserAccessPolicyInterface",
-            "\\Modules\\Auth\\Services\\UserCacheService",
+            "\\Modules\\Auth\\Services\\Support\\UserFinder",
+            "\\Modules\\Auth\\Services\\Support\\UserLifecycleProcessor",
             "\\Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
-            "\\Modules\\Auth\\Models\\User",
-            "\\Illuminate\\Auth\\Access\\AuthorizationException",
-            "\\Illuminate\\Support\\Arr",
-            "\\Illuminate\\Http\\Request",
-            "\\Spatie\\QueryBuilder\\QueryBuilder",
-            "\\Modules\\Schemes\\Models\\CourseAdmin",
-            "\\Spatie\\QueryBuilder\\AllowedFilter",
-            "\\Illuminate\\Support\\Str",
-            "\\Illuminate\\Validation\\ValidationException",
-            "\\Modules\\Auth\\Enums\\UserStatus",
-            "\\Illuminate\\Support\\Facades\\DB",
-            "\\Illuminate\\Support\\Facades\\Hash",
-            "\\App\\Jobs\\CreateAuditJob"
+            "\\Modules\\Auth\\Models\\User"
         ]
     },
     {
@@ -4024,7 +4097,7 @@
         "relations": []
     },
     {
-        "name": "\\anonymous@0000000000002b0a0000000000000000",
+        "name": "\\anonymous@00000000000020070000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -4032,7 +4105,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000000ee80000000000000000",
+        "name": "\\anonymous@0000000000001a550000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -4040,7 +4113,7 @@
         ]
     },
     {
-        "name": "\\anonymous@000000000000229a0000000000000000",
+        "name": "\\anonymous@00000000000016050000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -4048,7 +4121,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000002a080000000000000000",
+        "name": "\\anonymous@000000000000251b0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -4056,7 +4129,7 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000025240000000000000000",
+        "name": "\\anonymous@00000000000020a90000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -4064,7 +4137,7 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000026c00000000000000000",
+        "name": "\\anonymous@00000000000024010000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -4072,7 +4145,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000000d220000000000000000",
+        "name": "\\anonymous@00000000000006fa0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -4080,7 +4153,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000002f500000000000000000",
+        "name": "\\anonymous@00000000000020d70000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -4088,7 +4161,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000000e240000000000000000",
+        "name": "\\anonymous@0000000000000dbf0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -4096,7 +4169,15 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000007e90000000000000000",
+        "name": "\\anonymous@0000000000000f340000000000000000",
+        "size": 3000,
+        "relations": [
+            "\\Illuminate\\Database\\Migrations\\Migration",
+            "\\Illuminate\\Support\\Facades\\Schema"
+        ]
+    },
+    {
+        "name": "\\anonymous@00000000000018a70000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -4105,7 +4186,7 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000031ac0000000000000000",
+        "name": "\\anonymous@000000000000020b0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -4113,7 +4194,7 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000005110000000000000000",
+        "name": "\\anonymous@00000000000018a50000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -4121,7 +4202,7 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000015310000000000000000",
+        "name": "\\anonymous@0000000000000e0a0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -4129,12 +4210,25 @@
         ]
     },
     {
-        "name": "\\anonymous@000000000000159a0000000000000000",
+        "name": "\\anonymous@0000000000001aae0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
             "\\Illuminate\\Support\\Facades\\Schema"
         ]
+    },
+    {
+        "name": "\\Modules\\Gamification\\Database\\Seeders\\BadgeSeeder",
+        "size": 3000,
+        "relations": [
+            "\\Illuminate\\Database\\Seeder",
+            "\\Modules\\Gamification\\Models\\Badge"
+        ]
+    },
+    {
+        "name": "\\Modules\\Gamification\\Models\\Badge",
+        "size": 3000,
+        "relations": []
     },
     {
         "name": "\\Modules\\Gamification\\Database\\Seeders\\GamificationDatabaseSeeder",
@@ -4144,11 +4238,26 @@
         ]
     },
     {
+        "name": "\\Modules\\Gamification\\Database\\Seeders\\LeaderboardSeeder",
+        "size": 3000,
+        "relations": [
+            "\\Illuminate\\Database\\Seeder",
+            "\\Modules\\Gamification\\Contracts\\Services\\LeaderboardServiceInterface"
+        ]
+    },
+    {
+        "name": "\\Modules\\Gamification\\Contracts\\Services\\LeaderboardServiceInterface",
+        "size": 3000,
+        "relations": []
+    },
+    {
         "name": "\\Modules\\Gamification\\Database\\Seeders\\ChallengeSeeder",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Seeder",
             "\\DB",
+            "\\Modules\\Gamification\\Models\\Badge",
+            "\\Faker\\Factory",
             "\\Modules\\Gamification\\Models\\Challenge"
         ]
     },
@@ -4167,6 +4276,62 @@
     },
     {
         "name": "\\Modules\\Gamification\\Models\\Milestone",
+        "size": 3000,
+        "relations": []
+    },
+    {
+        "name": "\\Modules\\Gamification\\Database\\Seeders\\UserGamificationSeeder",
+        "size": 3000,
+        "relations": [
+            "\\Illuminate\\Database\\Seeder",
+            "\\Modules\\Auth\\Models\\User",
+            "\\Modules\\Gamification\\Models\\Badge",
+            "\\Modules\\Gamification\\Models\\Challenge",
+            "\\Modules\\Gamification\\Models\\UserGamificationStat",
+            "\\Modules\\Gamification\\Enums\\PointSourceType",
+            "\\Modules\\Gamification\\Enums\\PointReason",
+            "\\Modules\\Gamification\\Models\\Point",
+            "\\Modules\\Gamification\\Models\\UserBadge",
+            "\\Modules\\Gamification\\Models\\UserChallengeAssignment",
+            "\\Modules\\Schemes\\Models\\Course",
+            "\\Modules\\Gamification\\Models\\UserScopeStat"
+        ]
+    },
+    {
+        "name": "\\Modules\\Gamification\\Models\\UserGamificationStat",
+        "size": 3000,
+        "relations": []
+    },
+    {
+        "name": "\\Modules\\Gamification\\Enums\\PointSourceType",
+        "size": 3000,
+        "relations": []
+    },
+    {
+        "name": "\\Modules\\Gamification\\Enums\\PointReason",
+        "size": 3000,
+        "relations": []
+    },
+    {
+        "name": "\\Modules\\Gamification\\Models\\Point",
+        "size": 3000,
+        "relations": []
+    },
+    {
+        "name": "\\Modules\\Gamification\\Models\\UserBadge",
+        "size": 3000,
+        "relations": [
+            "\\Illuminate\\Database\\Eloquent\\Model",
+            "\\Illuminate\\Database\\Eloquent\\Relations\\BelongsTo"
+        ]
+    },
+    {
+        "name": "\\Modules\\Gamification\\Models\\UserChallengeAssignment",
+        "size": 3000,
+        "relations": []
+    },
+    {
+        "name": "\\Modules\\Gamification\\Models\\UserScopeStat",
         "size": 3000,
         "relations": []
     },
@@ -4192,19 +4357,7 @@
         "relations": [
             "\\Illuminate\\Support\\ServiceProvider",
             "\\Illuminate\\Support\\Facades\\Gate",
-            "\\Modules\\Gamification\\Services\\GamificationService",
             "\\Illuminate\\Support\\Facades\\Blade"
-        ]
-    },
-    {
-        "name": "\\Modules\\Gamification\\Services\\GamificationService",
-        "size": 3000,
-        "relations": [
-            "\\Modules\\Gamification\\Contracts\\Services\\GamificationServiceInterface",
-            "\\Illuminate\\Contracts\\View\\View",
-            "\\Illuminate\\Support\\Facades\\DB",
-            "\\Modules\\Gamification\\Models\\UserGamificationStat",
-            "\\Carbon\\Carbon"
         ]
     },
     {
@@ -4229,46 +4382,14 @@
         "relations": []
     },
     {
-        "name": "\\Modules\\Gamification\\Models\\Point",
-        "size": 3000,
-        "relations": []
-    },
-    {
         "name": "\\Modules\\Gamification\\Repositories\\GamificationRepository",
         "size": 3000,
-        "relations": [
-            "\\Modules\\Gamification\\Contracts\\Repositories\\GamificationRepositoryInterface",
-            "\\Modules\\Gamification\\Models\\Point",
-            "\\Modules\\Gamification\\Models\\UserGamificationStat",
-            "\\Modules\\Gamification\\Models\\Badge",
-            "\\Modules\\Gamification\\Models\\UserBadge",
-            "\\Illuminate\\Support\\Collection",
-            "\\Modules\\Gamification\\Models\\Leaderboard",
-            "\\Illuminate\\Database\\Eloquent\\Builder"
-        ]
+        "relations": []
     },
     {
         "name": "\\Modules\\Gamification\\Contracts\\Repositories\\GamificationRepositoryInterface",
         "size": 3000,
         "relations": []
-    },
-    {
-        "name": "\\Modules\\Gamification\\Models\\UserGamificationStat",
-        "size": 3000,
-        "relations": []
-    },
-    {
-        "name": "\\Modules\\Gamification\\Models\\Badge",
-        "size": 3000,
-        "relations": []
-    },
-    {
-        "name": "\\Modules\\Gamification\\Models\\UserBadge",
-        "size": 3000,
-        "relations": [
-            "\\Illuminate\\Database\\Eloquent\\Model",
-            "\\Illuminate\\Database\\Eloquent\\Relations\\BelongsTo"
-        ]
     },
     {
         "name": "\\Modules\\Gamification\\Models\\Leaderboard",
@@ -4324,11 +4445,6 @@
             "\\Illuminate\\Database\\Eloquent\\Model",
             "\\Illuminate\\Database\\Eloquent\\Relations\\BelongsTo"
         ]
-    },
-    {
-        "name": "\\Modules\\Gamification\\Models\\UserChallengeAssignment",
-        "size": 3000,
-        "relations": []
     },
     {
         "name": "\\Modules\\Gamification\\Models\\UserChallengeCompletion",
@@ -4389,6 +4505,39 @@
         ]
     },
     {
+        "name": "\\Modules\\Gamification\\Transformers\\ChallengeCompletionResource",
+        "size": 3000,
+        "relations": []
+    },
+    {
+        "name": "\\Modules\\Gamification\\Transformers\\ChallengeResource",
+        "size": 3000,
+        "relations": []
+    },
+    {
+        "name": "\\Modules\\Gamification\\Transformers\\UserChallengeAssignmentResource",
+        "size": 3000,
+        "relations": [
+            "\\Illuminate\\Http\\Resources\\Json\\JsonResource",
+            "\\Modules\\Gamification\\Transformers\\ChallengeResource"
+        ]
+    },
+    {
+        "name": "\\Modules\\Gamification\\Transformers\\LeaderboardResource",
+        "size": 3000,
+        "relations": []
+    },
+    {
+        "name": "\\Modules\\Gamification\\Transformers\\PointResource",
+        "size": 3000,
+        "relations": []
+    },
+    {
+        "name": "\\Modules\\Gamification\\Transformers\\UserBadgeResource",
+        "size": 3000,
+        "relations": []
+    },
+    {
         "name": "\\Modules\\Gamification\\Http\\Controllers\\ChallengeController",
         "size": 3000,
         "relations": [
@@ -4396,7 +4545,8 @@
             "\\Modules\\Gamification\\Services\\ChallengeService",
             "\\Illuminate\\Http\\JsonResponse",
             "\\Illuminate\\Http\\Request",
-            "\\Modules\\Gamification\\Models\\Challenge"
+            "\\Modules\\Gamification\\Transformers\\ChallengeResource",
+            "\\Modules\\Gamification\\Transformers\\ChallengeCompletionResource"
         ]
     },
     {
@@ -4409,19 +4559,16 @@
         "size": 3000,
         "relations": [
             "\\App\\Http\\Controllers\\Controller",
-            "\\Modules\\Gamification\\Services\\GamificationService",
-            "\\Modules\\Gamification\\Services\\LeaderboardService",
-            "\\Modules\\Gamification\\Services\\ChallengeService",
-            "\\Modules\\Gamification\\Contracts\\Repositories\\UserGamificationStatRepositoryInterface",
-            "\\Modules\\Gamification\\Contracts\\Repositories\\UserBadgeRepositoryInterface",
-            "\\Modules\\Gamification\\Contracts\\Repositories\\PointRepositoryInterface",
+            "\\Modules\\Gamification\\Contracts\\Services\\GamificationServiceInterface",
             "\\Illuminate\\Http\\JsonResponse",
             "\\Illuminate\\Http\\Request",
-            "\\Modules\\Gamification\\Models\\Milestone"
+            "\\Modules\\Gamification\\Transformers\\UserBadgeResource",
+            "\\Modules\\Gamification\\Transformers\\PointResource",
+            "\\Modules\\Schemes\\Models\\Course"
         ]
     },
     {
-        "name": "\\Modules\\Gamification\\Services\\LeaderboardService",
+        "name": "\\Modules\\Gamification\\Contracts\\Services\\GamificationServiceInterface",
         "size": 3000,
         "relations": []
     },
@@ -4432,8 +4579,15 @@
             "\\App\\Http\\Controllers\\Controller",
             "\\Modules\\Gamification\\Services\\LeaderboardService",
             "\\Illuminate\\Http\\JsonResponse",
-            "\\Illuminate\\Http\\Request"
+            "\\Illuminate\\Http\\Request",
+            "\\Modules\\Schemes\\Models\\Course",
+            "\\Modules\\Gamification\\Transformers\\LeaderboardResource"
         ]
+    },
+    {
+        "name": "\\Modules\\Gamification\\Services\\LeaderboardService",
+        "size": 3000,
+        "relations": []
     },
     {
         "name": "\\Modules\\Gamification\\Listeners\\AwardBadgeForCourseCompleted",
@@ -4445,11 +4599,37 @@
         ]
     },
     {
+        "name": "\\Modules\\Gamification\\Services\\GamificationService",
+        "size": 3000,
+        "relations": [
+            "\\Modules\\Gamification\\Contracts\\Services\\GamificationServiceInterface",
+            "\\Modules\\Gamification\\Services\\Support\\PointManager",
+            "\\Modules\\Gamification\\Services\\Support\\BadgeManager",
+            "\\Modules\\Gamification\\Services\\Support\\LeaderboardManager",
+            "\\Modules\\Gamification\\Contracts\\Services\\ChallengeServiceInterface",
+            "\\Modules\\Gamification\\Contracts\\Services\\LeaderboardServiceInterface",
+            "\\Illuminate\\Contracts\\View\\View",
+            "\\Modules\\Gamification\\Models\\UserGamificationStat",
+            "\\Illuminate\\Support\\Collection",
+            "\\Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
+            "\\Modules\\Schemes\\Models\\Unit",
+            "\\Modules\\Gamification\\Models\\UserScopeStat"
+        ]
+    },
+    {
         "name": "\\Modules\\Gamification\\Listeners\\UpdateChallengeProgressOnLessonCompleted",
         "size": 3000,
         "relations": [
             "\\Modules\\Gamification\\Services\\ChallengeService",
             "\\Modules\\Schemes\\Events\\LessonCompleted"
+        ]
+    },
+    {
+        "name": "\\Modules\\Gamification\\Listeners\\AwardXpForGradeReleased",
+        "size": 3000,
+        "relations": [
+            "\\Modules\\Gamification\\Services\\GamificationService",
+            "\\Modules\\Grading\\Events\\GradesReleased"
         ]
     },
     {
@@ -4489,9 +4669,60 @@
         "relations": []
     },
     {
-        "name": "\\Modules\\Gamification\\Contracts\\Services\\GamificationServiceInterface",
+        "name": "\\Modules\\Gamification\\Services\\Support\\ChallengeFinder",
+        "size": 3000,
+        "relations": [
+            "\\Illuminate\\Database\\Eloquent\\Builder",
+            "\\Modules\\Gamification\\Models\\UserChallengeAssignment",
+            "\\Illuminate\\Support\\Collection",
+            "\\Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
+            "\\Modules\\Gamification\\Models\\Challenge",
+            "\\Illuminate\\Support\\Facades\\Cache",
+            "\\Modules\\Gamification\\Models\\UserChallengeCompletion",
+            "\\Modules\\Auth\\Models\\User",
+            "\\Carbon\\Carbon"
+        ]
+    },
+    {
+        "name": "\\Modules\\Gamification\\Services\\Support\\ChallengeAssignmentProcessor",
+        "size": 3000,
+        "relations": [
+            "\\Modules\\Gamification\\Services\\Support\\ChallengeFinder",
+            "\\Modules\\Gamification\\Models\\Challenge",
+            "\\Carbon\\Carbon",
+            "\\Modules\\Gamification\\Models\\UserChallengeAssignment"
+        ]
+    },
+    {
+        "name": "\\Modules\\Gamification\\Services\\Support\\ChallengeProgressProcessor",
+        "size": 3000,
+        "relations": [
+            "\\Modules\\Gamification\\Services\\Support\\PointManager",
+            "\\Modules\\Gamification\\Services\\Support\\BadgeManager",
+            "\\Modules\\Gamification\\Models\\UserChallengeAssignment",
+            "\\Symfony\\Component\\HttpKernel\\Exception\\NotFoundHttpException",
+            "\\Symfony\\Component\\HttpKernel\\Exception\\BadRequestHttpException",
+            "\\Modules\\Gamification\\Models\\UserChallengeCompletion",
+            "\\Illuminate\\Support\\Facades\\DB"
+        ]
+    },
+    {
+        "name": "\\Modules\\Gamification\\Services\\Support\\PointManager",
         "size": 3000,
         "relations": []
+    },
+    {
+        "name": "\\Modules\\Gamification\\Services\\Support\\BadgeManager",
+        "size": 3000,
+        "relations": []
+    },
+    {
+        "name": "\\Modules\\Gamification\\Services\\Support\\LeaderboardManager",
+        "size": 3000,
+        "relations": [
+            "\\Modules\\Gamification\\Repositories\\GamificationRepository",
+            "\\Illuminate\\Support\\Facades\\DB"
+        ]
     },
     {
         "name": "\\Illuminate\\Contracts\\View\\View",
@@ -4499,7 +4730,12 @@
         "relations": []
     },
     {
-        "name": "\\Modules\\Gamification\\Contracts\\Services\\LeaderboardServiceInterface",
+        "name": "\\Symfony\\Component\\HttpKernel\\Exception\\NotFoundHttpException",
+        "size": 3000,
+        "relations": []
+    },
+    {
+        "name": "\\Symfony\\Component\\HttpKernel\\Exception\\BadRequestHttpException",
         "size": 3000,
         "relations": []
     },
@@ -4541,7 +4777,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000002d850000000000000000",
+        "name": "\\anonymous@00000000000011050000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -4549,7 +4785,7 @@
         ]
     },
     {
-        "name": "\\anonymous@000000000000251c0000000000000000",
+        "name": "\\anonymous@00000000000006300000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -4558,7 +4794,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000000d6a0000000000000000",
+        "name": "\\anonymous@000000000000128b0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -4566,7 +4802,7 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000019aa0000000000000000",
+        "name": "\\anonymous@000000000000253c0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -4574,7 +4810,7 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000026cc0000000000000000",
+        "name": "\\anonymous@00000000000004150000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -4582,7 +4818,7 @@
         ]
     },
     {
-        "name": "\\anonymous@000000000000281a0000000000000000",
+        "name": "\\anonymous@00000000000017ff0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -4590,7 +4826,7 @@
         ]
     },
     {
-        "name": "\\anonymous@000000000000304a0000000000000000",
+        "name": "\\anonymous@00000000000022d70000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -4598,7 +4834,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000001a5c0000000000000000",
+        "name": "\\anonymous@000000000000217e0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -4606,7 +4842,7 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000017290000000000000000",
+        "name": "\\anonymous@000000000000237e0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -4614,7 +4850,7 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000004180000000000000000",
+        "name": "\\anonymous@0000000000001cd10000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -4622,7 +4858,7 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000022310000000000000000",
+        "name": "\\anonymous@00000000000006ce0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -4630,7 +4866,7 @@
         ]
     },
     {
-        "name": "\\anonymous@000000000000336f0000000000000000",
+        "name": "\\anonymous@00000000000025640000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -4638,7 +4874,7 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000022800000000000000000",
+        "name": "\\anonymous@0000000000000bc60000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -4646,7 +4882,7 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000034160000000000000000",
+        "name": "\\anonymous@0000000000001a900000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -4654,7 +4890,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000002c540000000000000000",
+        "name": "\\anonymous@00000000000009390000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -4663,7 +4899,7 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000022640000000000000000",
+        "name": "\\anonymous@00000000000016d50000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -4671,7 +4907,7 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000031c00000000000000000",
+        "name": "\\anonymous@0000000000000c2c0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -4742,10 +4978,10 @@
         "relations": [
             "\\Illuminate\\Database\\Seeder",
             "\\DB",
+            "\\Illuminate\\Support\\Facades\\DB",
             "\\Faker\\Factory",
             "\\Modules\\Learning\\Models\\Assignment",
-            "\\Modules\\Learning\\Models\\Submission",
-            "\\Illuminate\\Support\\Facades\\DB"
+            "\\Modules\\Learning\\Models\\Submission"
         ]
     },
     {
@@ -5475,7 +5711,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000002b770000000000000000",
+        "name": "\\anonymous@00000000000012af0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -5483,7 +5719,7 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000022d80000000000000000",
+        "name": "\\anonymous@0000000000001bb10000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -5491,7 +5727,7 @@
         ]
     },
     {
-        "name": "\\anonymous@000000000000274b0000000000000000",
+        "name": "\\anonymous@0000000000000fbe0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -5499,7 +5735,7 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000022ed0000000000000000",
+        "name": "\\anonymous@00000000000005350000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -5507,7 +5743,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000001b160000000000000000",
+        "name": "\\anonymous@00000000000023630000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -5516,7 +5752,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000000f2e0000000000000000",
+        "name": "\\anonymous@00000000000011a30000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -5524,7 +5760,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000002b120000000000000000",
+        "name": "\\anonymous@0000000000000cc00000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -5532,7 +5768,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000002f0a0000000000000000",
+        "name": "\\anonymous@0000000000000c8c0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -5540,7 +5776,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000000e810000000000000000",
+        "name": "\\anonymous@000000000000265d0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -6094,7 +6330,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000000c2e0000000000000000",
+        "name": "\\anonymous@00000000000021ff0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -6102,7 +6338,7 @@
         ]
     },
     {
-        "name": "\\anonymous@000000000000294a0000000000000000",
+        "name": "\\anonymous@00000000000005c50000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -6110,7 +6346,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000001c070000000000000000",
+        "name": "\\anonymous@00000000000021a50000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -6202,7 +6438,7 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000014a30000000000000000",
+        "name": "\\anonymous@00000000000018ba0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -6299,7 +6535,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000002fc00000000000000000",
+        "name": "\\anonymous@00000000000027370000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -6307,7 +6543,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000000f880000000000000000",
+        "name": "\\anonymous@00000000000020310000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -6315,7 +6551,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000002bdc0000000000000000",
+        "name": "\\anonymous@000000000000122e0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -6323,7 +6559,7 @@
         ]
     },
     {
-        "name": "\\anonymous@000000000000235c0000000000000000",
+        "name": "\\anonymous@00000000000017590000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -6331,7 +6567,7 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000023f90000000000000000",
+        "name": "\\anonymous@0000000000000d650000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -6471,6 +6707,16 @@
         ]
     },
     {
+        "name": "\\Modules\\Common\\Support\\MasterDataEnumMapper",
+        "size": 3000,
+        "relations": []
+    },
+    {
+        "name": "\\enumClass",
+        "size": 3000,
+        "relations": []
+    },
+    {
         "name": "\\Modules\\Common\\Http\\Resources\\MasterDataTypeResource",
         "size": 3000,
         "relations": []
@@ -6539,17 +6785,20 @@
         "size": 3000,
         "relations": [
             "\\Illuminate\\Routing\\Controller",
-            "\\Modules\\Common\\Contracts\\Services\\AuditServiceInterface",
+            "\\Modules\\Common\\Services\\AuditLogQueryService",
             "\\Illuminate\\Http\\JsonResponse",
             "\\Modules\\Common\\Http\\Requests\\SearchAuditLogsRequest",
-            "\\Modules\\Common\\Http\\Resources\\AuditLogResource",
-            "\\Modules\\Common\\Models\\AuditLog"
+            "\\Modules\\Common\\Http\\Resources\\AuditLogResource"
         ]
     },
     {
-        "name": "\\Modules\\Common\\Contracts\\Services\\AuditServiceInterface",
+        "name": "\\Modules\\Common\\Services\\AuditLogQueryService",
         "size": 3000,
-        "relations": []
+        "relations": [
+            "\\Modules\\Common\\Contracts\\Services\\AuditServiceInterface",
+            "\\Modules\\Common\\Models\\AuditLog",
+            "\\Illuminate\\Support\\Collection"
+        ]
     },
     {
         "name": "\\Modules\\Common\\Http\\Controllers\\MasterDataController",
@@ -6567,14 +6816,14 @@
         "size": 3000,
         "relations": [
             "\\Modules\\Common\\Repositories\\MasterDataRepository",
+            "\\Modules\\Common\\Support\\MasterDataEnumMapper",
             "\\Illuminate\\Support\\Facades\\Cache",
             "\\Illuminate\\Contracts\\Pagination\\LengthAwarePaginator",
-            "\\Illuminate\\Support\\Facades\\Request",
-            "\\Illuminate\\Pagination\\LengthAwarePaginator",
             "\\Modules\\Common\\Models\\MasterDataItem",
             "\\Illuminate\\Database\\Eloquent\\ModelNotFoundException",
-            "\\enumClass",
-            "\\Spatie\\Permission\\Models\\Role"
+            "\\Illuminate\\Support\\Collection",
+            "\\Illuminate\\Support\\Facades\\Request",
+            "\\Illuminate\\Pagination\\LengthAwarePaginator"
         ]
     },
     {
@@ -6583,11 +6832,12 @@
         "relations": [
             "\\Illuminate\\Routing\\Controller",
             "\\Modules\\Common\\Services\\CategoryService",
+            "\\Illuminate\\Http\\JsonResponse",
             "\\Illuminate\\Http\\Request",
             "\\Modules\\Common\\Http\\Resources\\CategoryResource",
-            "\\Modules\\Common\\Enums\\CategoryStatus",
             "\\Modules\\Common\\Http\\Requests\\CategoryStoreRequest",
-            "\\Modules\\Common\\Http\\Requests\\CategoryUpdateRequest"
+            "\\Modules\\Common\\Http\\Requests\\CategoryUpdateRequest",
+            "\\Modules\\Common\\Enums\\CategoryStatus"
         ]
     },
     {
@@ -6614,6 +6864,11 @@
             "\\Modules\\Common\\Contracts\\Services\\AuditServiceInterface",
             "\\Modules\\Learning\\Events\\OverrideGranted"
         ]
+    },
+    {
+        "name": "\\Modules\\Common\\Contracts\\Services\\AuditServiceInterface",
+        "size": 3000,
+        "relations": []
     },
     {
         "name": "\\Modules\\Common\\Listeners\\LogSubmissionCreated",
@@ -6667,11 +6922,11 @@
             "\\Modules\\Common\\Contracts\\Services\\AuditServiceInterface",
             "\\Modules\\Common\\Contracts\\Repositories\\AuditRepositoryInterface",
             "\\Modules\\Learning\\Models\\Submission",
+            "\\Modules\\Auth\\Models\\User",
             "\\Modules\\Common\\Models\\AuditLog",
             "\\Modules\\Grading\\Models\\Grade",
             "\\Modules\\Learning\\Models\\Question",
-            "\\Illuminate\\Support\\Collection",
-            "\\Modules\\Auth\\Models\\User"
+            "\\Illuminate\\Support\\Collection"
         ]
     },
     {
@@ -6680,20 +6935,15 @@
         "relations": []
     },
     {
-        "name": "\\enumClass",
-        "size": 3000,
-        "relations": []
-    },
-    {
         "name": "\\Modules\\Common\\Services\\AuditService",
         "size": 3000,
         "relations": [
             "\\Modules\\Common\\Models\\Audit",
-            "\\Illuminate\\Support\\Facades\\Auth"
+            "\\Illuminate\\Http\\Request"
         ]
     },
     {
-        "name": "\\anonymous@0000000000001e9c0000000000000000",
+        "name": "\\anonymous@00000000000028db0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -6701,7 +6951,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000000b940000000000000000",
+        "name": "\\anonymous@000000000000268c0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -6709,7 +6959,7 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000037c20000000000000000",
+        "name": "\\anonymous@0000000000001b060000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -6724,7 +6974,7 @@
         "relations": []
     },
     {
-        "name": "\\anonymous@000000000000100c0000000000000000",
+        "name": "\\anonymous@00000000000017320000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -6732,7 +6982,7 @@
         ]
     },
     {
-        "name": "\\anonymous@00000000000028ed0000000000000000",
+        "name": "\\anonymous@00000000000004880000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -6740,7 +6990,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000000e780000000000000000",
+        "name": "\\anonymous@0000000000001c6a0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",
@@ -6748,7 +6998,7 @@
         ]
     },
     {
-        "name": "\\anonymous@0000000000000acc0000000000000000",
+        "name": "\\anonymous@00000000000021ca0000000000000000",
         "size": 3000,
         "relations": [
             "\\Illuminate\\Database\\Migrations\\Migration",

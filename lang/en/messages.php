@@ -56,6 +56,27 @@ return [
         'not_found' => 'Category not found.',
     ],
 
+    'badges' => [
+        'created' => 'Badge created successfully.',
+        'updated' => 'Badge updated successfully.',
+        'deleted' => 'Badge deleted successfully.',
+        'not_found' => 'Badge not found.',
+    ],
+
+    'level_configs' => [
+        'created' => 'Level configuration created successfully.',
+        'updated' => 'Level configuration updated successfully.',
+        'deleted' => 'Level configuration deleted successfully.',
+        'not_found' => 'Level configuration not found.',
+    ],
+
+    'achievements' => [
+        'created' => 'Achievement created successfully.',
+        'updated' => 'Achievement updated successfully.',
+        'deleted' => 'Achievement deleted successfully.',
+        'not_found' => 'Achievement not found.',
+    ],
+
     // Tags Module
     'tags' => [
         'created' => 'Tag created successfully.',

@@ -5,10 +5,12 @@ namespace Modules\Gamification\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Laravel\Scout\Searchable;
 use Modules\Gamification\Enums\ChallengeType;
 
 class Challenge extends Model
 {
+  use Searchable;
     protected $table = 'challenges';
 
     protected $fillable = [

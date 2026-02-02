@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
       SuperAdminSeeder::class,
       ActiveUsersSeeder::class,
       \Modules\Common\Database\Seeders\SystemSettingSeeder::class,
+      \Modules\Common\Database\Seeders\LevelConfigSeeder::class,
       \Modules\Common\Database\Seeders\CategorySeeder::class,
       MasterDataSeeder::class,
       \Modules\Auth\Database\Seeders\AuthComprehensiveDataSeeder::class,

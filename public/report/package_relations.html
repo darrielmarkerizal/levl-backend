@@ -49,7 +49,7 @@
 <div class="page">
     <div class="content content-first">
         <div class="report-details">
-            Created at 2026-02-01 12:06:07        , with PHPMetrics v2.9.1 (<a href="https://twitter.com/Halleck45">Jean-François Lépine</a>).
+            Created at 2026-02-02 09:34:09        , with PHPMetrics v2.9.1 (<a href="https://twitter.com/Halleck45">Jean-François Lépine</a>).
         </div>
 
         
@@ -1016,21 +1016,33 @@
         "size": 3000,
         "relations": [
             "Modules\\Enrollments\\Contracts\\Services",
-            "Modules\\Enrollments\\Contracts\\Repositories",
-            "App\\Contracts",
+            "Modules\\Enrollments\\Services\\Support",
             "Illuminate\\Contracts\\Pagination",
-            "Illuminate\\Support",
-            "Illuminate\\Http",
-            "Spatie\\QueryBuilder",
+            "Modules\\Auth\\Models",
             "Modules\\Enrollments\\Models",
             "Modules\\Schemes\\Models",
+            "Illuminate\\Database\\Eloquent"
+        ]
+    },
+    {
+        "name": "Modules\\Enrollments\\Services\\Support",
+        "size": 3000,
+        "relations": [
+            "Modules\\Enrollments\\Contracts\\Repositories",
+            "Illuminate\\Contracts\\Pagination",
+            "Spatie\\QueryBuilder",
             "Modules\\Auth\\Models",
             "App\\Exceptions",
+            "Modules\\Enrollments\\Models",
+            "Modules\\Schemes\\Models",
+            "Illuminate\\Http",
+            "Illuminate\\Support",
+            "Illuminate\\Database\\Eloquent",
+            "App\\Contracts",
+            "Modules\\Enrollments\\Events",
             "Illuminate\\Support\\Facades",
             "Modules\\Enrollments\\Mail",
             "App\\Support\\Helpers",
-            "Modules\\Enrollments\\Events",
-            "Illuminate\\Database\\Eloquent",
             "Illuminate\\Database\\Migrations"
         ]
     },
@@ -1501,22 +1513,20 @@
             "Illuminate\\Support",
             "global",
             "Illuminate\\Support\\Facades",
+            "Modules\\Auth\\Services\\Support",
+            "Illuminate\\Validation",
             "Modules\\Common\\Models",
             "Modules\\Auth\\Mail",
-            "Illuminate\\Validation",
             "Tymon\\JWTAuth",
             "App\\Exceptions",
             "Modules\\Auth\\Events",
             "Modules\\Auth\\Support",
-            "App\\Jobs",
             "Illuminate\\Contracts\\Pagination",
             "App\\Models",
             "Modules\\Auth\\DTOs",
             "Modules\\Auth\\Repositories",
             "App\\Contracts\\Services",
             "Illuminate\\Auth\\Access",
-            "Modules\\Auth\\Contracts",
-            "Modules\\Auth\\Enums",
             "Illuminate\\Cache",
             "Illuminate\\Database\\Migrations"
         ]
@@ -1552,6 +1562,31 @@
         ]
     },
     {
+        "name": "Modules\\Auth\\Services\\Support",
+        "size": 3000,
+        "relations": [
+            "Modules\\Auth\\Contracts\\Repositories",
+            "Tymon\\JWTAuth",
+            "Modules\\Auth\\Services",
+            "Illuminate\\Validation",
+            "Illuminate\\Support\\Facades",
+            "App\\Exceptions",
+            "Modules\\Auth\\Support",
+            "App\\Jobs",
+            "Modules\\Auth\\Models",
+            "Modules\\Auth\\Contracts",
+            "Illuminate\\Contracts\\Pagination",
+            "Illuminate\\Auth\\Access",
+            "Illuminate\\Support",
+            "Illuminate\\Http",
+            "Spatie\\QueryBuilder",
+            "Modules\\Schemes\\Models",
+            "Modules\\Common\\Models",
+            "Modules\\Auth\\Mail",
+            "Modules\\Auth\\Enums"
+        ]
+    },
+    {
         "name": "App\\Models",
         "size": 3000,
         "relations": []
@@ -1571,8 +1606,13 @@
         "size": 3000,
         "relations": [
             "Illuminate\\Database",
+            "Modules\\Gamification\\Models",
+            "Modules\\Gamification\\Contracts\\Services",
             "global",
-            "Modules\\Gamification\\Models"
+            "Faker",
+            "Modules\\Auth\\Models",
+            "Modules\\Gamification\\Enums",
+            "Modules\\Schemes\\Models"
         ]
     },
     {
@@ -1583,6 +1623,21 @@
             "Illuminate\\Database\\Eloquent\\Relations",
             "Spatie\\MediaLibrary"
         ]
+    },
+    {
+        "name": "Modules\\Gamification\\Contracts\\Services",
+        "size": 3000,
+        "relations": [
+            "Illuminate\\Support",
+            "Modules\\Gamification\\Models",
+            "Illuminate\\Contracts\\Pagination",
+            "Illuminate\\Contracts\\View"
+        ]
+    },
+    {
+        "name": "Modules\\Gamification\\Enums",
+        "size": 3000,
+        "relations": []
     },
     {
         "name": "Modules\\Gamification\\Database\\Factories",
@@ -1602,16 +1657,6 @@
         ]
     },
     {
-        "name": "Modules\\Gamification\\Contracts\\Services",
-        "size": 3000,
-        "relations": [
-            "Illuminate\\Support",
-            "Modules\\Gamification\\Models",
-            "Illuminate\\Contracts\\Pagination",
-            "Illuminate\\Contracts\\View"
-        ]
-    },
-    {
         "name": "Illuminate\\Contracts\\View",
         "size": 3000,
         "relations": []
@@ -1622,23 +1667,7 @@
         "relations": [
             "Illuminate\\Foundation\\Support\\Providers",
             "Illuminate\\Support\\Facades",
-            "Illuminate\\Support",
-            "Modules\\Gamification\\Services"
-        ]
-    },
-    {
-        "name": "Modules\\Gamification\\Services",
-        "size": 3000,
-        "relations": [
-            "Modules\\Gamification\\Contracts\\Services",
-            "Illuminate\\Support",
-            "Modules\\Gamification\\Models",
-            "Carbon",
-            "global",
-            "Illuminate\\Support\\Facades",
-            "Modules\\Enrollments\\Models",
-            "Illuminate\\Contracts\\View",
-            "Illuminate\\Contracts\\Pagination"
+            "Illuminate\\Support"
         ]
     },
     {
@@ -1668,14 +1697,37 @@
         ]
     },
     {
+        "name": "Modules\\Gamification\\Transformers",
+        "size": 3000,
+        "relations": [
+            "Illuminate\\Http\\Resources\\Json"
+        ]
+    },
+    {
         "name": "Modules\\Gamification\\Http\\Controllers",
         "size": 3000,
         "relations": [
             "App\\Http\\Controllers",
             "Modules\\Gamification\\Services",
             "Illuminate\\Http",
+            "Modules\\Gamification\\Transformers",
+            "Modules\\Gamification\\Contracts\\Services",
+            "Modules\\Schemes\\Models"
+        ]
+    },
+    {
+        "name": "Modules\\Gamification\\Services",
+        "size": 3000,
+        "relations": [
+            "Modules\\Gamification\\Contracts\\Services",
+            "Modules\\Gamification\\Services\\Support",
+            "Spatie\\QueryBuilder",
+            "Illuminate\\Support",
+            "Illuminate\\Contracts\\Pagination",
             "Modules\\Gamification\\Models",
-            "Modules\\Gamification\\Contracts\\Repositories"
+            "Illuminate\\Contracts\\View",
+            "Modules\\Schemes\\Models",
+            "Illuminate\\Support\\Facades"
         ]
     },
     {
@@ -1685,6 +1737,7 @@
             "Modules\\Gamification\\Services",
             "Modules\\Schemes\\Events",
             "Modules\\Common\\Models",
+            "Modules\\Grading\\Events",
             "Modules\\Learning\\Events"
         ]
     },
@@ -1695,6 +1748,30 @@
             "Modules\\Learning\\Models",
             "Modules\\Learning\\Enums"
         ]
+    },
+    {
+        "name": "Modules\\Gamification\\Services\\Support",
+        "size": 3000,
+        "relations": [
+            "Modules\\Gamification\\Repositories",
+            "Illuminate\\Support\\Facades",
+            "Illuminate\\Support",
+            "Modules\\Gamification\\Models",
+            "Carbon",
+            "Illuminate\\Database\\Eloquent",
+            "Illuminate\\Contracts\\Pagination",
+            "Modules\\Auth\\Models",
+            "Modules\\Schemes\\Models",
+            "Modules\\Learning\\Models",
+            "Modules\\Grading\\Models",
+            "Spatie\\QueryBuilder",
+            "Symfony\\Component\\HttpKernel\\Exception"
+        ]
+    },
+    {
+        "name": "Symfony\\Component\\HttpKernel\\Exception",
+        "size": 3000,
+        "relations": []
     },
     {
         "name": "Modules\\Gamification\\Console\\Commands",
@@ -2331,6 +2408,14 @@
         ]
     },
     {
+        "name": "Modules\\Common\\Support",
+        "size": 3000,
+        "relations": [
+            "global",
+            "Spatie\\Permission\\Models"
+        ]
+    },
+    {
         "name": "Modules\\Common\\Http\\Resources",
         "size": 3000,
         "relations": [
@@ -2359,13 +2444,11 @@
         "size": 3000,
         "relations": [
             "Illuminate\\Routing",
-            "Modules\\Common\\Contracts\\Services",
+            "Modules\\Common\\Services",
             "Illuminate\\Http",
             "Modules\\Common\\Http\\Requests",
             "Modules\\Common\\Http\\Resources",
-            "Modules\\Common\\Models",
             "App\\Http\\Controllers",
-            "Modules\\Common\\Services",
             "Modules\\Common\\Enums"
         ]
     },
@@ -2376,19 +2459,20 @@
             "Modules\\Common\\Contracts\\Services",
             "Modules\\Common\\Contracts\\Repositories",
             "Modules\\Learning\\Models",
+            "Modules\\Auth\\Models",
             "Modules\\Common\\Models",
             "Modules\\Grading\\Models",
             "Illuminate\\Support",
-            "Modules\\Auth\\Models",
             "Modules\\Common\\Repositories",
             "Illuminate\\Contracts\\Pagination",
             "Spatie\\QueryBuilder",
+            "Modules\\Common\\Support",
             "Illuminate\\Support\\Facades",
-            "Illuminate\\Pagination",
             "Illuminate\\Database\\Eloquent",
-            "global",
-            "Spatie\\Permission\\Models",
-            "Illuminate\\Database\\Migrations"
+            "Illuminate\\Pagination",
+            "Illuminate\\Http",
+            "Illuminate\\Database\\Migrations",
+            "global"
         ]
     },
     {

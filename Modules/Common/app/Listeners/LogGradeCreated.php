@@ -8,11 +8,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Modules\Common\Contracts\Services\AuditServiceInterface;
 use Modules\Grading\Events\GradeCreated;
 
-/**
- * Listener to log grading actions in the audit log.
- *
- * Requirements: 20.2 - THE System SHALL log all grading actions with instructor identity and timestamp
- */
 class LogGradeCreated implements ShouldQueue
 {
     /**

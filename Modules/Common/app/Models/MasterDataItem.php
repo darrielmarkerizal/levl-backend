@@ -12,6 +12,10 @@ class MasterDataItem extends Model
 {
     use Searchable;
 
+    private const CACHE_TAG = 'master_data';
+
+    private const CACHE_TTL = 3600;
+
     protected $table = 'master_data';
 
     protected $fillable = [
@@ -31,14 +35,10 @@ class MasterDataItem extends Model
         'sort_order' => 'integer',
     ];
 
-    private const CACHE_PREFIX = 'master_data:';
-
-    private const CACHE_TTL = 3600;
-
     public static function getByType(string $type): \Illuminate\Database\Eloquent\Collection
     {
-        return Cache::remember(
-            self::CACHE_PREFIX.$type,
+        return Cache::tags([self::CACHE_TAG])->remember(
+            "type:{$type}",
             self::CACHE_TTL,
             fn () => self::where('type', $type)
                 ->where('is_active', true)
@@ -56,14 +56,12 @@ class MasterDataItem extends Model
 
     public static function clearCache(string $type): void
     {
-        Cache::forget(self::CACHE_PREFIX.$type);
+        Cache::tags([self::CACHE_TAG])->forget("type:{$type}");
     }
 
     public static function clearAllCache(): void
     {
-        self::distinct('type')->pluck('type')->each(function ($type) {
-            self::clearCache($type);
-        });
+        Cache::tags([self::CACHE_TAG])->flush();
     }
 
     protected static function booted(): void

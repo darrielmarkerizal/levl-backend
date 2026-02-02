@@ -174,18 +174,27 @@ class PointManager
 
     public function calculateLevelFromXp(int $totalXp): int
     {
-        return $this->calculateLevelRecursive($totalXp, 0);
-    }
+        $configs = \Illuminate\Support\Facades\Cache::remember('gamification.level_configs', 3600, function () {
+             return \Modules\Common\Models\LevelConfig::all()->keyBy('level');
+        });
 
-    private function calculateLevelRecursive(int $remainingXp, int $level): int
-    {
-        $xpRequired = (int) round(100 * pow(1.1, $level));
+        $level = 0;
+        $xpCost = $this->getXpRequiredForLevel($configs, $level);
 
-        if ($xpRequired <= 0 || $remainingXp < $xpRequired) {
-            return $level;
+        while ($totalXp >= $xpCost) {
+            $totalXp -= $xpCost;
+            $level++;
+            $xpCost = $this->getXpRequiredForLevel($configs, $level);
         }
 
-        return $this->calculateLevelRecursive($remainingXp - $xpRequired, $level + 1);
+        return $level;
+    }
+
+    private function getXpRequiredForLevel(\Illuminate\Support\Collection $configs, int $level): int
+    {
+        $lookupLevel = $level + 1;
+        
+        return $configs->get($lookupLevel)?->xp_required ?? PHP_INT_MAX;
     }
 
     public function getOrCreateStats(int $userId): UserGamificationStat

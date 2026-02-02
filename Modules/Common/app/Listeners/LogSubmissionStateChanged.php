@@ -8,11 +8,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Modules\Common\Contracts\Services\AuditServiceInterface;
 use Modules\Learning\Events\SubmissionStateChanged;
 
-/**
- * Listener to log submission state transitions in the audit log.
- *
- * Requirements: 20.1, 9.8 - THE System SHALL log all submission state transitions
- */
 class LogSubmissionStateChanged implements ShouldQueue
 {
     /**

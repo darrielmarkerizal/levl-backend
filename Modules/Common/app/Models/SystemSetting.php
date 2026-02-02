@@ -38,55 +38,62 @@ class SystemSetting extends Model
     {
         $type = $this->type instanceof SettingType ? $this->type->value : $this->type;
 
+        return $this->castValueByType($type);
+    }
+
+    public function setValue($value, SettingType|string|null $type = null): void
+    {
+        $type = $this->resolveType($value, $type);
+
+        $this->value = $this->encodeValueByType($value, $type);
+        $this->type = $type;
+    }
+
+    protected function determineType($value): SettingType
+    {
+        return match (true) {
+            is_array($value) || is_object($value) => SettingType::Json,
+            is_bool($value) => SettingType::Boolean,
+            is_numeric($value) => SettingType::Number,
+            default => SettingType::String,
+        };
+    }
+
+    private function castValueByType(string $type): mixed
+    {
         return match ($type) {
-            'number' => is_numeric($this->value) ? (str_contains($this->value, '.') ? (float) $this->value : (int) $this->value) : 0,
+            'number' => $this->castToNumber(),
             'boolean' => filter_var($this->value, FILTER_VALIDATE_BOOLEAN),
             'json' => json_decode($this->value, true) ?? [],
             default => $this->value,
         };
     }
 
-    /**
-     * Set the value and automatically determine type if not specified.
-     */
-    public function setValue($value, SettingType|string|null $type = null): void
+    private function castToNumber(): int|float
+    {
+        if (! is_numeric($this->value)) {
+            return 0;
+        }
+
+        return str_contains($this->value, '.') ? (float) $this->value : (int) $this->value;
+    }
+
+    private function resolveType($value, SettingType|string|null $type): SettingType
     {
         if ($type === null) {
-            $type = $this->determineType($value);
+            return $this->determineType($value);
         }
 
-        // Convert string to enum if needed
-        if (is_string($type)) {
-            $type = SettingType::from($type);
-        }
+        return is_string($type) ? SettingType::from($type) : $type;
+    }
 
-        $this->value = match ($type) {
+    private function encodeValueByType($value, SettingType $type): string
+    {
+        return match ($type) {
             SettingType::Json => json_encode($value),
             SettingType::Boolean => $value ? '1' : '0',
             default => (string) $value,
         };
-
-        $this->type = $type;
-    }
-
-    /**
-     * Determine the type of value.
-     */
-    protected function determineType($value): SettingType
-    {
-        if (is_array($value) || is_object($value)) {
-            return SettingType::Json;
-        }
-
-        if (is_bool($value)) {
-            return SettingType::Boolean;
-        }
-
-        if (is_numeric($value)) {
-            return SettingType::Number;
-        }
-
-        return SettingType::String;
     }
 
     /**

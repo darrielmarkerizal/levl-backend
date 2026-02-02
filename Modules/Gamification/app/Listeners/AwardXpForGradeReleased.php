@@ -45,17 +45,17 @@ class AwardXpForGradeReleased
     private function calculateXpFromScore(float $score): int
     {
         if ($score >= 90) {
-            return 100;
+            return (int) \Modules\Common\Models\SystemSetting::get('gamification.points.grade.tier_s', 100);
         }
         if ($score >= 80) {
-            return 75;
+            return (int) \Modules\Common\Models\SystemSetting::get('gamification.points.grade.tier_a', 75);
         }
         if ($score >= 70) {
-            return 50;
+            return (int) \Modules\Common\Models\SystemSetting::get('gamification.points.grade.tier_b', 50);
         }
         if ($score >= 60) {
-            return 25;
+            return (int) \Modules\Common\Models\SystemSetting::get('gamification.points.grade.tier_c', 25);
         }
-        return 10;
+        return (int) \Modules\Common\Models\SystemSetting::get('gamification.points.grade.min', 10);
     }
 }

@@ -91,10 +91,17 @@ class Level extends Model
             return 0;
         }
 
+        $configs = $this->getAllLevelConfigs();
         $xp = 0;
+        
         for ($i = 1; $i < $level; $i++) {
-            $xp += $this->calculateXpRequiredForLevel($i);
+            $required = $configs->get($i)?->xp_required;
+            if ($required === null) {
+                return PHP_INT_MAX;
+            }
+            $xp += $required;
         }
+
         return $xp;
     }
 
@@ -104,7 +111,16 @@ class Level extends Model
             return 0;
         }
 
-        return (int) (100 * pow(1.1, $level - 1));
+        $configs = $this->getAllLevelConfigs();
+
+        return $configs->get($level)?->xp_required ?? PHP_INT_MAX;
+    }
+
+    private function getAllLevelConfigs(): \Illuminate\Support\Collection
+    {
+        return \Illuminate\Support\Facades\Cache::remember('gamification.level_configs', 3600, function () {
+             return \Modules\Common\Models\LevelConfig::all()->keyBy('level');
+        });
     }
 }
 

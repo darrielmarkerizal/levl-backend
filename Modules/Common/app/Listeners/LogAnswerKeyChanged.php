@@ -8,11 +8,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Modules\Common\Contracts\Services\AuditServiceInterface;
 use Modules\Learning\Events\AnswerKeyChanged;
 
-/**
- * Listener to log answer key changes in the audit log.
- *
- * Requirements: 20.3 - THE System SHALL log all answer key changes and recalculations
- */
 class LogAnswerKeyChanged implements ShouldQueue
 {
     /**

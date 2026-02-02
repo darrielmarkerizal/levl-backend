@@ -1,0 +1,86 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Modules\Common\Services;
+
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Meilisearch\Exceptions\ApiException;
+use Modules\Common\Repositories\AchievementRepository;
+use Modules\Gamification\Models\Challenge;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
+
+class AchievementService
+{
+    public function __construct(private readonly AchievementRepository $repository) {}
+
+    public function paginate(int $perPage = 15, array $params = []): LengthAwarePaginator
+    {
+        $perPage = max(1, $perPage);
+
+        $query = Challenge::query()->with('badge');
+
+        $searchQuery = $params['search'] ?? request('filter.search') ?? request('search');
+
+        if ($searchQuery && trim($searchQuery) !== '') {
+            try {
+                $ids = Challenge::search($searchQuery)->keys()->toArray();
+
+                if (! empty($ids)) {
+                    $query->whereIn('id', $ids);
+                } else {
+                    $query->whereRaw('1 = 0');
+                }
+            } catch (ApiException $e) {
+                if (str_contains($e->getMessage(), 'not found')) {
+                    $query->whereRaw('1 = 0');
+                } else {
+                    throw $e;
+                }
+            }
+        }
+
+        return QueryBuilder::for($query)
+            ->allowedFilters([
+                AllowedFilter::exact('id'),
+                AllowedFilter::partial('title'),
+                AllowedFilter::exact('type'),
+            ])
+            ->allowedSorts(['id', 'title', 'type', 'points_reward', 'start_at', 'end_at', 'created_at', 'updated_at'])
+            ->defaultSort('-created_at')
+            ->paginate($perPage);
+    }
+
+    public function create(array $data): Challenge
+    {
+        return $this->repository->create($data);
+    }
+
+    public function find(int $id): ?Challenge
+    {
+        return $this->repository->findById($id);
+    }
+
+    public function update(int $id, array $data): ?Challenge
+    {
+        $achievement = $this->repository->findById($id);
+
+        if (! $achievement) {
+            return null;
+        }
+
+        return $this->repository->update($achievement, $data);
+    }
+
+    public function delete(int $id): bool
+    {
+        $achievement = $this->repository->findById($id);
+
+        if (! $achievement) {
+            return false;
+        }
+
+        return $this->repository->delete($achievement);
+    }
+}

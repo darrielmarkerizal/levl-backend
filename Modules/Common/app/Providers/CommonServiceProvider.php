@@ -6,7 +6,14 @@ namespace Modules\Common\Providers;
 
 use App\Support\Traits\RegistersModuleConfig;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Modules\Common\Models\LevelConfig;
+use Modules\Common\Policies\AchievementPolicy;
+use Modules\Common\Policies\BadgePolicy;
+use Modules\Common\Policies\LevelConfigPolicy;
+use Modules\Gamification\Models\Badge;
+use Modules\Gamification\Models\Challenge;
 use Nwidart\Modules\Traits\PathNamespace;
 
 class CommonServiceProvider extends ServiceProvider
@@ -24,6 +31,7 @@ class CommonServiceProvider extends ServiceProvider
         $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();
+        $this->registerPolicies();
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
     }
 
@@ -32,12 +40,15 @@ class CommonServiceProvider extends ServiceProvider
         $this->app->register(EventServiceProvider::class);
         $this->app->register(RouteServiceProvider::class);
 
+        $this->app->singleton(
+            \Modules\Common\Support\MasterDataEnumMapper::class
+        );
+
         $this->app->bind(
             \Modules\Common\Contracts\Repositories\MasterDataRepositoryInterface::class,
             \Modules\Common\Repositories\MasterDataRepository::class
         );
 
-        // Audit logging bindings for assessment grading system
         $this->app->bind(
             \Modules\Common\Contracts\Repositories\AuditRepositoryInterface::class,
             \Modules\Common\Repositories\AuditRepository::class
@@ -71,9 +82,13 @@ class CommonServiceProvider extends ServiceProvider
         $this->registerModuleConfig();
     }
 
-    /**
-     * Register views.
-     */
+    protected function registerPolicies(): void
+    {
+        Gate::policy(Badge::class, BadgePolicy::class);
+        Gate::policy(LevelConfig::class, LevelConfigPolicy::class);
+        Gate::policy(Challenge::class, AchievementPolicy::class);
+    }
+
     public function registerViews(): void
     {
         $viewPath = resource_path('views/modules/'.$this->nameLower);
