@@ -27,9 +27,9 @@ class ChallengeAssignmentProcessor
         $today = Carbon::today();
         $endOfDay = Carbon::today()->endOfDay();
 
-        $this->finder->getActiveUsersQuery()->chunkById(100, function ($enrollments) use ($dailyChallenges, $today, $endOfDay, &$assignedCount) {
-            foreach ($enrollments as $enrollment) {
-                $userId = $enrollment->user_id;
+        $this->finder->getActiveUsersQuery()->chunkById(100, function ($users) use ($dailyChallenges, $today, $endOfDay, &$assignedCount) {
+            foreach ($users as $user) {
+                $userId = $user->id;
 
                 foreach ($dailyChallenges as $challenge) {
                     if ($this->finder->hasActiveAssignment($userId, $challenge->id, 'daily')) {
@@ -65,9 +65,9 @@ class ChallengeAssignmentProcessor
         $today = Carbon::today();
         $endOfWeek = Carbon::now()->endOfWeek();
 
-        $this->finder->getActiveUsersQuery()->chunkById(100, function ($enrollments) use ($weeklyChallenges, $today, $endOfWeek, &$assignedCount) {
-            foreach ($enrollments as $enrollment) {
-                $userId = $enrollment->user_id;
+        $this->finder->getActiveUsersQuery()->chunkById(100, function ($users) use ($weeklyChallenges, $today, $endOfWeek, &$assignedCount) {
+            foreach ($users as $user) {
+                $userId = $user->id;
 
                 foreach ($weeklyChallenges as $challenge) {
                     if ($this->finder->hasActiveAssignment($userId, $challenge->id, 'weekly')) {

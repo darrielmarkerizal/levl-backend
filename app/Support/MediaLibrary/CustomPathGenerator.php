@@ -46,7 +46,7 @@ class CustomPathGenerator implements PathGenerator
         $collection = $media->collection_name;
 
         // Use UUID for unique identification (prevents guessing)
-        $uuid = $media->uuid;
+        $uuid = $media->uuid ?: $media->id;
 
         return "{$modelType}/{$modelId}/{$collection}/{$uuid}";
     }

@@ -26,6 +26,11 @@ class QuestionAndAnswerSeeder extends Seeder
         
         echo "Seeding questions and answers...\n";
 
+        // Cleanup invalid question types from previous failed runs
+        \Illuminate\Support\Facades\DB::table('assignment_questions')
+            ->where('type', 'short_answer')
+            ->delete();
+
         $faker = \Faker\Factory::create('id_ID');
         $pregenSentences = [];
         $pregenWords = [];
@@ -63,7 +68,7 @@ class QuestionAndAnswerSeeder extends Seeder
                 $numQuestions = rand(2, 5);
 
                 for ($i = 0; $i < $numQuestions; $i++) {
-                    $questionTypes = ['essay', 'multiple_choice', 'short_answer', 'file_upload'];
+                    $questionTypes = ['essay', 'multiple_choice', 'file_upload'];
                     $questionType = $questionTypes[array_rand($questionTypes)];
                     
                     $questionData = [
@@ -92,13 +97,6 @@ class QuestionAndAnswerSeeder extends Seeder
                                 ['id' => $pregenUuids[array_rand($pregenUuids)], 'label' => $pregenWords[array_rand($pregenWords)]],
                             ]);
                             $questionData['answer_key'] = json_encode(['correct_option' => 0]);
-                            break;
-
-                        case 'short_answer':
-                            $questionData['answer_key'] = json_encode(['acceptable_answers' => [
-                                $pregenWords[array_rand($pregenWords)],
-                                $pregenWords[array_rand($pregenWords)],
-                            ]]);
                             break;
 
                         case 'file_upload':
@@ -144,9 +142,9 @@ class QuestionAndAnswerSeeder extends Seeder
                         'updated_at' => $createdAt,
                     ];
 
-                    switch ($question->type) {
+                    switch ($question->type->value) {
                         case 'multiple_choice':
-                            $options = json_decode($question->options, true);
+                            $options = $question->options;
                             if ($options) {
                                 $answerData['selected_options'] = json_encode([
                                     $options[rand(0, count($options)-1)]['id']
@@ -154,14 +152,14 @@ class QuestionAndAnswerSeeder extends Seeder
                             }
                             break;
                         
-                        case 'short_answer':
+                            
                         case 'essay':
                             $answerData['content'] = $pregenParagraphs[array_rand($pregenParagraphs)];
                             break;
                             
                         case 'file_upload':
                             $answerData['file_paths'] = json_encode([
-                                $pregenFilenames[array_rand($pregenFilenames)] . '.pdf',
+                                'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
                             ]);
                             $answerData['file_metadata'] = json_encode([
                                 'total_size' => rand(100000, 2000000),

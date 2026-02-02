@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
       \Modules\Schemes\Database\Seeders\SchemesDatabaseSeeder::class,
       \Modules\Enrollments\Database\Seeders\EnrollmentsDatabaseSeeder::class,
       \Modules\Learning\Database\Seeders\LearningDatabaseSeeder::class,
+      \Modules\Gamification\Database\Seeders\GamificationDatabaseSeeder::class,
       \Modules\Grading\Database\Seeders\GradingDatabaseSeeder::class,
     ]);
   }

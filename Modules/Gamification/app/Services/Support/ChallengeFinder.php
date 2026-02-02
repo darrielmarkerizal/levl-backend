@@ -53,13 +53,13 @@ class ChallengeFinder
 
     public function getActiveUsersQuery(): \Illuminate\Database\Eloquent\Builder
     {
-        return Enrollment::query()
-            ->whereIn('status', [
-                EnrollmentStatus::Active->value,
-                EnrollmentStatus::Pending->value,
-            ])
-            ->select('user_id') 
-            ->distinct();
+        return \Modules\Auth\Models\User::query()
+            ->whereHas('enrollments', function ($query) {
+                $query->whereIn('status', [
+                    EnrollmentStatus::Active->value,
+                    EnrollmentStatus::Pending->value,
+                ]);
+            });
     }
 
     public function hasActiveAssignment(int $userId, int $challengeId, string $challengeType): bool

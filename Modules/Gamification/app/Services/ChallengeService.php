@@ -11,6 +11,8 @@ use Modules\Gamification\Models\UserChallengeAssignment;
 use Modules\Gamification\Services\Support\ChallengeAssignmentProcessor;
 use Modules\Gamification\Services\Support\ChallengeFinder;
 use Modules\Gamification\Services\Support\ChallengeProgressProcessor;
+use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
 
 class ChallengeService implements ChallengeServiceInterface
 {
@@ -19,6 +21,38 @@ class ChallengeService implements ChallengeServiceInterface
         private readonly ChallengeAssignmentProcessor $assignmentProcessor,
         private readonly ChallengeProgressProcessor $progressProcessor
     ) {}
+
+    public function getChallengesQuery(?int $userId = null): QueryBuilder
+    {
+        return QueryBuilder::for(Challenge::class)
+            ->active()
+            ->with("badge")
+            ->allowedFilters([
+                AllowedFilter::exact('type'),
+                AllowedFilter::exact('status'),
+                AllowedFilter::exact('points_reward'),
+                AllowedFilter::callback('has_progress', function ($query, $value) use ($userId) {
+                    if (!$userId) return;
+                    
+                    if (filter_var($value, FILTER_VALIDATE_BOOLEAN)) {
+                        // User has progress (assignment exists)
+                        $query->whereHas('userAssignments', function ($q) use ($userId) {
+                            $q->where('user_id', $userId);
+                        });
+                    } else {
+                        // User has no progress (no assignment)
+                        $query->whereDoesntHave('userAssignments', function ($q) use ($userId) {
+                            $q->where('user_id', $userId);
+                        });
+                    }
+                }),
+                AllowedFilter::callback('criteria_type', function ($query, $value) {
+                    $query->where('criteria->type', $value);
+                }),
+            ])
+            ->allowedSorts(['points_reward', 'created_at', 'type'])
+            ->defaultSort('-points_reward');
+    }
 
     public function getUserChallenges(int $userId): Collection
     {

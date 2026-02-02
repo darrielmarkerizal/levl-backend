@@ -10,11 +10,14 @@ class ChallengeResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
+            'name' => $this->title,
             'description' => $this->description,
             'type' => $this->type->value,
             'points_reward' => $this->points_reward,
+            'criteria_type' => $this->criteria_type,
             'criteria_target' => $this->criteria_target,
+            'start_at' => $this->start_at,
+            'end_at' => $this->end_at,
             'badge' => $this->whenLoaded('badge', function () {
                 return [
                     'id' => $this->badge->id,

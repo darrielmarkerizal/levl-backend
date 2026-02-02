@@ -20,13 +20,11 @@ class ChallengeController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $challenges = Challenge::active()
-            ->with("badge")
-            ->orderBy("type")
-            ->orderBy("points_reward", "desc")
-            ->paginate($request->input("per_page", 15));
-
         $userId = $request->user()?->id;
+
+        $challenges = $this->challengeService->getChallengesQuery($userId)
+            ->paginate($request->input("per_page", 15))
+            ->appends($request->query());
 
         if ($userId) {
             $userChallenges = $this->challengeService->getUserChallenges($userId)->keyBy("challenge_id");
@@ -46,19 +44,13 @@ class ChallengeController extends Controller
             });
         }
 
-        return $this->paginateResponse($challenges, null, ChallengeResource::class);
+        $challenges->getCollection()->transform(fn($item) => new ChallengeResource($item));
+
+        return $this->paginateResponse($challenges, __("messages.challenges.list_retrieved"));
     }
 
     public function show(int $challengeId, Request $request): JsonResponse
     {
-        
-        
-        
-        
-        
-        
-        
-        
         $challenge = $this->challengeService->getActiveChallenge($challengeId);
 
         if (!$challenge) {
@@ -111,11 +103,21 @@ class ChallengeController extends Controller
     {
         $userId = $request->user()->id;
 
-        $rewards = $this->challengeService->claimReward($userId, $challengeId);
+        try {
+            $rewards = $this->challengeService->claimReward($userId, $challengeId);
 
-        return $this->success([
-            "message" => __("messages.challenges.reward_claimed"),
-            "rewards" => $rewards, 
-        ]);
+            return $this->success([
+                "message" => __("messages.challenges.reward_claimed"),
+                "rewards" => $rewards,
+            ], __("messages.challenges.reward_claimed"));
+        } catch (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e) {
+            return $this->notFound($e->getMessage());
+        } catch (\Symfony\Component\HttpKernel\Exception\BadRequestHttpException $e) {
+            // Use translation if key matches, otherwise use message
+            $message = $e->getMessage();
+            return $this->error($message, [], 400); 
+        } catch (\Exception $e) {
+            return $this->error(__("messages.server_error"), 500);
+        }
     }
 }

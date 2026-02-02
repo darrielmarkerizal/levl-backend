@@ -10,89 +10,73 @@ class ChallengeSeeder extends Seeder
     public function run(): void
     {
         \DB::connection()->disableQueryLog();
-        
-        
-        $dailyChallenges = [
-            [
-                'title' => 'Pejuang Harian',
-                'description' => 'Selesaikan 3 lesson hari ini untuk mendapatkan bonus XP!',
-                'type' => 'daily',
-                'criteria' => [
-                    'type' => 'lessons_completed',
-                    'target' => 3,
-                ],
-                'target_count' => 3,
-                'points_reward' => 50,
-            ],
-            [
-                'title' => 'Pengumpul Tugas',
-                'description' => 'Kumpulkan 1 tugas hari ini.',
-                'type' => 'daily',
-                'criteria' => [
-                    'type' => 'assignments_submitted',
-                    'target' => 1,
-                ],
-                'target_count' => 1,
-                'points_reward' => 30,
-            ],
-            [
-                'title' => 'Latihan Rutin',
-                'description' => 'Selesaikan 2 latihan soal hari ini.',
-                'type' => 'daily',
-                'criteria' => [
-                    'type' => 'exercises_completed',
-                    'target' => 2,
-                ],
-                'target_count' => 2,
-                'points_reward' => 40,
-            ],
-        ];
 
-        
-        $weeklyChallenges = [
-            [
-                'title' => 'Pembelajar Mingguan',
-                'description' => 'Selesaikan 10 lesson minggu ini untuk bonus besar!',
-                'type' => 'weekly',
-                'criteria' => [
-                    'type' => 'lessons_completed',
-                    'target' => 10,
-                ],
-                'target_count' => 10,
-                'points_reward' => 200,
-            ],
-            [
-                'title' => 'Kolektor XP',
-                'description' => 'Kumpulkan 500 XP minggu ini.',
-                'type' => 'weekly',
-                'criteria' => [
-                    'type' => 'xp_earned',
-                    'target' => 500,
-                ],
-                'target_count' => 500,
-                'points_reward' => 150,
-            ],
-            [
-                'title' => 'Master Latihan',
-                'description' => 'Selesaikan 5 latihan soal minggu ini.',
-                'type' => 'weekly',
-                'criteria' => [
-                    'type' => 'exercises_completed',
-                    'target' => 5,
-                ],
-                'target_count' => 5,
-                'points_reward' => 100,
-            ],
-        ];
+        $this->command->info('Seeding 50 Challenges with Badges...');
 
-        foreach (array_merge($dailyChallenges, $weeklyChallenges) as $challenge) {
-            Challenge::updateOrCreate(
-                ['title' => $challenge['title']],
-                $challenge
-            );
+        // Get available badges to assign randomly
+        $badges = \Modules\Gamification\Models\Badge::all();
+        $faker = \Faker\Factory::create('id_ID');
+
+        $challengesToCreate = [];
+
+        for ($i = 0; $i < 50; $i++) {
+            $type = $faker->randomElement(['daily', 'weekly']);
+            $points = $type === 'daily' ? $faker->numberBetween(10, 50) : $faker->numberBetween(100, 500);
+            
+            // Criteria templates
+            $criteriaOptions = [
+                ['type' => 'lessons_completed', 'target_range' => [1, 5], 'desc' => 'Selesaikan :target lesson'],
+                ['type' => 'exercises_completed', 'target_range' => [1, 5], 'desc' => 'Selesaikan :target latihan soal'],
+                ['type' => 'assignments_submitted', 'target_range' => [1, 3], 'desc' => 'Kumpulkan :target tugas'],
+                ['type' => 'xp_earned', 'target_range' => [50, 500], 'desc' => 'Kumpulkan :target XP'],
+            ];
+
+            $selectedCriteria = $faker->randomElement($criteriaOptions);
+            $target = $faker->numberBetween($selectedCriteria['target_range'][0], $selectedCriteria['target_range'][1]);
+            
+            // Adjust target higher for weekly
+            if ($type === 'weekly') {
+                $target = (int) ceil($target * 3.5);
+            }
+
+            $description = str_replace(':target', (string) $target, $selectedCriteria['desc']);
+            if ($type === 'daily') $description .= ' hari ini.';
+            else $description .= ' minggu ini.';
+
+            // 40% chance to have a badge reward
+            $badgeId = ($faker->boolean(40) && $badges->isNotEmpty()) 
+                ? $badges->random()->id 
+                : null;
+
+            $challengesToCreate[] = [
+                'title' => $faker->words(3, true) . ($type === 'daily' ? ' Harian' : ' Mingguan'),
+                'description' => ucfirst($description),
+                'type' => $type,
+                'criteria' => json_encode([
+                    'type' => $selectedCriteria['type'],
+                    'target' => $target,
+                ]),
+                'target_count' => $target,
+                'points_reward' => $points,
+                'badge_id' => $badgeId,
+                'start_at' => now(),
+                'end_at' => $type === 'daily' ? now()->endOfDay() : now()->endOfWeek(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
         }
 
-        $this->command->info('Sample challenges seeded successfully!');
+        foreach (array_chunk($challengesToCreate, 10) as $chunk) {
+            Challenge::insert($chunk);
+        }
+
+        $this->command->info('✅ 50 Challenges seeded successfully!');
+        
+        // Count stats
+        $badgeCount = Challenge::whereNotNull('badge_id')->count();
+        $this->command->info("   - With Badges: $badgeCount");
+        $this->command->info("   - Daily: " . Challenge::where('type', 'daily')->count());
+        $this->command->info("   - Weekly: " . Challenge::where('type', 'weekly')->count());
         
         gc_collect_cycles();
         \DB::connection()->enableQueryLog();

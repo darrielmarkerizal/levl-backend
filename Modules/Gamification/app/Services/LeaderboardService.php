@@ -8,21 +8,26 @@ use Modules\Gamification\Contracts\Services\LeaderboardServiceInterface;
 use Modules\Gamification\Models\Leaderboard;
 use Modules\Gamification\Models\UserGamificationStat;
 use Modules\Gamification\Models\UserScopeStat;
+use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
 
 class LeaderboardService implements LeaderboardServiceInterface
 {
     
     public function getGlobalLeaderboard(int $perPage = 10, int $page = 1, ?int $courseId = null): LengthAwarePaginator
     {
-        $perPage = min($perPage, 100); 
+        $perPage = min($perPage, 100);
 
-        $query = $courseId
-            ? \Modules\Gamification\Models\Leaderboard::with(['user:id,name', 'user.media'])
-                ->where('course_id', $courseId)
-                ->orderBy('rank', 'asc')
-            : UserGamificationStat::with(['user:id,name', 'user.media'])
-                ->orderByDesc('total_xp')
-                ->orderBy('user_id');
+        if ($courseId) {
+             $query = QueryBuilder::for(\Modules\Gamification\Models\Leaderboard::class)
+                ->with(['user:id,name', 'user.media'])
+                ->defaultSort('rank')
+                ->where('course_id', $courseId);
+        } else {
+             $query = QueryBuilder::for(UserGamificationStat::class)
+                ->with(['user:id,name', 'user.media'])
+                ->defaultSort('-total_xp');
+        }
 
         return $query->paginate($perPage, ['*'], 'page', $page);
     }

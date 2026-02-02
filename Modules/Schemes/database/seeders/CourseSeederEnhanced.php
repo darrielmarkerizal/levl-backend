@@ -53,11 +53,12 @@ class CourseSeederEnhanced extends Seeder
         $created = 0;
         foreach ($distribution as $scenario => $count) {
             $this->command->info("\n  📝 Scenario: {$scenario} ({$count} courses)");
-            $scenarioCourses = $this->createCoursesForScenario($scenario, $count);
+            $scenarioCourses = $this->createCoursesForScenario($scenario, $count, $categories, $instructors);
             
             $this->assignInstructorsToCourses($scenarioCourses, $instructors);
             $this->attachTagsToCourses($scenarioCourses, $tags);
             $this->createCourseOutcomes($scenarioCourses);
+            $this->attachMediaToCourses($scenarioCourses);
             
             $created += $scenarioCourses->count();
             $this->command->info("    ✓ Created {$scenarioCourses->count()} courses for {$scenario}");
@@ -69,9 +70,17 @@ class CourseSeederEnhanced extends Seeder
         $this->printCourseSummary();
     }
 
-    private function createCoursesForScenario(string $scenario, int $count): \Illuminate\Support\Collection
+    private function createCoursesForScenario(string $scenario, int $count, $categories, $instructors): \Illuminate\Support\Collection
     {
-        $factory = Course::factory()->count($count);
+        // Define a state callback to assign random category and instructor for each course
+        $state = function () use ($categories, $instructors) {
+            return [
+                'category_id' => $categories->random()->id,
+                'instructor_id' => $instructors->random()->id,
+            ];
+        };
+
+        $factory = Course::factory()->count($count)->state($state);
 
         return match ($scenario) {
             'published_auto' => $factory->published()->openEnrollment()->create(),
@@ -234,6 +243,21 @@ class CourseSeederEnhanced extends Seeder
         if (!empty($outcomes)) {
             foreach (array_chunk($outcomes, 500) as $chunk) {
                 DB::table('course_outcomes')->insertOrIgnore($chunk);
+            }
+        }
+    }
+
+    private function attachMediaToCourses($courses): void
+    {
+        foreach ($courses as $course) {
+            try {
+                $course->addMediaFromUrl("https://picsum.photos/seed/{$course->id}/300")
+                    ->toMediaCollection('thumbnail');
+                
+                $course->addMediaFromUrl("https://picsum.photos/seed/{$course->id}/800/600")
+                    ->toMediaCollection('banner');
+            } catch (\Exception $e) {
+                $this->command->warn("  ⚠️  Could not attach media for course {$course->id}: " . $e->getMessage());
             }
         }
     }

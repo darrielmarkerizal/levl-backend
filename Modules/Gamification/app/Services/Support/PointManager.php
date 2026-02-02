@@ -14,6 +14,8 @@ use Modules\Schemes\Models\Course;
 use Modules\Schemes\Models\Lesson;
 use Modules\Schemes\Models\Unit;
 use Modules\Learning\Models\Assignment;
+use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
 
 class PointManager
 {
@@ -192,7 +194,15 @@ class PointManager
 
     public function getPointsHistory(int $userId, int $perPage): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
-        return $this->repository->paginateByUserId($userId, $perPage);
+         return QueryBuilder::for(Point::class)
+            ->where('user_id', $userId)
+            ->allowedFilters([
+                AllowedFilter::exact('source_type'),
+                AllowedFilter::exact('reason'),
+            ])
+            ->defaultSort('-created_at')
+            ->allowedSorts(['created_at', 'points', 'source_type'])
+            ->paginate($perPage);
     }
 
     public function getAchievements(int $totalXp, int $currentLevel): array

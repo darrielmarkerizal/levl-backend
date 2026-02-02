@@ -21,11 +21,19 @@ class LeaderboardController extends Controller
     {
         $perPage = min($request->input('per_page', 10), 100);
         $page = $request->input('page', 1);
-        $courseId = $request->input('course_id') ? (int) $request->input('course_id') : null;
+        
+        $courseId = null;
+        if ($slug = $request->input('course_slug')) {
+            $course = \Modules\Schemes\Models\Course::where('slug', $slug)->first();
+            if ($course) {
+                $courseId = $course->id;
+            }
+        }
 
         $leaderboard = $this->leaderboardService->getGlobalLeaderboard($perPage, $page, $courseId);
 
         
+        $leaderboard->appends($request->query());
         $leaderboard->getCollection()->transform(function ($stat, $index) use ($leaderboard) {
             $rank = ($leaderboard->currentPage() - 1) * $leaderboard->perPage() + $index + 1;
             
@@ -33,7 +41,9 @@ class LeaderboardController extends Controller
             return $stat;
         });
 
-        return $this->paginateResponse($leaderboard, __('gamification.leaderboard_retrieved'), LeaderboardResource::class);
+        $leaderboard->getCollection()->transform(fn($item) => new LeaderboardResource($item));
+
+        return $this->paginateResponse($leaderboard, __('gamification.leaderboard_retrieved'));
     }
 
     public function myRank(Request $request): JsonResponse

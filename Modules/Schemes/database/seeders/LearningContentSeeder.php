@@ -139,7 +139,8 @@ class LearningContentSeeder extends Seeder
         $blocks = [];
 
         $blockTypes = ['text', 'image', 'video', 'file', 'embed'];
-        $weights = [0.5, 0.2, 0.15, 0.1, 0.05];
+        // Ensure at least one block if count is small, though loop handles it.
+        $weights = [0.4, 0.25, 0.15, 0.15, 0.05];
 
         for ($i = 1; $i <= $count; $i++) {
             $blockType = $this->weightedRandom($blockTypes, $weights);
@@ -232,10 +233,10 @@ class LearningContentSeeder extends Seeder
     {
         return match ($blockType) {
             'text' => $this->generateTextBlockContent(),
-            'image' => json_encode(['caption' => fake()->sentence(), 'alt' => fake()->words(5, true)]),
+            'image' => json_encode(['caption' => fake()->sentence(), 'alt' => fake()->words(5, true), 'url' => "https://picsum.photos/seed/" . uniqid() . "/800/600"]),
             'video' => json_encode(['title' => fake()->sentence(), 'duration' => rand(5, 30) * 60]),
             'code' => json_encode(['language' => fake()->randomElement(['php', 'javascript', 'python']), 'code' => '// Sample code here']),
-            'file' => json_encode(['filename' => fake()->word() . '.pdf', 'size' => rand(100, 5000) . 'KB']),
+            'file' => json_encode(['filename' => fake()->word() . '.pdf', 'size' => rand(100, 5000) . 'KB', 'url' => "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"]),
             'embed' => json_encode(['type' => 'youtube', 'embed_code' => '<iframe>...</iframe>']),
             default => fake()->paragraph(),
         };
@@ -260,11 +261,11 @@ class LearningContentSeeder extends Seeder
         }
         
         if ($blockType === 'image') {
-            return 'https://placehold.co/800x600/png?text=' . urlencode(fake()->words(2, true));
+            return 'https://picsum.photos/seed/' . uniqid() . '/800/600';
         }
 
         if ($blockType === 'file') {
-            return fake()->url() . '/files/' . fake()->word() . '.pdf';
+            return 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf';
         }
 
         return null;
@@ -273,7 +274,7 @@ class LearningContentSeeder extends Seeder
     private function generateThumbnailUrl(?string $blockType): ?string
     {
         if (in_array($blockType, ['video', 'image'])) {
-            return 'https://placehold.co/400x300/png?text=Thumbnail';
+            return 'https://picsum.photos/seed/' . uniqid() . '/400/300';
         }
 
         return null;

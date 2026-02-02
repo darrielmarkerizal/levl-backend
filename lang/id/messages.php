@@ -570,6 +570,11 @@ return [
         'assigned_weekly' => ':count tantangan mingguan diberikan ke user.',
         'expiring' => 'Mengecek tantangan kedaluwarsa...',
         'expired_count' => ':count tantangan kedaluwarsa telah diperbarui.',
+        'list_retrieved' => 'Daftar tantangan berhasil diambil.',
+        'reward_claimed' => 'Hadiah tantangan berhasil diklaim.',
+        'not_found_or_not_assigned' => 'Tantangan tidak ditemukan atau belum diberikan kepada Anda.',
+        'reward_already_claimed' => 'Hadiah tantangan ini sudah diklaim sebelumnya.',
+        'not_completed_cannot_claim' => 'Tantangan belum selesai, tidak dapat mengklaim hadiah.',
     ],
 
     // Gamification Module
@@ -577,6 +582,11 @@ return [
         'points_awarded' => 'Poin berhasil diberikan.',
         'leaderboard_updated' => 'Peringkat leaderboard berhasil diperbarui.',
         'updating_leaderboard' => 'Memperbarui leaderboard...',
+        'badges_retrieved' => 'Badge berhasil diambil.',
+        'achievements_retrieved' => 'Pencapaian berhasil diambil.',
+        'points_history_retrieved' => 'Riwayat poin berhasil diambil.',
+        'leaderboard_retrieved' => 'Leaderboard berhasil diambil.',
+        'levels_retrieved' => 'Data level berhasil diambil.',
     ],
 
     // Forums Module
