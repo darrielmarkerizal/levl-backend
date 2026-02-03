@@ -26,13 +26,12 @@ class ThreadController extends Controller
     public function index(Request $request, int $schemeId): JsonResponse
     {
         $filters = [
-            'pinned' => $request->boolean('pinned'),
-            'resolved' => $request->boolean('resolved'),
-            'closed' => $request->has('closed') ? $request->boolean('closed') : null,
             'per_page' => $request->input('per_page', 20),
         ];
+        
+        $search = $request->input('search');
 
-        $threads = $this->forumService->getThreadsForScheme($schemeId, $filters);
+        $threads = $this->forumService->getThreadsForScheme($schemeId, $filters, $search);
 
         return $this->paginateResponse($threads, __('forums.threads_retrieved'));
     }
@@ -118,16 +117,5 @@ class ThreadController extends Controller
     }
 
      
-    public function search(Request $request, int $schemeId): JsonResponse
-    {
-        $query = $request->input('search', '');
 
-        if (empty($query)) {
-            return $this->error(__('forums.search_query_required'), 400);
-        }
-
-        $threads = $this->forumService->searchThreads($query, $schemeId);
-
-        return $this->success($threads, __('forums.search_results_retrieved'));
-    }
 }

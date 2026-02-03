@@ -11,8 +11,7 @@ use Modules\Forums\Models\Reply;
 use Modules\Forums\Models\Thread;
 use Modules\Forums\Repositories\ReplyRepository;
 use Modules\Forums\Repositories\ThreadRepository;
-use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\QueryBuilder;
+
 
 class ForumService implements ModuleForumServiceInterface, \App\Contracts\Services\ForumServiceInterface
 {
@@ -76,27 +75,13 @@ class ForumService implements ModuleForumServiceInterface, \App\Contracts\Servic
     }
 
      
-    public function getThreadsForScheme(int $schemeId, array $filters = []): LengthAwarePaginator
+    public function getThreadsForScheme(int $schemeId, array $filters = [], ?string $search = null): LengthAwarePaginator
     {
-        $perPage = $filters['per_page'] ?? 15;
+        if ($search) {
+            return $this->threadRepository->searchThreads($search, $schemeId, $filters);
+        }
 
-        $query = QueryBuilder::for(Thread::class)
-            ->where('scheme_id', $schemeId)
-            ->allowedFilters([
-                AllowedFilter::exact('author_id'),
-                AllowedFilter::exact('status'),
-            ])
-            ->allowedIncludes(['author', 'replies', 'scheme'])
-            ->allowedSorts(['last_activity_at', 'created_at', 'replies_count', 'views_count'])
-            ->defaultSort('-last_activity_at');
-
-        return $query->paginate($perPage);
-    }
-
-     
-    public function searchThreads(string $query, int $schemeId): LengthAwarePaginator
-    {
-        return $this->threadRepository->searchThreads($query, $schemeId);
+        return $this->threadRepository->getThreadsForScheme($schemeId, $filters);
     }
 
      

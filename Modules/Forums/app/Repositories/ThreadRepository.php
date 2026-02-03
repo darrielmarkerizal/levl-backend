@@ -5,6 +5,7 @@ namespace Modules\Forums\Repositories;
 use App\Repositories\BaseRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Spatie\QueryBuilder\AllowedFilter;
 use Modules\Forums\Models\Thread;
 
 class ThreadRepository extends BaseRepository
@@ -98,31 +99,50 @@ class ThreadRepository extends BaseRepository
 
     public function getThreadsForScheme(int $schemeId, array $filters = []): LengthAwarePaginator
     {
-        return Thread::forScheme($schemeId)
-            ->with(['author', 'replies'])
-            ->withCount('replies')
-            ->when($filters['pinned'] ?? false, fn ($q) => $q->pinned())
-            ->when($filters['resolved'] ?? false, fn ($q) => $q->resolved())
-            ->when(isset($filters['closed']), fn ($q) => $filters['closed'] ? $q->closed() : $q->open())
-            ->orderBy('is_pinned', 'desc')
-            ->orderBy('last_activity_at', 'desc')
-            ->paginate($filters['per_page'] ?? 20);
+        $query = Thread::forScheme($schemeId)
+            ->with(['author', 'replies', 'scheme'])
+            ->withCount('replies');
+
+        return $this->filteredPaginate(
+            $query, 
+            $filters, 
+            [
+                AllowedFilter::exact('author_id'),
+                AllowedFilter::scope('pinned'),
+                AllowedFilter::scope('resolved'),
+                AllowedFilter::scope('closed'),
+            ],
+            ['last_activity_at', 'created_at', 'replies_count', 'views_count'],
+            '-last_activity_at',
+            $filters['per_page'] ?? 20
+        );
     }
 
-    public function searchThreads(string $searchQuery, int $schemeId, int $perPage = 20): LengthAwarePaginator
+    public function searchThreads(string $searchQuery, int $schemeId, array $filters = []): LengthAwarePaginator
     {
         $ids = Thread::search($searchQuery)
             ->where('scheme_id', $schemeId)
             ->keys()
             ->toArray();
 
-        return Thread::query()
+        $query = Thread::query()
             ->whereIn('id', $ids)
-            ->with(['author', 'replies'])
-            ->withCount('replies')
-            ->orderBy('is_pinned', 'desc')
-            ->orderBy('last_activity_at', 'desc')
-            ->paginate($perPage);
+            ->with(['author', 'replies', 'scheme'])
+            ->withCount('replies');
+
+        return $this->filteredPaginate(
+            $query,
+            $filters,
+            [
+                AllowedFilter::exact('author_id'),
+                AllowedFilter::scope('pinned'),
+                AllowedFilter::scope('resolved'),
+                AllowedFilter::scope('closed'),
+            ],
+            ['last_activity_at', 'created_at', 'replies_count', 'views_count'],
+            '-last_activity_at',
+            $filters['per_page'] ?? 20
+        );
     }
 
     public function findWithRelations(int $threadId): ?Thread

@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
       \Modules\Enrollments\Database\Seeders\EnrollmentsDatabaseSeeder::class,
       \Modules\Learning\Database\Seeders\LearningDatabaseSeeder::class,
       \Modules\Gamification\Database\Seeders\GamificationDatabaseSeeder::class,
+      \Modules\Forums\Database\Seeders\ForumsDatabaseSeeder::class,
       \Modules\Grading\Database\Seeders\GradingDatabaseSeeder::class,
     ]);
   }

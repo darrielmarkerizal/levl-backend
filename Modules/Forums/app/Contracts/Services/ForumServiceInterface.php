@@ -9,7 +9,7 @@ use Modules\Forums\Models\Thread;
 
 interface ForumServiceInterface
 {
-    public function getThreadsForScheme(int $schemeId, array $filters = []): LengthAwarePaginator;
+    public function getThreadsForScheme(int $schemeId, array $filters = [], ?string $search = null): LengthAwarePaginator;
 
     public function createThread(array $data, User $user): Thread;
 
@@ -22,6 +22,4 @@ interface ForumServiceInterface
     public function updateReply(Reply $reply, array $data): Reply;
 
     public function deleteReply(Reply $reply, User $user): bool;
-
-    public function searchThreads(string $query, int $schemeId): LengthAwarePaginator;
 }
