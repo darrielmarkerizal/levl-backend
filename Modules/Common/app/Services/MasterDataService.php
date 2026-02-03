@@ -112,15 +112,28 @@ class MasterDataService
     private function buildDatabaseTypesList(): Collection
     {
         return $this->repository->getTypes()->map(function ($item) {
-            $item = is_array($item) ? $item : $item->toArray();
-
-            if (isset($item['key']) && ! isset($item['type'])) {
-                $item['type'] = $item['key'];
-                unset($item['key']);
-            }
-
-            return $item;
+            // $item comes as object from DB query now
+            return $this->transformTypeItem($item);
         });
+    }
+
+    private function transformTypeItem($item): array
+    {
+        $labelMap = ["categories" => "Kategori", "tags" => "Tags"];
+        
+        // Handle object or array access safely
+        $type = is_object($item) ? $item->type : $item['type'];
+        $count = is_object($item) ? $item->count : $item['count'];
+        $last_updated = is_object($item) ? $item->last_updated : $item['last_updated'];
+
+        return [
+            "key" => $type,
+            "type" => $type,
+            "label" => $labelMap[$type] ?? ucwords(str_replace("-", " ", $type)),
+            "count" => $count,
+            "last_updated" => $last_updated,
+            "is_crud" => true,
+        ];
     }
 
     public function extractQueryParams(array $query): array

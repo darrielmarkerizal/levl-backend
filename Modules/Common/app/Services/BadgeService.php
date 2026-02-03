@@ -44,9 +44,7 @@ class BadgeService implements BadgeServiceInterface
                 $this->syncRules($badge->id, $data['rules']);
             }
 
-            if (isset($files['icon'])) {
-                $badge->addMedia($files['icon'])->toMediaCollection('icon');
-            }
+            $this->handleMedia($badge, $files);
 
             return $badge->fresh();
         });
@@ -96,13 +94,20 @@ class BadgeService implements BadgeServiceInterface
                 $this->syncRules($badge->id, $data['rules']);
             }
 
-            if (isset($files['icon'])) {
-                $updated->clearMediaCollection('icon');
-                $updated->addMedia($files['icon'])->toMediaCollection('icon');
-            }
+            $this->handleMedia($updated, $files);
 
             return $updated->fresh();
         });
+    }
+
+    private function handleMedia(Badge $badge, array $files): void
+    {
+        if (isset($files['icon'])) {
+            if ($badge->media()->exists()) {
+                $badge->clearMediaCollection('icon');
+            }
+            $badge->addMedia($files['icon'])->toMediaCollection('icon');
+        }
     }
 
     public function delete(int $id): bool

@@ -122,8 +122,7 @@ class MasterDataRepository extends \App\Repositories\BaseRepository implements \
     return $query->groupBy("type")
       ->allowedSorts($this->getAllowedSorts())
       ->defaultSort("type")
-      ->get()
-      ->map(fn($item) => $this->transformTypeItem($item));
+      ->get();
   }
 
   public function getAllowedSorts(): array
@@ -136,19 +135,6 @@ class MasterDataRepository extends \App\Repositories\BaseRepository implements \
       }),
       "count",
       "last_updated",
-    ];
-  }
-
-  private function transformTypeItem($item): array
-  {
-    $labelMap = ["categories" => "Kategori", "tags" => "Tags"];
-
-    return [
-      "key" => $item->type,
-      "label" => $labelMap[$item->type] ?? ucwords(str_replace("-", " ", $item->type)),
-      "count" => $item->count,
-      "last_updated" => $item->last_updated,
-      "is_crud" => true,
     ];
   }
 
