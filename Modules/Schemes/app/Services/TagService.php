@@ -36,7 +36,10 @@ class TagService
     private function buildQuery(array $filters = []): QueryBuilder
     {
         $searchQuery = data_get($filters, 'search');
-        $builder = QueryBuilder::for(Tag::class, $this->buildQueryBuilderRequest($filters));
+        
+        $cleanFilters = \Illuminate\Support\Arr::except($filters, ['search']);
+        
+        $builder = QueryBuilder::for(Tag::class, $this->buildQueryBuilderRequest($cleanFilters));
 
         if ($searchQuery && trim((string) $searchQuery) !== '') {
             $ids = Tag::search($searchQuery)->keys()->toArray();

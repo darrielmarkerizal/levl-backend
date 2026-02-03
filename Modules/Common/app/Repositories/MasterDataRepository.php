@@ -143,24 +143,49 @@ class MasterDataRepository extends \App\Repositories\BaseRepository implements \
     string $search, 
     ?bool $normalizedIsCrud
   ): SupportCollection {
+    // Transform to standard structure first (key, label, is_crud)
+    $types = $types->map(function ($item) {
+        $key = $item['type'] ?? $item->type ?? '';
+        
+        if (method_exists($item, 'toArray')) {
+            $item = $item->toArray();
+        }
+        
+        $item['key'] = $item['type'] ?? '';
+        $item['label'] = ucwords(str_replace(['-', '_'], ' ', $item['key']));
+        $item['is_crud'] = $item['is_crud'] ?? $this->determineIsCrud($item['key']);
+
+        return $item;
+    });
+
     if ($search !== "") {
       $types = $this->filterBySearch($types, $search);
     }
 
     if ($normalizedIsCrud !== null) {
-      $types = $types->filter(fn($item) => $item["is_crud"] === $normalizedIsCrud);
+      $types = $types->filter(fn($item) => ($item['is_crud'] ?? true) === $normalizedIsCrud);
     }
 
     return $types;
   }
+  
+  // Helper to determine is_crud (recreating logic that must exist somewhere or default)
+  private function determineIsCrud(string $type): bool
+  {
+      // List of non-CRUD types based on valid values or business logic
+      $nonCrudTypes = ['roles', 'priorities', 'permissions']; 
+      return !in_array($type, $nonCrudTypes);
+  }
 
   private function filterBySearch(SupportCollection $types, string $search): SupportCollection
   {
-    $searchLower = strtolower($search);
+    $searchLower = strtolower(trim($search));
     
     return $types->filter(function ($item) use ($searchLower) {
-      return str_contains(strtolower($item["key"]), $searchLower)
-        || str_contains(strtolower($item["label"]), $searchLower);
+      $key = strtolower((string)($item['key'] ?? $item['type'] ?? ''));
+      $label = strtolower((string)($item['label'] ?? ''));
+      
+      return str_contains($key, $searchLower) || str_contains($label, $searchLower);
     });
   }
 

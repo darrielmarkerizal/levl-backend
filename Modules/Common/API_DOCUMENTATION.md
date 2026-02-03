@@ -181,7 +181,17 @@ Mendapatkan daftar tags.
 ```
 
 ### 3.2 Create Tags
-[... existing tag docs ...]
+- **Method**: `POST`
+- **URL**: `/api/v1/tags`
+- **Akses**: `Superadmin`, `Admin`, `Instructor`
+
+**Request Body:**
+```json
+{
+    "name": "PHP",             // Required: String, Max 255
+    "description": "..."       // Optional: String, Max 1000
+}
+```
 
 ---
 
