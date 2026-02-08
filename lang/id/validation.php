@@ -294,6 +294,7 @@ $overrides = [
     ],
     'invalid_choice' => 'Pilihan yang Anda pilih tidak valid.',
     'invalid_format' => 'Format jawaban tidak valid.',
+    'mentioned_users_not_found' => 'Pengguna yang disebutkan tidak ditemukan: :usernames',
 ];
 
 return array_replace_recursive($base, $overrides);

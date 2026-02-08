@@ -12,7 +12,10 @@ class ReplyPolicy
      
     public function view(User $user, Reply $reply): bool
     {
-        
+        if ($user->hasRole(['Admin', 'Superadmin'])) {
+            return true;
+        }
+
         return Enrollment::where('user_id', $user->id)
             ->where('course_id', $reply->thread->scheme_id)
             ->exists();
@@ -21,7 +24,10 @@ class ReplyPolicy
      
     public function create(User $user, Thread $thread): bool
     {
-        
+        if ($user->hasRole(['admin', 'superadmin'])) {
+            return true;
+        }
+
         return Enrollment::where('user_id', $user->id)
             ->where('course_id', $thread->scheme_id)
             ->exists();
@@ -30,7 +36,10 @@ class ReplyPolicy
      
     public function update(User $user, Reply $reply): bool
     {
-        
+        if ($user->hasRole(['admin', 'superadmin'])) {
+            return true;
+        }
+
         return $user->id === $reply->author_id;
     }
 

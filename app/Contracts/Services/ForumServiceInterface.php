@@ -9,7 +9,7 @@ use Modules\Forums\Models\Thread;
 
 interface ForumServiceInterface
 {
-    public function createThread(array $data, User $user): Thread;
+    public function createThread(array $data, User $user, int $courseId): Thread;
     public function updateThread(Thread $thread, array $data): Thread;
     public function deleteThread(Thread $thread, User $user): bool;
     public function getThreadsForScheme(int $schemeId, array $filters = []): LengthAwarePaginator;
@@ -19,5 +19,4 @@ interface ForumServiceInterface
     public function updateReply(Reply $reply, array $data): Reply;
     public function deleteReply(Reply $reply, User $user): bool;
 
-    public function resolveForumableId(string $forumableType, string $forumableSlug): ?int;
 }

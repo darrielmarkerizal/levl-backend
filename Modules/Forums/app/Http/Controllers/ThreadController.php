@@ -14,6 +14,7 @@ use Modules\Forums\Http\Requests\UpdateThreadRequest;
 use Modules\Forums\Http\Resources\ThreadResource;
 use Modules\Forums\Models\Thread;
 use Modules\Forums\Services\ModerationService;
+use Modules\Forums\Services\ThreadReadService;
 use Modules\Schemes\Models\Course;
 
 class ThreadController extends Controller
@@ -22,27 +23,19 @@ class ThreadController extends Controller
 
     public function __construct(
         private readonly ForumServiceInterface $forumService,
-        private readonly ModerationService $moderationService
+        private readonly ModerationService $moderationService,
+        private readonly ThreadReadService $threadReadService
     ) {}
 
     public function index(Request $request, Course $course): JsonResponse
     {
-        $forumableType = $request->input('forumable_type', \Modules\Schemes\Models\Course::class);
-        $forumableSlug = (string) $request->input('forumable_slug', $course->slug);
-        $forumableId = $this->forumService->resolveForumableId($forumableType, $forumableSlug);
-        $search = $request->input('search');
-        $filters = array_merge(
-            $request->only(['page', 'per_page', 'sort']),
-            $request->input('filter', [])
+        $threads = $this->threadReadService->paginateCourseThreads(
+            $course->id,
+            $request->input('search'),
+            (int) $request->input('per_page', 20)
         );
 
-        if (! $forumableId) {
-            return $this->notFound(__('messages.forums.thread_not_found'));
-        }
-
-        $threads = $this->forumService->getThreadsForumable($forumableType, $forumableId, $filters, $search);
-
-        return $this->paginateResponse(ThreadResource::collection($threads), __('messages.forums.threads_retrieved'));
+        return $this->paginateResponse($threads, __('messages.forums.threads_retrieved'));
     }
 
     public function store(CreateThreadRequest $request, Course $course): JsonResponse
@@ -50,18 +43,18 @@ class ThreadController extends Controller
         $data = $request->validated();
         $data['attachments'] = $request->file('attachments') ?? [];
 
-        $thread = $this->forumService->createThread($data, $request->user());
-        $thread->load('author', 'forumable', 'media');
+        $thread = $this->forumService->createThread($data, $request->user(), $course->id);
 
-        return $this->created(new ThreadResource($thread), __('messages.forums.thread_created'));
+        $threadWithIncludes = $this->threadReadService->getThreadSummary($thread->id);
+
+        return $this->created(new ThreadResource($threadWithIncludes), __('messages.forums.thread_created'));
     }
 
-    public function show(Course $course, Thread $thread): JsonResponse
+    public function show(Request $request, Course $course, Thread $thread): JsonResponse
     {
-        $thread = $this->forumService->getThreadDetail($thread->id);
-        $thread->load('author', 'forumable', 'replies.author', 'media');
+        $threadDetail = $this->threadReadService->getThreadDetail($thread->id);
 
-        return $this->success(new ThreadResource($thread), __('messages.forums.thread_retrieved'));
+        return $this->success(new ThreadResource($threadDetail), __('messages.forums.thread_retrieved'));
     }
 
     public function update(UpdateThreadRequest $request, Course $course, Thread $thread): JsonResponse
@@ -69,9 +62,10 @@ class ThreadController extends Controller
         $this->authorize('update', $thread);
 
         $updatedThread = $this->forumService->updateThread($thread, $request->validated());
-        $updatedThread->load('author', 'forumable');
 
-        return $this->success(new ThreadResource($updatedThread), __('messages.forums.thread_updated'));
+        $threadWithIncludes = $this->threadReadService->getThreadSummary($updatedThread->id);
+
+        return $this->success(new ThreadResource($threadWithIncludes), __('messages.forums.thread_updated'));
     }
 
     public function destroy(Request $request, Course $course, Thread $thread): JsonResponse
@@ -88,9 +82,10 @@ class ThreadController extends Controller
         $this->authorize('pin', $thread);
 
         $pinnedThread = $this->moderationService->pinThread($thread, $request->user());
-        $pinnedThread->load('author', 'forumable');
 
-        return $this->success(new ThreadResource($pinnedThread), __('messages.forums.thread_pinned'));
+        $threadWithIncludes = $this->threadReadService->getThreadSummary($pinnedThread->id);
+
+        return $this->success(new ThreadResource($threadWithIncludes), __('messages.forums.thread_pinned'));
     }
 
     public function unpin(Request $request, Course $course, Thread $thread): JsonResponse
@@ -98,9 +93,10 @@ class ThreadController extends Controller
         $this->authorize('unpin', $thread);
 
         $unpinnedThread = $this->moderationService->unpinThread($thread, $request->user());
-        $unpinnedThread->load('author', 'forumable');
 
-        return $this->success(new ThreadResource($unpinnedThread), __('messages.forums.thread_unpinned'));
+        $threadWithIncludes = $this->threadReadService->getThreadSummary($unpinnedThread->id);
+
+        return $this->success(new ThreadResource($threadWithIncludes), __('messages.forums.thread_unpinned'));
     }
 
     public function close(Request $request, Course $course, Thread $thread): JsonResponse
@@ -108,8 +104,9 @@ class ThreadController extends Controller
         $this->authorize('close', $thread);
 
         $closedThread = $this->moderationService->closeThread($thread, $request->user());
-        $closedThread->load('author', 'forumable');
 
-        return $this->success(new ThreadResource($closedThread), __('messages.forums.thread_closed'));
+        $threadWithIncludes = $this->threadReadService->getThreadSummary($closedThread->id);
+
+        return $this->success(new ThreadResource($threadWithIncludes), __('messages.forums.thread_closed'));
     }
 }

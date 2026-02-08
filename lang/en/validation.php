@@ -116,6 +116,7 @@ return [
     'uuid' => 'The :attribute must be a valid UUID.',
     'invalid_choice' => 'The selected choice is invalid.',
     'invalid_format' => 'The format is invalid.',
+    'mentioned_users_not_found' => 'The following mentioned users do not exist: :usernames',
 
     'custom' => [
         'score_awarded' => [

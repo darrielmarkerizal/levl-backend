@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Forums\Http\Controllers;
 
 use App\Http\Controllers\Controller;
@@ -24,7 +26,7 @@ class ReplyController extends Controller
         private readonly ModerationService $moderationService
     ) {}
 
-    public function index(Course $course, int $threadId): JsonResponse
+    public function index(Request $request, Course $course, int $threadId): JsonResponse
     {
         $thread = Thread::find($threadId);
 
@@ -32,20 +34,28 @@ class ReplyController extends Controller
             return $this->notFound(__('messages.forums.thread_not_found'));
         }
 
-        $replies = $thread->replies()
-            ->topLevel()
-            ->with([
+        $perPage = (int) $request->input('per_page', 20);
+
+        $repliesQuery = \Spatie\QueryBuilder\QueryBuilder::for(Reply::class)
+            ->where('thread_id', $threadId)
+            ->whereNull('parent_id')
+            ->allowedIncludes([
                 'author',
                 'media',
-                'children' => function ($query) {
-                    $query->with(['author', 'media', 'children' => function ($query) {
-                        $query->with(['author', 'media', 'children']);
-                    }]);
-                }
+                'children',
+                'children.author',
+                'children.media',
+                'children.children',
+                'children.children.author',
+                'children.children.media',
             ])
-            ->paginate(20);
+            ->allowedSorts(['created_at', 'updated_at'])
+            ->defaultSort('created_at');
 
-        return $this->paginateResponse(ReplyResource::collection($replies), __('messages.forums.replies_retrieved'));
+        $replies = $repliesQuery->paginate($perPage);
+        $replies->getCollection()->transform(fn($item) => new ReplyResource($item));
+
+        return $this->paginateResponse($replies, __('messages.forums.replies_retrieved'));
     }
 
     public function store(CreateReplyRequest $request, Course $course, int $threadId): JsonResponse
@@ -68,9 +78,12 @@ class ReplyController extends Controller
                 $request->user()
             );
 
-            $reply->load('author', 'media');
+            $replyWithIncludes = \Spatie\QueryBuilder\QueryBuilder::for(Reply::class)
+                ->where('id', $reply->id)
+                ->allowedIncludes(['author', 'media', 'children'])
+                ->firstOrFail();
 
-            return $this->created(new ReplyResource($reply), __('messages.forums.reply_created'));
+            return $this->created(new ReplyResource($replyWithIncludes), __('messages.forums.reply_created'));
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), [], 400);
         }
@@ -82,9 +95,12 @@ class ReplyController extends Controller
 
         $updatedReply = $this->forumService->updateReply($reply, $request->validated());
 
-        $updatedReply->load('author', 'media');
+        $replyWithIncludes = \Spatie\QueryBuilder\QueryBuilder::for(Reply::class)
+            ->where('id', $updatedReply->id)
+            ->allowedIncludes(['author', 'media', 'children'])
+            ->firstOrFail();
 
-        return $this->success(new ReplyResource($updatedReply), __('messages.forums.reply_updated'));
+        return $this->success(new ReplyResource($replyWithIncludes), __('messages.forums.reply_updated'));
     }
 
     public function destroy(Request $request, Course $course, Reply $reply): JsonResponse

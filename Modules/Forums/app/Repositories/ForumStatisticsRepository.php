@@ -35,7 +35,7 @@ class ForumStatisticsRepository
             ->count();
 
         $repliesCount = Reply::whereHas('thread', function ($query) use ($schemeId) {
-            $query->where('scheme_id', $schemeId);
+            $query->where('course_id', $schemeId);
         })
             ->whereBetween('created_at', [$periodStart, $periodEnd])
             ->count();
@@ -69,7 +69,7 @@ class ForumStatisticsRepository
             ->count();
 
         $repliesCount = Reply::whereHas('thread', function ($query) use ($schemeId) {
-            $query->where('scheme_id', $schemeId);
+            $query->where('course_id', $schemeId);
         })
             ->where('author_id', $userId)
             ->whereBetween('created_at', [$periodStart, $periodEnd])

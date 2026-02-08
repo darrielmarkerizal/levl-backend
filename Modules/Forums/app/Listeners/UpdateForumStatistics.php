@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Forums\Listeners;
 
 use Carbon\Carbon;
@@ -9,14 +11,10 @@ use Modules\Forums\Repositories\ForumStatisticsRepository;
 
 class UpdateForumStatistics
 {
-    protected ForumStatisticsRepository $statisticsRepository;
+    public function __construct(
+        protected ForumStatisticsRepository $statisticsRepository
+    ) {}
 
-    public function __construct(ForumStatisticsRepository $statisticsRepository)
-    {
-        $this->statisticsRepository = $statisticsRepository;
-    }
-
-     
     public function handle($event): void
     {
         $now = Carbon::now();
@@ -25,35 +23,45 @@ class UpdateForumStatistics
 
         if ($event instanceof ThreadCreated) {
             $thread = $event->thread;
+            $courseId = $thread->course_id;
 
-            
+            if (! $courseId) {
+                return;
+            }
+
             $this->statisticsRepository->updateSchemeStatistics(
-                $thread->scheme_id,
+                $courseId,
                 $periodStart,
                 $periodEnd
             );
 
-            
             $this->statisticsRepository->updateUserStatistics(
-                $thread->scheme_id,
+                $courseId,
                 $thread->author_id,
                 $periodStart,
                 $periodEnd
             );
-        } elseif ($event instanceof ReplyCreated) {
+
+            return;
+        }
+
+        if ($event instanceof ReplyCreated) {
             $reply = $event->reply;
             $thread = $reply->thread;
+            $courseId = $thread?->course_id;
 
-            
+            if (! $courseId) {
+                return;
+            }
+
             $this->statisticsRepository->updateSchemeStatistics(
-                $thread->scheme_id,
+                $courseId,
                 $periodStart,
                 $periodEnd
             );
 
-            
             $this->statisticsRepository->updateUserStatistics(
-                $thread->scheme_id,
+                $courseId,
                 $reply->author_id,
                 $periodStart,
                 $periodEnd

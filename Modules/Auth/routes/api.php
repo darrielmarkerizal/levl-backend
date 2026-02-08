@@ -98,9 +98,12 @@ Route::prefix("v1")
       Route::post("/profile/account/restore", [ProfileAccountController::class, "restore"])
         ->name("profile.account.restore");
 
-      // Public Profile
       Route::get("/users/{user}/profile", [PublicProfileController::class, "show"])->name(
         "users.profile.show",
+      );
+
+      Route::get("/courses/{course:slug}/users/mentions", [\Modules\Auth\Http\Controllers\UserController::class, "searchMentions"])->name(
+        "users.mentions.search",
       );
 
       // User Management (Refactored)

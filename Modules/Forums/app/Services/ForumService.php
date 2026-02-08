@@ -20,20 +20,13 @@ class ForumService implements ModuleForumServiceInterface, \App\Contracts\Servic
         private readonly ReplyRepository $replyRepository,
     ) {}
 
-    public function createThread(array $data, User $user): Thread
+    public function createThread(array $data, User $user, int $courseId): Thread
     {
         $this->validateContent($data['content']);
 
-        $forumableId = $this->resolveForumableId($data['forumable_type'], $data['forumable_slug']);
-
-        if (! $forumableId) {
-            throw new \Exception('Forum not found.');
-        }
-
-        return DB::transaction(function () use ($data, $user, $forumableId) {
+        return DB::transaction(function () use ($data, $user, $courseId) {
             $threadData = [
-                'forumable_type' => $data['forumable_type'],
-                'forumable_id' => $forumableId,
+                'course_id' => $courseId,
                 'author_id' => $user->id,
                 'title' => $data['title'],
                 'content' => $data['content'],
@@ -57,13 +50,7 @@ class ForumService implements ModuleForumServiceInterface, \App\Contracts\Servic
         });
     }
 
-    public function resolveForumableId(string $forumableType, string $forumableSlug): ?int
-    {
-        return match ($forumableType) {
-            \Modules\Schemes\Models\Course::class => \Modules\Schemes\Models\Course::where('slug', $forumableSlug)->value('id'),
-            default => null,
-        };
-    }
+
 
     public function updateThread(Thread $thread, array $data): Thread
     {
@@ -96,25 +83,24 @@ class ForumService implements ModuleForumServiceInterface, \App\Contracts\Servic
         return $this->threadRepository->delete($thread, $user->id);
     }
 
-    public function getThreadsForumable(string $forumableType, int $forumableId, array $filters = [], ?string $search = null): LengthAwarePaginator
+    public function getThreadsByCourse(int $courseId, array $filters = [], ?string $search = null): LengthAwarePaginator
     {
         if ($search) {
-            return $this->threadRepository->searchThreadsByForumable($search, $forumableType, $forumableId, $filters);
+            return $this->threadRepository->searchThreadsByCourse($search, $courseId, $filters);
         }
 
-        return $this->threadRepository->getThreadsByForumable($forumableType, $forumableId, $filters);
+        return $this->threadRepository->getThreadsByCourse($courseId, $filters);
     }
 
     public function getThreadsForScheme(int $schemeId, array $filters = [], ?string $search = null): LengthAwarePaginator
     {
-        return $this->getThreadsForumable(\Modules\Schemes\Models\Course::class, $schemeId, $filters, $search);
+        return $this->getThreadsByCourse($schemeId, $filters, $search);
     }
 
     public function searchThreads(string $query, int $schemeId): LengthAwarePaginator
     {
-        return $this->threadRepository->searchThreadsByForumable(
+        return $this->threadRepository->searchThreadsByCourse(
             $query,
-            \Modules\Schemes\Models\Course::class,
             $schemeId,
             []
         );

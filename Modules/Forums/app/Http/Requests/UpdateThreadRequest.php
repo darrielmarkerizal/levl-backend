@@ -17,8 +17,41 @@ class UpdateThreadRequest extends FormRequest
     {
         return [
             'title' => 'sometimes|string|min:3|max:255',
-            'content' => 'sometimes|string|min:1|max:5000|required_unless:title',
+            'content' => [
+                'sometimes',
+                'string',
+                'min:1',
+                'max:5000',
+                'required_unless:title',
+                function ($attribute, $value, $fail) {
+                    if ($value) {
+                        $this->validateMentionedUsernames($value, $fail);
+                    }
+                },
+            ],
         ];
+    }
+
+    private function validateMentionedUsernames(string $content, $fail): void
+    {
+        preg_match_all('/@([a-zA-Z0-9._-]+)/', $content, $matches);
+        
+        if (empty($matches[1])) {
+            return;
+        }
+
+        $mentionedUsernames = array_unique($matches[1]);
+        $existingUsernames = \Modules\Auth\Models\User::whereIn('username', $mentionedUsernames)
+            ->pluck('username')
+            ->toArray();
+
+        $invalidUsernames = array_diff($mentionedUsernames, $existingUsernames);
+
+        if (!empty($invalidUsernames)) {
+            $fail(__('validation.mentioned_users_not_found', [
+                'usernames' => implode(', ', array_map(fn($u) => "@{$u}", $invalidUsernames))
+            ]));
+        }
     }
 
     public function messages(): array

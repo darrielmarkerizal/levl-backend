@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
+
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Scout\Searchable;
 use Spatie\MediaLibrary\HasMedia;
@@ -25,8 +25,7 @@ class Thread extends Model implements HasMedia
     }
 
     protected $fillable = [
-        'forumable_type',
-        'forumable_id',
+        'course_id',
         'author_id',
         'title',
         'content',
@@ -53,9 +52,9 @@ class Thread extends Model implements HasMedia
         'deleted_at' => 'datetime',
     ];
 
-    public function forumable(): MorphTo
+    public function course(): BelongsTo
     {
-        return $this->morphTo();
+        return $this->belongsTo(\Modules\Schemes\Models\Course::class);
     }
 
     public function author(): BelongsTo
@@ -73,6 +72,11 @@ class Thread extends Model implements HasMedia
         return $this->hasMany(Reply::class);
     }
 
+    public function topLevelReplies(): HasMany
+    {
+        return $this->hasMany(Reply::class)->whereNull('parent_id');
+    }
+
     public function reactions(): MorphMany
     {
         return $this->morphMany(Reaction::class, 'reactable');
@@ -83,14 +87,14 @@ class Thread extends Model implements HasMedia
         return $this->morphMany(Mention::class, 'mentionable');
     }
 
-    public function scopeForumable($query, string $type, int $id)
+    public function scopeByCourse($query, int $courseId)
     {
-        return $query->where('forumable_type', $type)->where('forumable_id', $id);
+        return $query->where('course_id', $courseId);
     }
 
     public function scopeForCourse($query, int $courseId)
     {
-        return $this->scopeForumable($query, \Modules\Schemes\Models\Course::class, $courseId);
+        return $this->scopeByCourse($query, $courseId);
     }
 
     public function scopeForScheme($query, int $schemeId)
@@ -172,8 +176,7 @@ class Thread extends Model implements HasMedia
             'id' => $this->id,
             'title' => $this->title,
             'content' => $this->content,
-            'forumable_type' => $this->forumable_type,
-            'forumable_id' => $this->forumable_id,
+            'course_id' => $this->course_id,
             'author_id' => $this->author_id,
             'author_name' => $this->author->name ?? '',
         ];
@@ -182,7 +185,7 @@ class Thread extends Model implements HasMedia
     public function searchableOptions(): array
     {
         return [
-            'filterableAttributes' => ['author_id', 'forumable_type', 'forumable_id'],
+            'filterableAttributes' => ['author_id', 'course_id'],
             'sortableAttributes' => ['created_at'],
         ];
     }

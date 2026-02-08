@@ -21,13 +21,7 @@ class CreateReplyRequest extends FormRequest
             return false;
         }
 
-        return match ($thread->forumable_type) {
-            Course::class => $this->canAccessCourse($this->user()->id, $thread->forumable_id),
-            \Modules\Learning\Models\Unit::class => $this->canAccessUnit($this->user()->id, $thread->forumable_id),
-            \Modules\Learning\Models\Lesson::class => $this->canAccessLesson($this->user()->id, $thread->forumable_id),
-            \Modules\Learning\Models\Assignment::class => $this->canAccessAssignment($this->user()->id, $thread->forumable_id),
-            default => false,
-        };
+        return $this->canAccessCourse($this->user()->id, $thread->course_id);
     }
 
     public function rules(): array
@@ -35,7 +29,15 @@ class CreateReplyRequest extends FormRequest
         $threadId = (int) $this->route('thread');
 
         return [
-            'content' => 'required|string|min:1|max:5000',
+            'content' => [
+                'required',
+                'string',
+                'min:1',
+                'max:5000',
+                function ($attribute, $value, $fail) {
+                    $this->validateMentionedUsernames($value, $fail);
+                },
+            ],
             'parent_id' => [
                 'nullable',
                 'integer',
@@ -72,11 +74,33 @@ class CreateReplyRequest extends FormRequest
         ];
     }
 
+    private function validateMentionedUsernames(string $content, $fail): void
+    {
+        preg_match_all('/@([a-zA-Z0-9._-]+)/', $content, $matches);
+        
+        if (empty($matches[1])) {
+            return;
+        }
+
+        $mentionedUsernames = array_unique($matches[1]);
+        $existingUsernames = \Modules\Auth\Models\User::whereIn('username', $mentionedUsernames)
+            ->pluck('username')
+            ->toArray();
+
+        $invalidUsernames = array_diff($mentionedUsernames, $existingUsernames);
+
+        if (!empty($invalidUsernames)) {
+            $fail(__('validation.mentioned_users_not_found', [
+                'usernames' => implode(', ', array_map(fn($u) => "@{$u}", $invalidUsernames))
+            ]));
+        }
+    }
+
     private function canAccessCourse(int $userId, int $courseId): bool
     {
-        if ($this->user()->hasRole(['admin', 'instructor'])) {
+        if ($this->user()->hasRole(['Admin', 'Instructor'])) {
             $course = Course::find($courseId);
-            if ($this->user()->hasRole('instructor') && $course->instructor_id !== $userId) {
+            if ($this->user()->hasRole('Instructor') && $course->instructor_id !== $userId) {
                 return Enrollment::where('user_id', $userId)->where('course_id', $courseId)->exists();
             }
 
@@ -86,33 +110,5 @@ class CreateReplyRequest extends FormRequest
         return Enrollment::where('user_id', $userId)->where('course_id', $courseId)->exists();
     }
 
-    private function canAccessUnit(int $userId, int $unitId): bool
-    {
-        $unit = \Modules\Learning\Models\Unit::find($unitId);
-        if (!$unit) {
-            return false;
-        }
 
-        return $this->canAccessCourse($userId, $unit->course_id);
-    }
-
-    private function canAccessLesson(int $userId, int $lessonId): bool
-    {
-        $lesson = \Modules\Learning\Models\Lesson::find($lessonId);
-        if (!$lesson) {
-            return false;
-        }
-
-        return $this->canAccessUnit($userId, $lesson->unit_id);
-    }
-
-    private function canAccessAssignment(int $userId, int $assignmentId): bool
-    {
-        $assignment = \Modules\Learning\Models\Assignment::find($assignmentId);
-        if (!$assignment) {
-            return false;
-        }
-
-        return $this->canAccessUnit($userId, $assignment->unit_id);
-    }
 }

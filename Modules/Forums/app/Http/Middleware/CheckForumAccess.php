@@ -35,7 +35,7 @@ class CheckForumAccess
             ], 400);
         }
 
-        if ($user->hasRole(['admin', 'superadmin'])) {
+        if ($user->hasRole(['Admin', 'Superadmin'])) {
             return $next($request);
         }
 

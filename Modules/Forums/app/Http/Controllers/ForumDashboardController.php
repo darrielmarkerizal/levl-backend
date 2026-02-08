@@ -23,31 +23,84 @@ class ForumDashboardController extends Controller
     public function allThreads(Request $request): JsonResponse
     {
         $user = $request->user();
-        $filters = $request->all();
-        $search = $request->input('search');
+        $perPage = (int) $request->input('per_page', 20);
 
-        if ($user->hasRole(['Admin', 'Superadmin'])) {
-            $threads = $this->threadRepository->getAllThreads($filters, $search);
-
-            return $this->paginateResponse($threads, __('messages.forums.threads_retrieved'));
+        if (!$user->hasRole(['Admin', 'Superadmin', 'Instructor'])) {
+            return $this->error(__('messages.forums.unauthorized_access'), [], 403);
         }
+
+        $threadsQuery = \Spatie\QueryBuilder\QueryBuilder::for(\Modules\Forums\Models\Thread::class)
+            ->allowedIncludes([
+                'author',
+                'course',
+                'media',
+                'topLevelReplies',
+                'topLevelReplies.author',
+                'topLevelReplies.media',
+            ])
+            ->allowedFilters([
+                'author_id',
+                \Spatie\QueryBuilder\AllowedFilter::exact('pinned', 'is_pinned'),
+                \Spatie\QueryBuilder\AllowedFilter::exact('resolved', 'is_resolved'),
+                \Spatie\QueryBuilder\AllowedFilter::exact('closed', 'is_closed'),
+                'is_mentioned',
+            ])
+            ->allowedSorts(['created_at', 'updated_at', 'last_activity_at', 'views_count', 'replies_count'])
+            ->defaultSort('-last_activity_at');
 
         if ($user->hasRole('Instructor')) {
-            $threads = $this->threadRepository->getInstructorThreads($user->id, $filters, $search);
-
-            return $this->paginateResponse($threads, __('messages.forums.threads_retrieved'));
+            $instructorCourseIds = \Modules\Schemes\Models\Course::where('instructor_id', $user->id)
+                ->pluck('id');
+            $threadsQuery->whereIn('course_id', $instructorCourseIds);
         }
 
-        return $this->error(__('messages.forums.unauthorized_access'), [], 403);
+        $search = $request->input('search');
+        if ($search) {
+            $threadsQuery->where(function ($query) use ($search) {
+                $query->where('title', 'like', "%{$search}%")
+                    ->orWhere('content', 'like', "%{$search}%");
+            });
+        }
+
+        $threads = $threadsQuery->paginate($perPage);
+        $threads->getCollection()->transform(fn($item) => new \Modules\Forums\Http\Resources\ThreadResource($item));
+
+        return $this->paginateResponse($threads, __('messages.forums.threads_retrieved'));
     }
 
     public function myThreads(Request $request): JsonResponse
     {
         $user = $request->user();
-        $filters = $request->all();
-        $search = $request->input('search');
+        $perPage = (int) $request->input('per_page', 20);
 
-        $threads = $this->threadRepository->getUserThreads($user->id, $filters, $search);
+        $threadsQuery = \Spatie\QueryBuilder\QueryBuilder::for(\Modules\Forums\Models\Thread::class)
+            ->where('author_id', $user->id)
+            ->allowedIncludes([
+                'author',
+                'course',
+                'media',
+                'topLevelReplies',
+                'topLevelReplies.author',
+                'topLevelReplies.media',
+            ])
+            ->allowedFilters([
+                \Spatie\QueryBuilder\AllowedFilter::exact('pinned', 'is_pinned'),
+                \Spatie\QueryBuilder\AllowedFilter::exact('resolved', 'is_resolved'),
+                \Spatie\QueryBuilder\AllowedFilter::exact('closed', 'is_closed'),
+            ])
+            ->allowedSorts(['created_at', 'updated_at', 'last_activity_at', 'views_count', 'replies_count'])
+            ->defaultSort('-created_at');
+
+        $search = $request->input('search');
+        if ($search) {
+            $threadsQuery->where(function ($query) use ($search) {
+                $query->where('title', 'like', "%{$search}%")
+                    ->orWhere('content', 'like', "%{$search}%");
+            });
+        }
+
+        $threads = $threadsQuery->paginate($perPage);
+        $threads->getCollection()->transform(fn($item) => new \Modules\Forums\Http\Resources\ThreadResource($item));
 
         return $this->paginateResponse($threads, __('messages.forums.my_threads_retrieved'));
     }
@@ -55,21 +108,47 @@ class ForumDashboardController extends Controller
     public function trendingThreads(Request $request): JsonResponse
     {
         $user = $request->user();
-        $filters = (array) $request->input('filter', []);
-        $search = $request->input('search');
+        $perPage = (int) $request->input('per_page', 20);
 
-        if ($user->hasRole(['Admin', 'Superadmin'])) {
-            $threads = $this->threadRepository->getTrendingThreads($filters, $search);
-
-            return $this->paginateResponse($threads, __('messages.forums.trending_threads_retrieved'));
+        if (!$user->hasRole(['Admin', 'Superadmin', 'Instructor'])) {
+            return $this->error(__('messages.forums.unauthorized_access'), [], 403);
         }
+
+        $threadsQuery = \Spatie\QueryBuilder\QueryBuilder::for(\Modules\Forums\Models\Thread::class)
+            ->allowedIncludes([
+                'author',
+                'course',
+                'media',
+                'topLevelReplies',
+                'topLevelReplies.author',
+                'topLevelReplies.media',
+            ])
+            ->allowedFilters([
+                'author_id',
+                \Spatie\QueryBuilder\AllowedFilter::exact('pinned', 'is_pinned'),
+                \Spatie\QueryBuilder\AllowedFilter::exact('resolved', 'is_resolved'),
+                \Spatie\QueryBuilder\AllowedFilter::exact('closed', 'is_closed'),
+            ])
+            ->allowedSorts(['created_at', 'updated_at', 'views_count', 'replies_count'])
+            ->defaultSort('-views_count');
 
         if ($user->hasRole('Instructor')) {
-            $threads = $this->threadRepository->getInstructorTrendingThreads($user->id, $filters, $search);
-
-            return $this->paginateResponse($threads, __('messages.forums.trending_threads_retrieved'));
+            $instructorCourseIds = \Modules\Schemes\Models\Course::where('instructor_id', $user->id)
+                ->pluck('id');
+            $threadsQuery->whereIn('course_id', $instructorCourseIds);
         }
 
-        return $this->error(__('messages.forums.unauthorized_access'), [], 403);
+        $search = $request->input('search');
+        if ($search) {
+            $threadsQuery->where(function ($query) use ($search) {
+                $query->where('title', 'like', "%{$search}%")
+                    ->orWhere('content', 'like', "%{$search}%");
+            });
+        }
+
+        $threads = $threadsQuery->paginate($perPage);
+        $threads->getCollection()->transform(fn($item) => new \Modules\Forums\Http\Resources\ThreadResource($item));
+
+        return $this->paginateResponse($threads, __('messages.forums.trending_threads_retrieved'));
     }
 }

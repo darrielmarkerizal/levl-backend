@@ -136,7 +136,10 @@ class User extends Authenticatable implements HasMedia, JWTSubject
 
     public function scopeActive($query)
     {
-        return $query->where('account_status', 'active');
+        return $query->where(function ($builder) {
+            $builder->where('account_status', 'active')
+                ->orWhere('status', UserStatus::Active);
+        });
     }
 
     public function scopeSuspended($query)
@@ -191,7 +194,7 @@ class User extends Authenticatable implements HasMedia, JWTSubject
 
     public function shouldBeSearchable(): bool
     {
-        return $this->account_status === 'active';
+        return $this->account_status === 'active' || $this->status === UserStatus::Active;
     }
 
     protected static function newFactory()

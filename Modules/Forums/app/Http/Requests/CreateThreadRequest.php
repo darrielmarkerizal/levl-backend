@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Modules\Forums\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 use Modules\Enrollments\Models\Enrollment;
 use Modules\Schemes\Models\Course;
 
@@ -13,34 +12,29 @@ class CreateThreadRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        $forumableType = $this->input('forumable_type', Course::class);
-        $forumableSlug = (string) $this->input('forumable_slug', '');
-        $forumableId = $this->resolveForumableId($forumableType, $forumableSlug);
+        $course = $this->route('course');
         $userId = $this->user()->id;
 
-        if (! $forumableId) {
+        if (! $course) {
             return false;
         }
 
-        return match ($forumableType) {
-            Course::class => $this->canAccessCourse($userId, $forumableId),
-            default => false,
-        };
+        return $this->canAccessCourse($userId, $course->id);
     }
 
     public function rules(): array
     {
         return [
-            'forumable_type' => [
+            'title' => 'required|string|min:3|max:255',
+            'content' => [
                 'required',
                 'string',
-                Rule::in([
-                    Course::class,
-                ]),
+                'min:1',
+                'max:5000',
+                function ($attribute, $value, $fail) {
+                    $this->validateMentionedUsernames($value, $fail);
+                },
             ],
-            'forumable_slug' => 'required|string',
-            'title' => 'required|string|min:3|max:255',
-            'content' => 'required|string|min:1|max:5000',
             'attachments' => 'nullable|array|max:5',
             'attachments.*' => 'file|mimes:jpeg,png,jpg,gif,pdf,mp4,webm,ogg,mov,avi|max:51200',
         ];
@@ -66,19 +60,34 @@ class CreateThreadRequest extends FormRequest
         ];
     }
 
-    private function resolveForumableId(string $forumableType, string $forumableSlug): ?int
+    private function validateMentionedUsernames(string $content, $fail): void
     {
-        return match ($forumableType) {
-            Course::class => Course::where('slug', $forumableSlug)->value('id'),
-            default => null,
-        };
+        preg_match_all('/@([a-zA-Z0-9._-]+)/', $content, $matches);
+        
+        if (empty($matches[1])) {
+            return;
+        }
+
+        $mentionedUsernames = array_unique($matches[1]);
+        $existingUsernames = \Modules\Auth\Models\User::whereIn('username', $mentionedUsernames)
+            ->pluck('username')
+            ->toArray();
+
+        $invalidUsernames = array_diff($mentionedUsernames, $existingUsernames);
+
+        if (!empty($invalidUsernames)) {
+            $fail(__('validation.mentioned_users_not_found', [
+                'usernames' => implode(', ', array_map(fn($u) => "@{$u}", $invalidUsernames))
+            ]));
+        }
     }
+
 
     private function canAccessCourse(int $userId, int $courseId): bool
     {
-        if ($this->user()->hasRole(['admin', 'instructor'])) {
+        if ($this->user()->hasRole(['Admin', 'Superadmin', 'Instructor'])) {
             $course = Course::find($courseId);
-            if ($this->user()->hasRole('instructor') && $course->instructor_id !== $userId) {
+            if ($this->user()->hasRole('Instructor') && $course->instructor_id !== $userId) {
                 return Enrollment::where('user_id', $userId)->where('course_id', $courseId)->exists();
             }
 

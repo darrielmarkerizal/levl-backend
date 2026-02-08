@@ -19,19 +19,47 @@ Dokumentasi ini menjelaskan endpoint API untuk modul Forum.
 
 ## Overview
 
-### Forum Types (Polymorphic)
+### Forum Structure
 
-Forum dapat dibuat di berbagai level:
-
-| Type | `forumable_type` | Deskripsi |
-| :--- | :--- | :--- |
-| **Course** | `Modules\\Schemes\\Models\\Course` | Forum diskusi level course |
-| **PENTING** | - | Saat ini forum hanya mendukung tipe `Course`. Tipe lain seperti Unit, Lesson, dan Assignment tidak didukung. |
+Forum threads are exclusively attached to courses. Each course has its own forum where students and instructors can discuss course-related topics.
 
 ### User Mentions / Tagging
 Anda dapat men-tag user lain di dalam konten thread maupun reply dengan menggunakan format `@username`.
 - Sistem akan otomatis mendeteksi username yang valid dan menyimpan data mention.
 - Ini berguna untuk menarik perhatian user tertentu atau memberi referensi.
+
+### Search Username (Mention)
+Gunakan endpoint berikut untuk pencarian username (mention) dengan scope course yang sama.
+
+**Endpoint:** `GET /api/v1/courses/{course_slug}/users/mentions`
+
+**Query Parameters:**
+| Parameter | Tipe | Wajib | Deskripsi | Default |
+| :--- | :--- | :--- | :--- | :--- |
+| `search` | string | Ya | Keyword pencarian (username/nama) | - |
+| `limit` | integer | Tidak | Batas hasil (1-20) | `10` |
+
+**Contoh Request:**
+```http
+GET /api/v1/courses/web-development-course/users/mentions?search=jan&limit=10
+Authorization: Bearer {token}
+```
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Success",
+  "data": [
+    {
+      "id": 10,
+      "name": "Jane Smith",
+      "username": "jane.smith",
+      "avatar_url": "https://example.com/avatar.jpg"
+    }
+  ]
+}
+```
 
 ### Authentication
 Semua endpoint membutuhkan:
@@ -260,17 +288,36 @@ Menampilkan daftar diskusi dengan fitur pencarian, filter, dan pagination.
 **Query Parameters:**
 | Parameter | Tipe | Wajib | Allowed Values | Deskripsi | Default |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| `forumable_type` | string | Tidak | `Modules\\Schemes\\Models\\Course` | Tipe forum | `Modules\\Schemes\\Models\\Course` |
-| `forumable_slug` | string | Tidak | Valid slug format | Slug resource (course/unit/lesson/assignment) | Course slug dari URL |
 | `page` | integer | Tidak | >= 1 | Halaman pagination | `1` |
 | `per_page` | integer | Tidak | 1-100 | Jumlah item per halaman | `20` |
-| `sort` | string | Tidak | `id`, `-id`, `created_at`, `-created_at`, `last_activity_at`, `-last_activity_at`, `views_count`, `-views_count`, `replies_count`, `-replies_count` | Sort field (gunakan `-` untuk descending) | `-last_activity_at` |
+| `include` | string | Tidak | `author`, `course`, `media`, `replies`, `replies.author`, `replies.media` | Comma-separated relationships to include | - |
+| `sort` | string | Tidak | `created_at`, `-created_at`, `updated_at`, `-updated_at`, `views_count`, `-views_count`, `replies_count`, `-replies_count` | Sort field (gunakan `-` untuk descending) | `-created_at` |
 | `search` | string | Tidak | Any string | Kata kunci pencarian judul/konten (via Meilisearch) | - |
 | `filter[author_id]`| integer | Tidak | Valid user ID | Filter berdasarkan ID pembuat thread | - |
 | `filter[pinned]` | boolean | Tidak | `1` atau `0` atau `true` atau `false` | Filter thread yang disematkan | - |
 | `filter[resolved]` | boolean | Tidak | `1` atau `0` atau `true` atau `false` | Filter thread yang sudah selesai | - |
 | `filter[closed]` | boolean | Tidak | `1` atau `0` atau `true` atau `false` | Filter thread yang ditutup | - |
 | `filter[is_mentioned]` | boolean | Tidak | `1`, `0`, `true`, `false` | Filter thread dimana user di-tag | - |
+
+**Available Includes:**
+- `author` - Include thread author information
+- `course` - Include course information
+- `media` - Include thread attachments
+- `replies` - Include top-level replies
+- `replies.author` - Include reply authors (requires `replies`)
+- `replies.media` - Include reply attachments (requires `replies`)
+
+**Examples:**
+```http
+# Include only author
+GET /api/v1/courses/web-development-course/forum/threads?include=author
+
+# Include multiple relationships
+GET /api/v1/courses/web-development-course/forum/threads?include=author,course,media
+
+# Include nested relationships
+GET /api/v1/courses/web-development-course/forum/threads?include=author,replies.author
+```
 
 **Contoh Request (Course Forum):**
 ```http
@@ -296,8 +343,6 @@ Membuat topik diskusi baru dengan opsional file attachment (photo, video, PDF). 
 **Body Fields:**
 | Key | Tipe | Wajib | Allowed Values | Deskripsi |
 | :--- | :--- | :--- | :--- | :--- |
-| `forumable_type` | string | Ya | `Modules\\Schemes\\Models\\Course` | Tipe forum |
-| `forumable_slug` | string | Ya | Valid slug format | Slug resource (course, unit, lesson, atau assignment) |
 | `title` | string | Ya | 3-255 characters | Judul thread (min 3, max 255 karakter) |
 | `content` | string | Ya | 1-5000 characters, no XSS | Isi konten thread (min 1, max 5000 karakter). Gunakan `@username` untuk men-tag user. |
 | `attachments[]` | file | Tidak | jpeg, png, jpg, gif, pdf, mp4, webm, ogg, mov, avi (max 50MB per file) | File attachment (max 5 files, up to 50MB each) |
@@ -305,8 +350,6 @@ Membuat topik diskusi baru dengan opsional file attachment (photo, video, PDF). 
 **Validasi:**
 - Title: `min:3|max:255|required|string`
 - Content: `min:1|max:5000|required|string`
-- Forumable Type: `required|in:...`
-- Forumable Slug: `required|string` (must resolve to valid forumable)
 - Attachments: `nullable|array|max:5` (max 5 files)
 - Each attachment: `file|mimes:jpeg,png,jpg,gif,pdf,mp4,webm,ogg,mov,avi|max:51200` (50MB)
 - No XSS patterns allowed
@@ -316,8 +359,6 @@ Membuat topik diskusi baru dengan opsional file attachment (photo, video, PDF). 
 ```bash
 curl -X POST http://localhost:8000/api/v1/courses/web-development-course/forum/threads \
   -H "Authorization: Bearer {token}" \
-  -F "forumable_type=Modules\\Schemes\\Models\\Course" \
-  -F "forumable_slug=web-development-course" \
   -F "title=Setup Laravel with Docker" \
   -F "content=Bagaimana cara setup Laravel menggunakan Docker?" \
   -F "attachments=@/path/to/image1.jpg" \
@@ -341,9 +382,8 @@ curl -X POST http://localhost:8000/api/v1/courses/web-development-course/forum/t
       "email": "john@example.com",
       "avatar": "https://example.com/avatar.jpg"
     },
-    "forumable_type": "Modules\\Schemes\\Models\\Course",
-    "forumable_slug": "web-development-course",
-    "forumable": {
+    "course_slug": "web-development-course",
+    "course": {
       "slug": "web-development-course",
       "title": "Web Development Course"
     },
@@ -403,6 +443,22 @@ Melihat detail satu thread beserta relasinya (replies, reactions, author info).
 | :--- | :--- | :--- |
 | `thread_id` | integer | ID thread yang ingin dilihat |
 
+**Query Parameters:**
+| Parameter | Tipe | Wajib | Allowed Values | Deskripsi |
+| :--- | :--- | :--- | :--- | :--- |
+| `include` | string | Tidak | `author`, `course`, `media`, `replies`, `replies.author`, `replies.media`, `replies.children`, `replies.children.author`, `replies.children.media` | Comma-separated relationships to include |
+
+**Available Includes:**
+- `author` - Include thread author information
+- `course` - Include course information
+- `media` - Include thread attachments
+- `replies` - Include top-level replies
+- `replies.author` - Include reply authors (requires `replies`)
+- `replies.media` - Include reply attachments (requires `replies`)
+- `replies.children` - Include nested replies (requires `replies`)
+- `replies.children.author` - Include nested reply authors
+- `replies.children.media` - Include nested reply attachments
+
 **Response (200 OK):**
 ```json
 {
@@ -419,7 +475,7 @@ Melihat detail satu thread beserta relasinya (replies, reactions, author info).
       "email": "john@example.com",
       "avatar": "https://example.com/avatar.jpg"
     },
-    "forumable_slug": "web-development-course",
+    "course_slug": "web-development-course",
     "is_pinned": false,
     "is_closed": false,
     "is_resolved": false,
@@ -1106,7 +1162,6 @@ Attachments dapat ditambahkan saat membuat atau memperbarui thread/reply dengan 
 curl -X POST http://localhost:8000/api/v1/courses/web-development-course/forum/threads \
   -H "Authorization: Bearer {token}" \
   -F "forumable_type=Modules\\Schemes\\Models\\Course" \
-  -F "forumable_slug=web-development-course" \
   -F "title=Sharing: Database Design Pattern" \
   -F "content=Database design patterns yang biasa saya gunakan di project" \
   -F "attachments=@database-design.pdf" \
@@ -1117,8 +1172,6 @@ curl -X POST http://localhost:8000/api/v1/courses/web-development-course/forum/t
 
 **Form Data Structure:**
 ```
-forumable_type: "Modules\\Schemes\\Models\\Course"
-forumable_slug: "web-development-course"
 title: "Sharing: Database Design Pattern"
 content: "Database design patterns yang biasa saya gunakan di project"
 attachments[0]: <binary data for database-design.pdf>
@@ -1143,8 +1196,7 @@ attachments[3]: <binary data for tutorial-video.mp4>
       "email": "john@example.com",
       "avatar": "https://example.com/avatar.jpg"
     },
-    "forumable_type": "Modules\\Schemes\\Models\\Course",
-    "forumable_slug": "web-development-course",
+    "course_slug": "web-development-course",
     "is_pinned": false,
     "is_closed": false,
     "is_resolved": false,

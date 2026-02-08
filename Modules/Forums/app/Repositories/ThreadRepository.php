@@ -92,12 +92,11 @@ class ThreadRepository extends BaseRepository
         return $thread;
     }
 
-    public function getThreadsByForumable(string $forumableType, int $forumableId, array $filters = []): LengthAwarePaginator
+    public function getThreadsByCourse(int $courseId, array $filters = []): LengthAwarePaginator
     {
         $query = Thread::query()
             ->withIsMentioned()
-            ->where('forumable_type', $forumableType)
-            ->where('forumable_id', $forumableId)
+            ->where('course_id', $courseId)
             ->with(['author', 'replies']);
 
         return $this->filteredPaginate(
@@ -118,21 +117,19 @@ class ThreadRepository extends BaseRepository
 
     public function getThreadsForScheme(int $schemeId, array $filters = []): LengthAwarePaginator
     {
-        return $this->getThreadsByForumable(\Modules\Schemes\Models\Course::class, $schemeId, $filters);
+        return $this->getThreadsByCourse($schemeId, $filters);
     }
 
-    public function searchThreadsByForumable(string $searchQuery, string $forumableType, int $forumableId, array $filters = []): LengthAwarePaginator
+    public function searchThreadsByCourse(string $searchQuery, int $courseId, array $filters = []): LengthAwarePaginator
     {
         $query = Thread::query()
             ->withIsMentioned()
-            ->where('forumable_type', $forumableType)
-            ->where('forumable_id', $forumableId)
+            ->where('course_id', $courseId)
             ->with(['author', 'replies']);
 
         if (! empty(trim($searchQuery))) {
             $threadIds = Thread::search($searchQuery)
-                ->where('forumable_type', $forumableType)
-                ->where('forumable_id', $forumableId)
+                ->where('course_id', $courseId)
                 ->keys()
                 ->toArray();
 
@@ -170,22 +167,21 @@ class ThreadRepository extends BaseRepository
 
     public function searchThreads(string $searchQuery, int $schemeId, array $filters = []): LengthAwarePaginator
     {
-        return $this->searchThreadsByForumable($searchQuery, \Modules\Schemes\Models\Course::class, $schemeId, $filters);
+        return $this->searchThreadsByCourse($searchQuery, $schemeId, $filters);
     }
 
     public function findWithRelations(int $threadId): ?Thread
     {
         return Thread::withIsMentioned()
-            ->with(['author', 'forumable', 'replies.author', 'replies.children'])
+            ->with(['author', 'course', 'replies.author', 'replies.children'])
             ->find($threadId);
     }
 
-    public function getPinnedThreads(string $forumableType, int $forumableId): Collection
+    public function getPinnedThreads(int $courseId): Collection
     {
         return Thread::query()
             ->withIsMentioned()
-            ->where('forumable_type', $forumableType)
-            ->where('forumable_id', $forumableId)
+            ->where('course_id', $courseId)
             ->pinned()
             ->with(['author'])
             ->orderBy('last_activity_at', 'desc')
@@ -196,7 +192,7 @@ class ThreadRepository extends BaseRepository
     {
         $query = Thread::query()
             ->withIsMentioned()
-            ->with(['author', 'forumable']);
+            ->with(['author', 'course']);
 
         if ($search && ! empty(trim($search))) {
             $ids = Thread::search($search)->keys()->toArray();
@@ -232,13 +228,11 @@ class ThreadRepository extends BaseRepository
 
         $query = Thread::query()
             ->withIsMentioned()
-            ->where('forumable_type', \Modules\Schemes\Models\Course::class)
-            ->whereIn('forumable_id', $courseIds)
-            ->with(['author', 'forumable']);
+            ->whereIn('course_id', $courseIds)
+            ->with(['author', 'course']);
 
         if ($search && ! empty(trim($search))) {
             $ids = Thread::search($search)
-                ->where('forumable_type', \Modules\Schemes\Models\Course::class)
                 ->keys()
                 ->toArray();
 
@@ -270,7 +264,7 @@ class ThreadRepository extends BaseRepository
         $query = Thread::query()
             ->withIsMentioned()
             ->where('author_id', $userId)
-            ->with(['author', 'forumable']);
+            ->with(['author', 'course']);
 
         if ($search && ! empty(trim($search))) {
             $ids = Thread::search($search)
@@ -304,7 +298,7 @@ class ThreadRepository extends BaseRepository
     {
         return Thread::query()
             ->withIsMentioned()
-            ->with(['author', 'forumable'])
+            ->with(['author', 'course'])
             ->orderBy('created_at', 'desc')
             ->limit($limit)
             ->get();
@@ -318,9 +312,8 @@ class ThreadRepository extends BaseRepository
 
         return Thread::query()
             ->withIsMentioned()
-            ->where('forumable_type', \Modules\Schemes\Models\Course::class)
-            ->whereIn('forumable_id', $courseIds)
-            ->with(['author', 'forumable'])
+            ->whereIn('course_id', $courseIds)
+            ->with(['author', 'course'])
             ->orderBy('created_at', 'desc')
             ->limit($limit)
             ->get();
@@ -332,7 +325,7 @@ class ThreadRepository extends BaseRepository
 
         $query = Thread::query()
             ->withIsMentioned()
-            ->with(['author', 'forumable']);
+            ->with(['author', 'course']);
 
         if ($search && ! empty(trim($search))) {
             $ids = Thread::search($search)->keys()->toArray();
@@ -375,13 +368,11 @@ class ThreadRepository extends BaseRepository
 
         $query = Thread::query()
             ->withIsMentioned()
-            ->where('forumable_type', \Modules\Schemes\Models\Course::class)
-            ->whereIn('forumable_id', $courseIds)
-            ->with(['author', 'forumable']);
+            ->whereIn('course_id', $courseIds)
+            ->with(['author', 'course']);
 
         if ($search && ! empty(trim($search))) {
             $ids = Thread::search($search)
-                ->where('forumable_type', \Modules\Schemes\Models\Course::class)
                 ->keys()
                 ->toArray();
 

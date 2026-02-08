@@ -11,7 +11,7 @@ interface ForumServiceInterface
 {
     public function getThreadsForScheme(int $schemeId, array $filters = [], ?string $search = null): LengthAwarePaginator;
 
-    public function createThread(array $data, User $user): Thread;
+    public function createThread(array $data, User $user, int $courseId): Thread;
 
     public function updateThread(Thread $thread, array $data): Thread;
 
@@ -22,6 +22,5 @@ interface ForumServiceInterface
     public function updateReply(Reply $reply, array $data): Reply;
 
     public function deleteReply(Reply $reply, User $user): bool;
-
-    public function resolveForumableId(string $forumableType, string $forumableSlug): ?int;
 }
+

@@ -19,10 +19,10 @@ class ForumSeeder extends Seeder
         $this->command->info('Starting forum seeding...');
 
         $users = User::limit(20)->get();
-        $courses = Course::limit(5)->get();
+        $courses = Course::all();
 
         if ($users->isEmpty() || $courses->isEmpty()) {
-            $this->command->warn('Not enough users or courses. Need at least 20 users and 5 courses.');
+            $this->command->warn('Not enough users or courses. Need at least 20 users and at least 1 course.');
             return;
         }
 
@@ -41,7 +41,6 @@ class ForumSeeder extends Seeder
 
         for ($i = 1; $i <= 10; $i++) {
             $thread = $this->createThread(
-                Course::class,
                 $course->id,
                 $users,
                 "Course Discussion: {$course->title} - Topic $i"
@@ -52,7 +51,7 @@ class ForumSeeder extends Seeder
         }
     }
 
-    private function createThread(string $forumableType, int $forumableId, $users, string $title): Thread
+    private function createThread(int $courseId, $users, string $title): Thread
     {
         $author = $users->random();
         $hasMention = rand(0, 100) < 40;
@@ -60,8 +59,7 @@ class ForumSeeder extends Seeder
         $content = $this->generateThreadContent($mentionedUsers);
 
         $thread = Thread::create([
-            'forumable_type' => $forumableType,
-            'forumable_id' => $forumableId,
+            'course_id' => $courseId,
             'author_id' => $author->id,
             'title' => $title,
             'content' => $content,
