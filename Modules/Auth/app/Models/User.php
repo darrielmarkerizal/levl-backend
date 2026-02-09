@@ -134,11 +134,17 @@ class User extends Authenticatable implements HasMedia, JWTSubject
         return $this->hasMany(\Modules\Learning\Models\Override::class, 'grantor_id');
     }
 
-    public function scopeActive($query)
+    public function scopeActive($query, bool $isActive = true)
     {
+        if ($isActive) {
+            return $query->where(function ($builder) {
+                $builder->where('account_status', 'active')
+                    ->orWhere('status', UserStatus::Active);
+            });
+        }
         return $query->where(function ($builder) {
-            $builder->where('account_status', 'active')
-                ->orWhere('status', UserStatus::Active);
+            $builder->where('account_status', '!=', 'active')
+                ->where('status', '!=', UserStatus::Active);
         });
     }
 

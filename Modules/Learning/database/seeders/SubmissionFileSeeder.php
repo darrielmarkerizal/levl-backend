@@ -5,13 +5,16 @@ namespace Modules\Learning\Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
+use Modules\Learning\Models\SubmissionFile;
+use Illuminate\Support\Facades\Storage;
+
 class SubmissionFileSeeder extends Seeder
 {
     public function run(): void
     {
         DB::connection()->disableQueryLog();
 
-        echo "Seeding submission files...\n";
+        $this->command->info("Seeding submission files with Object Storage uploads...");
 
         $fileUploadAssignmentIds = DB::table('assignment_questions')
             ->where('type', 'file_upload')
@@ -20,65 +23,86 @@ class SubmissionFileSeeder extends Seeder
             ->toArray();
 
         if (empty($fileUploadAssignmentIds)) {
-            echo "⚠️  No assignments with file upload questions found.\n";
+            $this->command->warn("⚠️  No assignments with file upload questions found.");
             return;
         }
 
-        echo "   📁 Found " . count($fileUploadAssignmentIds) . " assignments\n";
+        $this->command->info("   📁 Found " . count($fileUploadAssignmentIds) . " assignments");
 
-        $totalSubmissions = DB::table('submissions')
+        // Get submissions that need files
+        $submissions = DB::table('submissions')
             ->whereIn('assignment_id', $fileUploadAssignmentIds)
-            ->count();
+            ->orderBy('id')
+            ->get(); // We use get() here to iterate easier, assuming not millions suitable for cursor yet for complex logic
 
-        if ($totalSubmissions === 0) {
-            echo "⚠️  No submissions found.\n";
+        if ($submissions->isEmpty()) {
+            $this->command->warn("⚠️  No submissions found.");
             return;
         }
 
-        echo "   📋 Processing $totalSubmissions submissions...\n";
+        $totalSubmissions = $submissions->count();
+        $this->command->info("   📋 Processing $totalSubmissions submissions...");
 
         $fileCount = 0;
         $processed = 0;
-        $filesToInsert = [];
-        $batchSize = 500;
+        $bar = $this->command->getOutput()->createProgressBar($totalSubmissions);
+        $bar->start();
 
-        foreach (DB::table('submissions')
-            ->whereIn('assignment_id', $fileUploadAssignmentIds)
-            ->orderBy('id')
-            ->cursor() as $submission) {
-
-            if (rand(1, 100) > 60) {
+        foreach ($submissions as $submission) {
+            // Randomly decide if this submission has files (simulate some empty or failed ones? nah, lets give most files)
+            // User requested robust seeding, let's say 80% have files
+            if (rand(1, 100) > 80) {
                 $processed++;
+                $bar->advance();
                 continue;
             }
 
-            $numFiles = rand(1, 3);
-            for ($i = 0; $i < $numFiles; $i++) {
-                $filesToInsert[] = [
-                    'submission_id' => $submission->id,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-                $fileCount++;
-            }
+            $numFiles = rand(1, 2); // 1 or 2 files per submission
 
-            if (count($filesToInsert) >= $batchSize) {
-                DB::table('submission_files')->insertOrIgnore($filesToInsert);
-                $filesToInsert = [];
+            for ($i = 0; $i < $numFiles; $i++) {
+                try {
+                    $submissionFile = SubmissionFile::create([
+                        'submission_id' => $submission->id,
+                    ]);
+
+                    // Create a dummy file
+                    $fileName = "submission_{$submission->id}_file_{$i}.txt";
+                    $fileContent = "This is a dummy submission file for Submission ID: {$submission->id}.\nGenerated at: " . now();
+                    
+                    // Use a temporary path
+                    $tempPath = sys_get_temp_dir() . '/' . $fileName;
+                    file_put_contents($tempPath, $fileContent);
+
+                    // Upload to Media Library (Object Storage)
+                    $submissionFile->addMedia($tempPath)
+                        ->usingFileName($fileName)
+                        ->toMediaCollection('file');
+
+                    $fileCount++;
+                    
+                    // Cleanup temp file
+                    if (file_exists($tempPath)) {
+                        unlink($tempPath);
+                    }
+
+                } catch (\Exception $e) {
+                    $this->command->error("\nFailed to upload file for submission {$submission->id}: " . $e->getMessage());
+                }
             }
 
             $processed++;
-            if ($processed % 5000 === 0) {
-                echo "      ✓ $processed/$totalSubmissions ($fileCount files)\n";
-                gc_collect_cycles();
+            $bar->advance();
+            
+            // Clean memory occasionally
+            if ($processed % 100 === 0) {
+                 gc_collect_cycles();
             }
         }
 
-        if (!empty($filesToInsert)) {
-            DB::table('submission_files')->insertOrIgnore($filesToInsert);
-        }
-
-        echo "✅ Created $fileCount submission files\n";
+        $bar->finish();
+        $this->command->newLine();
+        $this->command->info("✅ Created and uploaded $fileCount submission files to Object Storage.");
+        
         DB::connection()->enableQueryLog();
     }
 }

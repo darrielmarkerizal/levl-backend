@@ -61,6 +61,21 @@ class ThreadPolicy
         return $this->isModerator($user, $thread->course_id);
     }
 
+    public function open(User $user, Thread $thread): bool
+    {
+        return $this->isModerator($user, $thread->course_id);
+    }
+
+    public function resolve(User $user, Thread $thread): bool
+    {
+        return $user->id === $thread->author_id || $this->isModerator($user, $thread->course_id);
+    }
+
+    public function unresolve(User $user, Thread $thread): bool
+    {
+        return $user->id === $thread->author_id || $this->isModerator($user, $thread->course_id);
+    }
+
     protected function isModerator(User $user, int $courseId): bool
     {
         if ($user->hasRole(['Admin', 'Superadmin'])) {

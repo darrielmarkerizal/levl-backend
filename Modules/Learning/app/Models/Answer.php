@@ -90,29 +90,45 @@ class Answer extends Model implements HasMedia
         return strip_tags($this->feedback);
     }
 
-        public function scopeGraded($query)
+        public function scopeGraded($query, bool $isGraded = true)
     {
-        return $query->whereNotNull('score');
-    }
-
-        public function scopeUngraded($query)
-    {
+        if ($isGraded) {
+            return $query->whereNotNull('score');
+        }
         return $query->whereNull('score');
     }
 
-        public function scopeAutoGraded($query)
+        public function scopeUngraded($query, bool $isUngraded = true)
     {
-        return $query->where('is_auto_graded', true);
+        if ($isUngraded) {
+            return $query->whereNull('score');
+        }
+        return $query->whereNotNull('score');
     }
 
-        public function scopeManuallyGraded($query)
+        public function scopeAutoGraded($query, bool $isAutoGraded = true)
     {
-        return $query->where('is_auto_graded', false)->whereNotNull('score');
+        return $query->where('is_auto_graded', $isAutoGraded);
     }
 
-        public function scopeWithFeedback($query)
+        public function scopeManuallyGraded($query, bool $isManuallyGraded = true)
     {
-        return $query->whereNotNull('feedback')->where('feedback', '!=', '');
+        if ($isManuallyGraded) {
+            return $query->where('is_auto_graded', false)->whereNotNull('score');
+        }
+        return $query->where(function ($q) {
+            $q->where('is_auto_graded', true)->orWhereNull('score');
+        });
+    }
+
+        public function scopeWithFeedback($query, bool $hasFeedback = true)
+    {
+        if ($hasFeedback) {
+            return $query->whereNotNull('feedback')->where('feedback', '!=', '');
+        }
+        return $query->where(function ($q) {
+            $q->whereNull('feedback')->orWhere('feedback', '');
+        });
     }
 
         public function scopeWithFiles(Builder $query): Builder

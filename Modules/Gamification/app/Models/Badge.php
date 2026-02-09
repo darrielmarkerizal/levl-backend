@@ -89,4 +89,9 @@ class Badge extends Model implements HasMedia
           'type' => $this->type,
       ];
   }
+
+  public function searchableAs(): string
+  {
+      return 'badges_index';
+  }
 }

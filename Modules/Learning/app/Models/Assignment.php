@@ -293,18 +293,27 @@ class Assignment extends Model implements HasMedia
         });
     }
 
-        public function scopePublished($query)
+        public function scopePublished($query, bool $isPublished = true)
     {
-        return $query->where('status', AssignmentStatus::Published);
+        if ($isPublished) {
+            return $query->where('status', AssignmentStatus::Published);
+        }
+        return $query->where('status', '!=', AssignmentStatus::Published);
     }
 
-        public function scopeAvailable($query)
+        public function scopeAvailable($query, bool $isAvailable = true)
     {
-        return $query->published()
-            ->where(function ($q) {
-                $q->whereNull('available_from')
-                    ->orWhere('available_from', '<=', now());
-            });
+        if ($isAvailable) {
+            return $query->published()
+                ->where(function ($q) {
+                    $q->whereNull('available_from')
+                        ->orWhere('available_from', '<=', now());
+                });
+        }
+        return $query->where(function ($q) {
+            $q->where('status', '!=', AssignmentStatus::Published)
+                ->orWhere('available_from', '>', now());
+        });
     }
 
         public function hasValidScope(): bool
@@ -345,5 +354,30 @@ class Assignment extends Model implements HasMedia
         }
 
         return null;
+    }
+
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'description' => $this->description,
+            'type' => $this->type,
+            'submission_type' => $this->submission_type->value,
+            'status' => $this->status->value,
+            'lesson_id' => $this->lesson_id,
+            'assignable_type' => $this->assignable_type,
+            'assignable_id' => $this->assignable_id,
+            'created_by' => $this->created_by,
+            'max_score' => $this->max_score,
+            'available_from' => $this->available_from?->timestamp,
+            'deadline_at' => $this->deadline_at?->timestamp,
+            'created_at' => $this->created_at->timestamp,
+        ];
+    }
+
+    public function searchableAs(): string
+    {
+        return 'assignments_index';
     }
 }

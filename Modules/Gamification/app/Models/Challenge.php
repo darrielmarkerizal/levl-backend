@@ -65,16 +65,23 @@ class Challenge extends Model
         return $query->where('type', 'special');
     }
 
-    public function scopeActive($query)
+    public function scopeActive($query, bool $isActive = true)
     {
-        $now = now();
-
-        return $query->where(function ($q) use ($now) {
-            $q->whereNull('start_at')
-                ->orWhere('start_at', '<=', $now);
-        })->where(function ($q) use ($now) {
-            $q->whereNull('end_at')
-                ->orWhere('end_at', '>=', $now);
+        if ($isActive) {
+            return $query->where(function ($q) {
+                $q->where(function ($subQ) {
+                    $subQ->whereNull('start_at')
+                        ->orWhere('start_at', '<=', now());
+                })
+                ->where(function ($subQ) {
+                    $subQ->whereNull('end_at')
+                        ->orWhere('end_at', '>=', now());
+                });
+            });
+        }
+        return $query->where(function ($q) {
+            $q->where('start_at', '>', now())
+                ->orWhere('end_at', '<', now());
         });
     }
 
@@ -95,5 +102,26 @@ class Challenge extends Model
     public function getCriteriaTargetAttribute(): int
     {
         return $this->criteria['target'] ?? $this->target_count;
+    }
+
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'description' => $this->description,
+            'type' => $this->type->value,
+            'badge_id' => $this->badge_id,
+            'points_reward' => $this->points_reward,
+            'target_count' => $this->target_count,
+            'start_at' => $this->start_at?->timestamp,
+            'end_at' => $this->end_at?->timestamp,
+            'created_at' => $this->created_at->timestamp,
+        ];
+    }
+
+    public function searchableAs(): string
+    {
+        return 'challenges_index';
     }
 }

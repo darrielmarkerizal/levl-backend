@@ -75,9 +75,9 @@ class MasterDataItem extends Model
         });
     }
 
-    public function scopeActive($query)
+    public function scopeActive($query, bool $isActive = true)
     {
-        return $query->where('is_active', true);
+        return $query->where('is_active', $isActive);
     }
 
     public function scopeOfType($query, string $type)

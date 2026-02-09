@@ -57,12 +57,15 @@ class Override extends Model
         return ! $this->isActive();
     }
 
-        public function scopeActive($query)
+        public function scopeActive($query, bool $isActive = true)
     {
-        return $query->where(function ($q) {
-            $q->whereNull('expires_at')
-                ->orWhere('expires_at', '>', now());
-        });
+        if ($isActive) {
+            return $query->where(function ($q) {
+                $q->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            });
+        }
+        return $query->where('expires_at', '<=', now());
     }
 
         public function scopeOfType($query, OverrideType $type)

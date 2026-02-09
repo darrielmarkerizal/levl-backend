@@ -109,4 +109,37 @@ class ThreadController extends Controller
 
         return $this->success(new ThreadResource($threadWithIncludes), __('messages.forums.thread_closed'));
     }
+
+    public function open(Request $request, Course $course, Thread $thread): JsonResponse
+    {
+        $this->authorize('open', $thread);
+
+        $openedThread = $this->moderationService->openThread($thread, $request->user());
+
+        $threadWithIncludes = $this->threadReadService->getThreadSummary($openedThread->id);
+
+        return $this->success(new ThreadResource($threadWithIncludes), __('messages.forums.thread_opened'));
+    }
+
+    public function resolve(Request $request, Course $course, Thread $thread): JsonResponse
+    {
+        $this->authorize('resolve', $thread);
+
+        $resolvedThread = $this->moderationService->resolveThread($thread, $request->user());
+
+        $threadWithIncludes = $this->threadReadService->getThreadSummary($resolvedThread->id);
+
+        return $this->success(new ThreadResource($threadWithIncludes), __('messages.forums.thread_resolved'));
+    }
+
+    public function unresolve(Request $request, Course $course, Thread $thread): JsonResponse
+    {
+        $this->authorize('unresolve', $thread);
+
+        $unresolvedThread = $this->moderationService->unresolveThread($thread, $request->user());
+
+        $threadWithIncludes = $this->threadReadService->getThreadSummary($unresolvedThread->id);
+
+        return $this->success(new ThreadResource($threadWithIncludes), __('messages.forums.thread_unresolved'));
+    }
 }

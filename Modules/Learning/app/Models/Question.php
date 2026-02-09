@@ -102,19 +102,31 @@ class Question extends Model implements HasMedia
         return $query->where('type', $type);
     }
 
-        public function scopeAutoGradable($query)
+        public function scopeAutoGradable($query, bool $isAutoGradable = true)
     {
-        return $query->whereIn('type', [
-            QuestionType::MultipleChoice->value,
-            QuestionType::Checkbox->value,
+        if ($isAutoGradable) {
+            return $query->whereIn('type', [
+                QuestionType::MultipleChoice,
+                QuestionType::TrueFalse,
+            ]);
+        }
+        return $query->whereNotIn('type', [
+            QuestionType::MultipleChoice,
+            QuestionType::TrueFalse,
         ]);
     }
 
-        public function scopeManualGrading($query)
+        public function scopeManualGrading($query, bool $requiresManualGrading = true)
     {
-        return $query->whereIn('type', [
-            QuestionType::Essay->value,
-            QuestionType::FileUpload->value,
+        if ($requiresManualGrading) {
+            return $query->whereIn('type', [
+                QuestionType::Essay,
+                QuestionType::FileUpload,
+            ]);
+        }
+        return $query->whereNotIn('type', [
+            QuestionType::Essay,
+            QuestionType::FileUpload,
         ]);
     }
 

@@ -22,16 +22,19 @@ Route::middleware(['auth:api'])->prefix('v1')->group(function () {
             Route::patch('threads/{thread}/pin', [ThreadController::class, 'pin']);
             Route::patch('threads/{thread}/unpin', [ThreadController::class, 'unpin']);
             Route::patch('threads/{thread}/close', [ThreadController::class, 'close']);
+            Route::patch('threads/{thread}/open', [ThreadController::class, 'open']);
+            Route::patch('threads/{thread}/resolve', [ThreadController::class, 'resolve']);
+            Route::patch('threads/{thread}/unresolve', [ThreadController::class, 'unresolve']);
 
-            Route::post('threads/{thread}/replies', [ReplyController::class, 'store']);
             Route::get('threads/{thread}/replies', [ReplyController::class, 'index']);
-            Route::patch('replies/{reply}', [ReplyController::class, 'update']);
-            Route::delete('replies/{reply}', [ReplyController::class, 'destroy']);
+            Route::post('threads/{thread}/replies', [ReplyController::class, 'store']);
+            Route::patch('threads/{thread}/replies/{reply}', [ReplyController::class, 'update']);
+            Route::delete('threads/{thread}/replies/{reply}', [ReplyController::class, 'destroy']);
 
             Route::post('threads/{thread}/reactions', [ReactionController::class, 'storeThreadReaction']);
             Route::delete('threads/{thread}/reactions/{reaction}', [ReactionController::class, 'destroyThreadReaction']);
-            Route::post('replies/{reply}/reactions', [ReactionController::class, 'storeReplyReaction']);
-            Route::delete('replies/{reply}/reactions/{reaction}', [ReactionController::class, 'destroyReplyReaction']);
+            Route::post('threads/{thread}/replies/{reply}/reactions', [ReactionController::class, 'storeReplyReaction']);
+            Route::delete('threads/{thread}/replies/{reply}/reactions/{reaction}', [ReactionController::class, 'destroyReplyReaction']);
 
             Route::get('statistics', [ForumStatisticsController::class, 'index']);
             Route::get('my-statistics', [ForumStatisticsController::class, 'show']);

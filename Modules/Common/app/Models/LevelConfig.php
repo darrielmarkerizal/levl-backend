@@ -32,7 +32,14 @@ class LevelConfig extends Model
             'id' => $this->id,
             'level' => $this->level,
             'name' => $this->name,
-            'xp_required' => $this->xp_required,
+            'description' => $this->description,
+            'min_points' => $this->min_points,
+            'is_active' => $this->is_active,
         ];
+    }
+
+    public function searchableAs(): string
+    {
+        return 'level_configs_index';
     }
 }

@@ -300,6 +300,15 @@ class UserSeederEnhanced extends Seeder
             'updated_at' => now(),
         ]);
 
+        try {
+            $url = "https://api.dicebear.com/9.x/avataaars/png?seed={$user->username}";
+            $user->addMediaFromUrl($url)
+                ->toMediaCollection('avatar');
+        } catch (\Throwable $e) {
+            // Log warning but continue
+            $this->command->warn("Failed to add avatar for {$user->username}: " . $e->getMessage());
+        }
+
         return $user;
     }
 

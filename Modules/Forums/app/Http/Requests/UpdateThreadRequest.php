@@ -20,9 +20,8 @@ class UpdateThreadRequest extends FormRequest
             'content' => [
                 'sometimes',
                 'string',
-                'min:1',
-                'max:5000',
-                'required_unless:title',
+                'max:10000',
+                'required_without:title',
                 function ($attribute, $value, $fail) {
                     if ($value) {
                         $this->validateMentionedUsernames($value, $fail);
@@ -61,7 +60,7 @@ class UpdateThreadRequest extends FormRequest
             'title.max' => __('validation.max.string', ['attribute' => __('validation.attributes.title'), 'max' => 255]),
             'content.min' => __('validation.min.string', ['attribute' => __('validation.attributes.content'), 'min' => 1]),
             'content.max' => __('validation.max.string', ['attribute' => __('validation.attributes.content'), 'max' => 5000]),
-            'content.required_unless' => __('validation.required_unless', ['attribute' => __('validation.attributes.content'), 'other' => __('validation.attributes.title')]),
+            'content.required_without' => __('validation.required_without', ['attribute' => __('validation.attributes.content'), 'values' => __('validation.attributes.title')]),
         ];
     }
 }

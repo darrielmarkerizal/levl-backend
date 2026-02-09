@@ -76,5 +76,19 @@ class ActiveUsersSeeder extends Seeder
         if (! $student->hasRole('Student')) {
             $student->assignRole('Student');
         }
+
+        // Add avatars to all users
+        foreach ([$superadmin, $admin, $instructor, $student] as $user) {
+            try {
+                if (! $user->hasMedia('avatar')) {
+                    $url = "https://api.dicebear.com/9.x/avataaars/png?seed={$user->username}";
+                    $user->addMediaFromUrl($url)
+                        ->toMediaCollection('avatar');
+                }
+            } catch (\Throwable $e) {
+                // Log warning but continue
+                $this->command->warn("Failed to add avatar for {$user->username}: " . $e->getMessage());
+            }
+        }
     }
 }

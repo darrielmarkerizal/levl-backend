@@ -116,9 +116,9 @@ class Grade extends Model
         return $this->score;
     }
 
-    public function scopeDraft($query)
+    public function scopeDraft($query, bool $isDraft = true)
     {
-        return $query->where('is_draft', true);
+        return $query->where('is_draft', $isDraft);
     }
 
     public function scopeFinalized($query)
@@ -163,5 +163,10 @@ class Grade extends Model
             'graded_at' => $this->graded_at?->timestamp,
             'released_at' => $this->released_at?->timestamp,
         ];
+    }
+
+    public function searchableAs(): string
+    {
+        return 'grades_index';
     }
 }

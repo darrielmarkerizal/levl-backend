@@ -102,19 +102,19 @@ class Thread extends Model implements HasMedia
         return $this->scopeForCourse($query, $schemeId);
     }
 
-    public function scopePinned($query)
+    public function scopePinned($query, bool $isPinned = true)
     {
-        return $query->where('is_pinned', true);
+        return $query->where('is_pinned', $isPinned);
     }
 
-    public function scopeResolved($query)
+    public function scopeResolved($query, bool $isResolved = true)
     {
-        return $query->where('is_resolved', true);
+        return $query->where('is_resolved', $isResolved);
     }
 
-    public function scopeClosed($query)
+    public function scopeClosed($query, bool $isClosed = true)
     {
-        return $query->where('is_closed', true);
+        return $query->where('is_closed', $isClosed);
     }
 
     public function scopeOpen($query)
@@ -182,12 +182,9 @@ class Thread extends Model implements HasMedia
         ];
     }
 
-    public function searchableOptions(): array
+    public function searchableAs(): string
     {
-        return [
-            'filterableAttributes' => ['author_id', 'course_id'],
-            'sortableAttributes' => ['created_at'],
-        ];
+        return 'threads_index';
     }
 
     public function registerMediaCollections(): void

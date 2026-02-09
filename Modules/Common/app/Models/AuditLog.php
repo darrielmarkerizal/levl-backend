@@ -305,4 +305,9 @@ class AuditLog extends Model
             'event' => $this->event, // Legacy
         ];
     }
+
+    public function searchableAs(): string
+    {
+        return 'audit_logs_index';
+    }
 }

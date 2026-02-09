@@ -173,6 +173,14 @@ class Course extends Model implements HasMedia
         return $this->getBannerUrlAttribute() ?? '';
     }
 
+    public function scopePublished($query, bool $isPublished = true)
+    {
+        if ($isPublished) {
+            return $query->where('status', 'published');
+        }
+        return $query->where('status', '!=', 'published');
+    }
+
     public function scopeWithMediaUrls($query)
     {
         return $query->addSelect([

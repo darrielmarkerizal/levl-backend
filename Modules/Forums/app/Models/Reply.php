@@ -165,4 +165,9 @@ class Reply extends Model implements HasMedia
             'author_name' => $this->author->name ?? '',
         ];
     }
+
+    public function searchableAs(): string
+    {
+        return 'replies_index';
+    }
 }

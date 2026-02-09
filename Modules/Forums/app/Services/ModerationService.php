@@ -6,6 +6,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Modules\Auth\Models\User;
 use Modules\Forums\Contracts\Services\ModerationServiceInterface;
+use Modules\Forums\Events\ThreadClosed;
+use Modules\Forums\Events\ThreadOpened;
+use Modules\Forums\Events\ThreadResolved;
+use Modules\Forums\Events\ThreadUnresolved;
 use Modules\Forums\Models\Reply;
 use Modules\Forums\Models\Thread;
 use Modules\Forums\Repositories\ReplyRepository;
@@ -49,15 +53,45 @@ class ModerationService implements ModerationServiceInterface
     }
 
      
-    public function closeThread(Thread $thread, User $moderator): Thread
+    public function closeThread(Thread $thread, User $actor): Thread
     {
-        $this->threadRepository->update($thread, ['is_closed' => true]);
+        $thread->is_closed = true;
+        $thread->save();
 
-        $this->logModerationAction('close_thread', $moderator, $thread);
+        event(new ThreadClosed($thread, $actor));
 
         return $thread->fresh();
     }
 
+    public function openThread(Thread $thread, User $actor): Thread
+    {
+        $thread->is_closed = false;
+        $thread->save();
+
+        event(new ThreadOpened($thread, $actor));
+
+        return $thread->fresh();
+    }
+
+    public function resolveThread(Thread $thread, User $actor): Thread
+    {
+        $thread->is_resolved = true;
+        $thread->save();
+
+        event(new ThreadResolved($thread, $actor));
+
+        return $thread->fresh();
+    }
+
+    public function unresolveThread(Thread $thread, User $actor): Thread
+    {
+        $thread->is_resolved = false;
+        $thread->save();
+
+        event(new ThreadUnresolved($thread, $actor));
+
+        return $thread->fresh();
+    }
      
     public function reopenThread(Thread $thread, User $moderator): Thread
     {

@@ -69,5 +69,8 @@ jobs:
             php artisan cache:clear
             php artisan view:cache
             
+            # Sync Meilisearch index settings and import all searchable models
+            php artisan meilisearch:import-all --fresh
+            
             # Restart Octane via systemd
             sudo systemctl restart laravel-octane

@@ -162,6 +162,10 @@ return [
                     'instructor_name',
                     'tags',
                 ],
+                'typoTolerance' => [
+                    'enabled' => true,
+                    'minWordSizeForTypos' => ['oneTypo' => 5, 'twoTypos' => 9],
+                ],
             ],
             'categories_index' => [
                 'filterableAttributes' => [
@@ -176,6 +180,10 @@ return [
                     'value',
                     'description',
                 ],
+                'typoTolerance' => [
+                    'enabled' => true,
+                    'minWordSizeForTypos' => ['oneTypo' => 5, 'twoTypos' => 9],
+                ],
             ],
             'tags_index' => [
                 'filterableAttributes' => [],
@@ -187,6 +195,10 @@ return [
                     'name',
                     'slug',
                     'description',
+                ],
+                'typoTolerance' => [
+                    'enabled' => true,
+                    'minWordSizeForTypos' => ['oneTypo' => 5, 'twoTypos' => 9],
                 ],
             ],
             'users_index' => [
@@ -203,6 +215,10 @@ return [
                     'email',
                     'username',
                 ],
+                'typoTolerance' => [
+                    'enabled' => true,
+                    'minWordSizeForTypos' => ['oneTypo' => 5, 'twoTypos' => 9],
+                ],
             ],
             'units_index' => [
                 'filterableAttributes' => [
@@ -218,6 +234,10 @@ return [
                     'description',
                     'code',
                     'course_title',
+                ],
+                'typoTolerance' => [
+                    'enabled' => true,
+                    'minWordSizeForTypos' => ['oneTypo' => 5, 'twoTypos' => 9],
                 ],
             ],
             'lessons_index' => [
@@ -238,6 +258,10 @@ return [
                     'unit_title',
                     'course_title',
                 ],
+                'typoTolerance' => [
+                    'enabled' => true,
+                    'minWordSizeForTypos' => ['oneTypo' => 5, 'twoTypos' => 9],
+                ],
             ],
             'master_data_index' => [
                 'filterableAttributes' => [
@@ -255,6 +279,10 @@ return [
                     'type',
                     'value',
                     'label',
+                ],
+                'typoTolerance' => [
+                    'enabled' => true,
+                    'minWordSizeForTypos' => ['oneTypo' => 5, 'twoTypos' => 9],
                 ],
             ],
             'submissions_index' => [
@@ -282,6 +310,90 @@ return [
                     'student_email',
                     'assignment_title',
                     'state',
+                ],
+                'typoTolerance' => [
+                    'enabled' => true,
+                    'minWordSizeForTypos' => ['oneTypo' => 5, 'twoTypos' => 9],
+                ],
+            ],
+            'threads_index' => [
+                'filterableAttributes' => ['course_id', 'author_id', 'is_pinned', 'is_closed', 'is_resolved'],
+                'sortableAttributes' => ['created_at', 'last_activity_at', 'views_count', 'replies_count'],
+                'searchableAttributes' => ['title', 'content', 'author_name'],
+                'typoTolerance' => [
+                    'enabled' => true,
+                    'minWordSizeForTypos' => ['oneTypo' => 5, 'twoTypos' => 9],
+                ],
+            ],
+            'replies_index' => [
+                'filterableAttributes' => ['thread_id', 'author_id', 'is_accepted_answer'],
+                'sortableAttributes' => ['created_at'],
+                'searchableAttributes' => ['content', 'author_name'],
+                'typoTolerance' => [
+                    'enabled' => true,
+                    'minWordSizeForTypos' => ['oneTypo' => 5, 'twoTypos' => 9],
+                ],
+            ],
+            'badges_index' => [
+                'filterableAttributes' => ['type', 'is_active'],
+                'sortableAttributes' => ['name', 'points', 'created_at'],
+                'searchableAttributes' => ['name', 'description'],
+                'typoTolerance' => [
+                    'enabled' => true,
+                    'minWordSizeForTypos' => ['oneTypo' => 5, 'twoTypos' => 9],
+                ],
+            ],
+            'challenges_index' => [
+                'filterableAttributes' => ['type', 'badge_id', 'start_at', 'end_at'],
+                'sortableAttributes' => ['title', 'points_reward', 'created_at'],
+                'searchableAttributes' => ['title', 'description'],
+                'typoTolerance' => [
+                    'enabled' => true,
+                    'minWordSizeForTypos' => ['oneTypo' => 5, 'twoTypos' => 9],
+                ],
+            ],
+            'grades_index' => [
+                'filterableAttributes' => ['source_type', 'source_id', 'user_id', 'graded_by', 'status', 'is_override', 'is_draft'],
+                'sortableAttributes' => ['score', 'graded_at', 'released_at'],
+                'searchableAttributes' => ['feedback'],
+                'typoTolerance' => [
+                    'enabled' => true,
+                    'minWordSizeForTypos' => ['oneTypo' => 5, 'twoTypos' => 9],
+                ],
+            ],
+            'assignments_index' => [
+                'filterableAttributes' => ['lesson_id', 'assignable_type', 'assignable_id', 'created_by', 'type', 'submission_type', 'status'],
+                'sortableAttributes' => ['title', 'max_score', 'available_from', 'deadline_at', 'created_at'],
+                'searchableAttributes' => ['title', 'description'],
+                'typoTolerance' => [
+                    'enabled' => true,
+                    'minWordSizeForTypos' => ['oneTypo' => 5, 'twoTypos' => 9],
+                ],
+            ],
+            'questions_index' => [
+                'filterableAttributes' => ['assignment_id', 'type', 'difficulty'],
+                'sortableAttributes' => ['order', 'points'],
+                'searchableAttributes' => ['question_text', 'explanation'],
+                'typoTolerance' => [
+                    'enabled' => true,
+                    'minWordSizeForTypos' => ['oneTypo' => 5, 'twoTypos' => 9],
+                ],
+            ],
+            'audit_logs_index' => [
+                'filterableAttributes' => ['action', 'actor_type', 'actor_id', 'subject_type', 'subject_id', 'user_id'],
+                'sortableAttributes' => ['created_at'],
+                'searchableAttributes' => ['action', 'event'],
+                'typoTolerance' => [
+                    'enabled' => false,
+                ],
+            ],
+            'level_configs_index' => [
+                'filterableAttributes' => ['is_active'],
+                'sortableAttributes' => ['level', 'min_points'],
+                'searchableAttributes' => ['name', 'description'],
+                'typoTolerance' => [
+                    'enabled' => true,
+                    'minWordSizeForTypos' => ['oneTypo' => 5, 'twoTypos' => 9],
                 ],
             ],
         ],

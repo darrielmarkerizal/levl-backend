@@ -256,9 +256,9 @@ class Submission extends Model
         return $query->orderByDesc('score');
     }
 
-        public function scopeLate($query)
+        public function scopeLate($query, bool $isLate = true)
     {
-        return $query->where('is_late', true);
+        return $query->where('is_late', $isLate);
     }
 
         public function scopePendingManualGrading($query)
