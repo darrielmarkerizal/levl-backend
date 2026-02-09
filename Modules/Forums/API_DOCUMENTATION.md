@@ -290,43 +290,48 @@ Menampilkan daftar diskusi dengan fitur pencarian, filter, dan pagination.
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | `page` | integer | Tidak | >= 1 | Halaman pagination | `1` |
 | `per_page` | integer | Tidak | 1-100 | Jumlah item per halaman | `20` |
-| `include` | string | Tidak | `author`, `course`, `media`, `replies`, `replies.author`, `replies.media` | Comma-separated relationships to include | - |
-| `sort` | string | Tidak | `created_at`, `-created_at`, `updated_at`, `-updated_at`, `views_count`, `-views_count`, `replies_count`, `-replies_count` | Sort field (gunakan `-` untuk descending) | `-created_at` |
-| `search` | string | Tidak | Any string | Kata kunci pencarian judul/konten (via Meilisearch) | - |
+| `include` | string | Tidak | `author`, `course`, `media`, `tags`, `replies`, `topLevelReplies`, `topLevelReplies.children` (recursive up to 10 levels), `topLevelReplies.author`, `topLevelReplies.media` | Comma-separated relationships to include. Gunakan `topLevelReplies` untuk struktur nested. | - |
+| `sort` | string | Tidak | `created_at`, `-created_at`, `updated_at`, `-updated_at`, `views_count`, `-views_count`, `replies_count`, `-replies_count`, `last_activity_at`, `-last_activity_at`, `title`, `-title`, `pinned`, `-pinned` | Sort field (gunakan `-` untuk descending) | `-is_pinned, -last_activity_at` |
+| `filter[title]` | string | Tidak | Any string | Filter berdasarkan judul (partial match) | - |
+| `filter[content]` | string | Tidak | Any string | Filter berdasarkan konten (partial match) | - |
 | `filter[author_id]`| integer | Tidak | Valid user ID | Filter berdasarkan ID pembuat thread | - |
-| `filter[pinned]` | boolean | Tidak | `1` atau `0` atau `true` atau `false` | Filter thread yang disematkan | - |
-| `filter[resolved]` | boolean | Tidak | `1` atau `0` atau `true` atau `false` | Filter thread yang sudah selesai | - |
-| `filter[closed]` | boolean | Tidak | `1` atau `0` atau `true` atau `false` | Filter thread yang ditutup | - |
-| `filter[is_mentioned]` | boolean | Tidak | `1`, `0`, `true`, `false` | Filter thread dimana user di-tag | - |
+| `filter[is_pinned]` | boolean | Tidak | `1`, `0` | Filter exact match pinned | - |
+| `filter[pinned]` | boolean | Tidak | `1`, `0`, `true`, `false` | Scope filter pinned threads | - |
+| `filter[closed]` | boolean | Tidak | `1`, `0`, `true`, `false` | Scope filter closed threads | - |
+| `filter[resolved]` | boolean | Tidak | `1`, `0`, `true`, `false` | Scope filter resolved threads | - |
+| `filter[is_mentioned]` | boolean | Tidak | `1`, `0`, `true`, `false` | Scope filter thread dimana user di-tag | - |
 
 **Available Includes:**
 - `author` - Include thread author information
 - `course` - Include course information
 - `media` - Include thread attachments
-- `replies` - Include top-level replies
-- `replies.author` - Include reply authors (requires `replies`)
-- `replies.media` - Include reply attachments (requires `replies`)
+- `tags` - Include thread tags
+- `replies` - Include flat list of replies
+- `topLevelReplies` - Include top-level replies (root of nested structure)
+- `topLevelReplies.children` - Include nested replies (recursive, e.g., `topLevelReplies.children.children`)
+- `topLevelReplies.author` - Include author of top-level replies
+- `topLevelReplies.media` - Include attachments of top-level replies
 
 **Examples:**
 ```http
-# Include only author
-GET /api/v1/courses/web-development-course/forum/threads?include=author
+# Include author and nested replies (2 levels deep)
+GET /api/v1/courses/web-development-course/forum/threads?include=author,topLevelReplies.author,topLevelReplies.children.author
 
-# Include multiple relationships
-GET /api/v1/courses/web-development-course/forum/threads?include=author,course,media
+# Deep nesting (up to 10 levels supported)
+GET /api/v1/courses/web-development-course/forum/threads?include=topLevelReplies.children.children.children.author
 
-# Include nested relationships
-GET /api/v1/courses/web-development-course/forum/threads?include=author,replies.author
+# Filter by pinned and sort by most viewed
+GET /api/v1/courses/web-development-course/forum/threads?filter[pinned]=1&sort=-views_count
 ```
 
 **Contoh Request (Course Forum):**
 ```http
-GET /api/v1/courses/web-development-course/forum/threads?page=1&per_page=20&sort=-created_at
+GET /api/v1/courses/web-development-course/forum/threads?page=1&per_page=20&sort=-is_pinned,-last_activity_at
 ```
 
 **Contoh Request (dengan filter dan search):**
 ```http
-GET /api/v1/courses/web-development-course/forum/threads?search=laravel&filter[pinned]=1&filter[author_id]=10&sort=-replies_count&per_page=10
+GET /api/v1/courses/web-development-course/forum/threads?search=laravel&filter[is_pinned]=1&filter[author_id]=10&sort=-replies_count&per_page=10
 ```
 
 
@@ -446,18 +451,19 @@ Melihat detail satu thread beserta relasinya (replies, reactions, author info).
 **Query Parameters:**
 | Parameter | Tipe | Wajib | Allowed Values | Deskripsi |
 | :--- | :--- | :--- | :--- | :--- |
-| `include` | string | Tidak | `author`, `course`, `media`, `replies`, `replies.author`, `replies.media`, `replies.children`, `replies.children.author`, `replies.children.media` | Comma-separated relationships to include |
+| `include` | string | Tidak | `author`, `course`, `media`, `tags`, `topLevelReplies`, `topLevelReplies.children` (recursive), ... | Comma-separated relationships to include. Use `topLevelReplies.children` (repeated) for deeper levels. |
 
 **Available Includes:**
 - `author` - Include thread author information
 - `course` - Include course information
 - `media` - Include thread attachments
-- `replies` - Include top-level replies
-- `replies.author` - Include reply authors (requires `replies`)
-- `replies.media` - Include reply attachments (requires `replies`)
-- `replies.children` - Include nested replies (requires `replies`)
-- `replies.children.author` - Include nested reply authors
-- `replies.children.media` - Include nested reply attachments
+- `tags` - Include thread tags
+- `topLevelReplies` - Include top-level replies (root)
+- `topLevelReplies.author` - Include author of top-level replies
+- `topLevelReplies.media` - Include attachments of top-level replies
+- `topLevelReplies.children` - Include 2nd level replies
+- `topLevelReplies.children.children` - Include 3rd level replies (and so on, up to 10 levels)
+- `topLevelReplies.children.author` - Include author of 2nd level replies
 
 **Response (200 OK):**
 ```json

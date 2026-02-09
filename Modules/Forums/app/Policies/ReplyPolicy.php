@@ -24,7 +24,7 @@ class ReplyPolicy
      
     public function create(User $user, Thread $thread): bool
     {
-        if ($user->hasRole(['admin', 'superadmin'])) {
+        if ($user->hasRole(['Admin', 'Superadmin'])) {
             return true;
         }
 
@@ -36,7 +36,7 @@ class ReplyPolicy
      
     public function update(User $user, Reply $reply): bool
     {
-        if ($user->hasRole(['admin', 'superadmin'])) {
+        if ($user->hasRole(['Admin', 'Superadmin'])) {
             return true;
         }
 
@@ -59,7 +59,7 @@ class ReplyPolicy
      
     protected function isModerator(User $user, int $schemeId): bool
     {
-        if ($user->hasRole(['admin', 'superadmin'])) {
+        if ($user->hasRole(['Admin', 'Superadmin'])) {
             return true;
         }
 
@@ -74,7 +74,7 @@ class ReplyPolicy
 
     protected function isInstructor(User $user, int $schemeId): bool
     {
-        if ($user->hasRole(['admin', 'superadmin'])) {
+        if ($user->hasRole(['Admin', 'Superadmin'])) {
             return true;
         }
 
