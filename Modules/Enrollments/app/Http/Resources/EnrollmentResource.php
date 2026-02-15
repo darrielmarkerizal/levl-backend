@@ -20,11 +20,15 @@ class EnrollmentResource extends JsonResource
             'updated_at' => $this->updated_at->toISOString(),
 
             'user' => $this->whenLoaded('user', function () {
+                $avatarUrl = null;
+                if (is_object($this->user) && method_exists($this->user, 'getFirstMedia')) {
+                    $avatarUrl = $this->user->getFirstMedia('avatar')?->getUrl();
+                }
                 return [
                     'id' => $this->user->id,
                     'name' => $this->user->name,
                     'email' => $this->user->email,
-                    'avatar_url' => $this->user->avatar_url,
+                    'avatar_url' => $avatarUrl,
                 ];
             }),
 

@@ -1,16 +1,15 @@
 name: CI/CD Pipeline
-
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   validate:
     name: Validate Code
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -18,7 +17,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: "8.4"
           extensions: pdo, pdo_pgsql, pgsql, zip, gd, bcmath, exif, intl
           coverage: none
 
@@ -44,7 +43,7 @@ jobs:
     needs: validate
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -63,14 +62,13 @@ jobs:
             git pull origin main
             composer install --no-dev --optimize-autoloader
             php artisan migrate --force
-            php artisan db:seed --force
             php artisan config:clear
             php artisan route:clear
             php artisan cache:clear
             php artisan view:cache
-            
+
             # Sync Meilisearch index settings and import all searchable models
             php artisan meilisearch:import-all --fresh
-            
+
             # Restart Octane via systemd
             sudo systemctl restart laravel-octane

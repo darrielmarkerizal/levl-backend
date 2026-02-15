@@ -288,13 +288,22 @@ class EnrollmentFinder
     private function buildQuery(QueryBuilder $builder, array $filters, int $perPage, bool $usePrioritySort = true): LengthAwarePaginator
     {
         $perPage = max(1, min($perPage, 100));
-        $searchQuery = data_get($filters, 'search');
+        $searchQuery = trim((string) (data_get($filters, 'search') ?? data_get($filters, 'filter.search') ?? ''));
 
-        if ($searchQuery && trim((string) $searchQuery) !== '') {
-            $builder->search($searchQuery);
+        if ($searchQuery !== '') {
+            $term = "%{$searchQuery}%";
+            $builder->where(function ($query) use ($term) {
+                $query->whereHas('user', function ($q) use ($term) {
+                    $q->where('name', 'ILIKE', $term)
+                        ->orWhere('email', 'ILIKE', $term)
+                        ->orWhere('username', 'ILIKE', $term);
+                })->orWhereHas('course', function ($q) use ($term) {
+                    $q->where('title', 'ILIKE', $term);
+                });
+            });
         }
 
-        $builder->with(['user', 'course'])
+        $builder->with(['user' => fn ($q) => $q->select('id', 'name', 'email')->with('media'), 'course'])
             ->allowedFilters($this->getAllowedFilters())
             ->allowedIncludes(['user', 'course']);
 
@@ -330,13 +339,22 @@ class EnrollmentFinder
     private function buildQueryForIndex(QueryBuilder $builder, array $filters, int $perPage, bool $usePrioritySort = true): LengthAwarePaginator
     {
         $perPage = max(1, min($perPage, 100));
-        $searchQuery = data_get($filters, 'search');
+        $searchQuery = trim((string) (data_get($filters, 'search') ?? data_get($filters, 'filter.search') ?? ''));
 
-        if ($searchQuery && trim((string) $searchQuery) !== '') {
-            $builder->search($searchQuery);
+        if ($searchQuery !== '') {
+            $term = "%{$searchQuery}%";
+            $builder->where(function ($query) use ($term) {
+                $query->whereHas('user', function ($q) use ($term) {
+                    $q->where('name', 'ILIKE', $term)
+                        ->orWhere('email', 'ILIKE', $term)
+                        ->orWhere('username', 'ILIKE', $term);
+                })->orWhereHas('course', function ($q) use ($term) {
+                    $q->where('title', 'ILIKE', $term);
+                });
+            });
         }
 
-        $builder->with(['user:id,name,email', 'course:id,title,slug,code'])
+        $builder->with(['user' => fn ($q) => $q->select('id', 'name', 'email')->with('media'), 'course:id,title,slug,code'])
             ->allowedFilters($this->getAllowedFilters());
 
         $userNameSort = AllowedSort::field('user_name', 'user.name');
